@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 
 
-class DateParser:
+class DateParser(object):
     
     original_text  = ''
     reference_date = datetime.now()
@@ -36,7 +36,6 @@ class DateParser:
         """Countinue parsing the text, stop at the first detected pattern, and extract the information by self.extract(..)
         This function can return both [ParsingResult] or [None] depend on the extaction result"""
         
-        
         match = re.search(self.pattern(),self.parsing_text)
         
         if match is None:
@@ -53,6 +52,7 @@ class DateParser:
                 merged_result = self.merge_overlap_results(result, old_result)
                 
                 if merged_result : result = merged_result 
+            
             
             self.find_time(result)
             self.find_concordance(result)
@@ -82,10 +82,11 @@ class DateParser:
         if ('hour' in result.start) and ( result.end is None or 'hour' not in result.end) :
             return
         
-        SUFFIX_PATTERN = '\s*(at)?\s*([0-9]{1,2})((\.|\:|\：)([0-9]{1,2})((\.|\:|\：)([0-9]{1,2}))?)?(\s*(AM|PM))?';
+        SUFFIX_PATTERN = '\s*(at|T|on|from)?\s*([0-9]{1,2})((\.|\:|\：)([0-9]{1,2})((\.|\:|\：)([0-9]{1,2}))?)?(\s*(AM|PM))?';
         TO_SUFFIX_PATTERN = '\s*(\-|\~|\〜|to)?\s*([0-9]{1,2})((\.|\:|\：)([0-9]{1,2})((\.|\:|\：)([0-9]{1,2}))?)?(\s*(AM|PM))?';
         
-        if len(self.original_text) <= result.index + len(result.text) :
+        
+        if len(self.original_text) < result.index + len(result.text) :
             return;
         
         text  = self.original_text[ result.index + len(result.text) :]
@@ -115,7 +116,48 @@ class DateParser:
             result.start['minute'] = minute
             result.start['second'] = second
         
+        text = text[len(match.group(0)):]
+        match2 = re.match(TO_SUFFIX_PATTERN, text)
         
+        if match2 is None:
+            
+            if result.end and 'hour' not in result.end :
+                result.end['hour'] = hour
+                result.end['minute'] = minute
+                result.end['second'] = second
+            
+            return
+        
+        minute = 0
+        second = 0
+        hour   = int(match2.group(2))
+        
+        if match2.group(10) : # AM & PM
+            if hour > 12 : return
+            if match2.group(10).lower() == "pm" : hour += 12
+            
+            if match.group(10) is None :
+                if result.start['hour'] <= 12 : 
+                    if match2.group(10).lower() == "pm" :
+                        result.start['hour'] = result.start['hour'] + 12
+        
+        if match2.group(5): # minute
+            minute = int(match2.group(5))
+            if minute >= 60: return
+        
+        if match2.group(8): # second
+            second = int(match2.group(8))
+            if second >= 60: return
+        
+        result.text = result.text + match2.group(0)
+        
+        if result.end is None:
+            result.end = result.start.copy()
+        
+        result.end['hour'] = hour
+        result.end['minute'] = minute
+        result.end['second'] = second
+            
     
     def find_concordance(self, result):
         """Find missing 'concordance' part of giving ParsingResult"""
@@ -184,8 +226,8 @@ class ParsingResult:
         month   = components['month']
         day     = components['day']
         hour    = components.get('hour', 12)
-        minute  = components.get('munute',  0)
-        second  = components.get('munute',  0)
+        minute  = components.get('minute',  0)
+        second  = components.get('second',  0)
         
         return datetime(year,month,day,hour,minute,second)
     

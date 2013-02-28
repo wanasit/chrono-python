@@ -101,8 +101,64 @@ class TestBesicOperations(unittest.TestCase):
         
         parser.parse_all()
         self.assertEqual(parser.parsing_finished, True)
-    
-    
+        
+        
+        results = []
+        result1 = ParsingResult(index=0,text='aaa')
+        result2 = ParsingResult(index=4,text='aaa')
+        result3 = ParsingResult(index=7,text='aaa')
+        results = IntegratedDateParser.insert_result(results, result1)
+        results = IntegratedDateParser.insert_result(results, result2)
+        results = IntegratedDateParser.insert_result(results, result3)
+        self.assertEqual(results, [result1,result2,result3])
+        
+        results = []
+        result1 = ParsingResult(index=0,text='aaa')
+        result2 = ParsingResult(index=4,text='aaa')
+        result3 = ParsingResult(index=6,text='aaaa')
+        results = IntegratedDateParser.insert_result(results, result1)
+        results = IntegratedDateParser.insert_result(results, result2)
+        results = IntegratedDateParser.insert_result(results, result3)
+        self.assertEqual(results, [result1,result3])
+        
+        results = []
+        result1 = ParsingResult(index=0,text='aaa')
+        result2 = ParsingResult(index=4,text='aaa')
+        result3 = ParsingResult(index=6,text='aa')
+        results = IntegratedDateParser.insert_result(results, result1)
+        results = IntegratedDateParser.insert_result(results, result2)
+        results = IntegratedDateParser.insert_result(results, result3)
+        self.assertEqual(results, [result1,result2])
+        
+        results = []
+        result1 = ParsingResult(index=0,text='aaa')
+        result2 = ParsingResult(index=4,text='aaa')
+        result3 = ParsingResult(index=3,text='aa')
+        results = IntegratedDateParser.insert_result(results, result1)
+        results = IntegratedDateParser.insert_result(results, result2)
+        results = IntegratedDateParser.insert_result(results, result3)
+        self.assertEqual(results, [result1,result2])
+        
+        results = []
+        result1 = ParsingResult(index=0,text='aaa')
+        result2 = ParsingResult(index=4,text='aaa')
+        result3 = ParsingResult(index=2,text='aaaa')
+        results = IntegratedDateParser.insert_result(results, result1)
+        results = IntegratedDateParser.insert_result(results, result2)
+        results = IntegratedDateParser.insert_result(results, result3)
+        self.assertEqual(results, [result3])
+        
+        
+        
+        results = []
+        result1 = ParsingResult(index=1,text='aaa')
+        result2 = ParsingResult(index=5,text='aaa')
+        result3 = ParsingResult(index=0,text='aaaaaaaaaaa')
+        results = IntegratedDateParser.insert_result(results, result1)
+        results = IntegratedDateParser.insert_result(results, result2)
+        results = IntegratedDateParser.insert_result(results, result3)
+        self.assertEqual(results, [result3])
+        
     def test_3_exmple_parser(self):
         
         parser = ENDateParserISO('Hello World')
@@ -160,7 +216,7 @@ class TestBesicOperations(unittest.TestCase):
         self.assertEqual(result, None)
         
         results = chrono.parse('Test : 2013-2-27')
-        self.assertGreater(len(results), 0)
+        self.assertEqual(len(results), 1)
         
         result = results[0]
         self.assertEqual(result.index, 7)
@@ -170,6 +226,24 @@ class TestBesicOperations(unittest.TestCase):
         self.assertEqual(result.start['year'], 2013)
         self.assertEqual(result.start_date, datetime(2013, 2, 27, 12))
         
+        results = chrono.parse('Test : 2013-2-27 and 2013-2-28')
+        self.assertEqual(len(results), 2)
+        
+        result = results[0]
+        self.assertEqual(result.index, 7)
+        self.assertEqual(result.text, '2013-2-27')
+        self.assertEqual(result.start['day'], 27)
+        self.assertEqual(result.start['month'], 2)
+        self.assertEqual(result.start['year'], 2013)
+        self.assertEqual(result.start_date, datetime(2013, 2, 27, 12))
+        
+        result = results[1]
+        self.assertEqual(result.index, 21)
+        self.assertEqual(result.text, '2013-2-28')
+        self.assertEqual(result.start['day'], 28)
+        self.assertEqual(result.start['month'], 2)
+        self.assertEqual(result.start['year'], 2013)
+        self.assertEqual(result.start_date, datetime(2013, 2, 28, 12))
         
         pass
     

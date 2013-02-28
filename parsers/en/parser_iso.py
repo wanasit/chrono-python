@@ -10,8 +10,7 @@ from parsers import ParsingResult
 class ENDateParserISO (DateParser):
     
     def pattern(self):
-        return '([0-9]{4})\-([0-9]{1,2})\-([0-9]{1,2})(\W|$)'
-    
+        return '([0-9]{4})\-([0-9]{1,2})\-([0-9]{1,2})(T|\W|$)'
     
     def extract(self, index):
         

@@ -48,7 +48,7 @@ class IntegratedDateParser(DateParser):
         result         = current_parser.parse()
         
         if result :
-            insert_result (self.parsing_results, result);
+            self.parsing_results = IntegratedDateParser.insert_result (self.parsing_results, result)
             
         if current_parser.parsing_finished :
             self.parser_index += 1
@@ -59,7 +59,46 @@ class IntegratedDateParser(DateParser):
     @staticmethod
     def insert_result(results, new_result):
         
-        pass
+        original_results = results[:]
+        
+        #Find the place in the array that this result is belong to
+        # Change to binary search later.
+        index = 0
+        while index < len(results) and results[index].index < new_result.index :
+            index += 1
+        
+        if index < len(results) :
+            
+            #Checking conflict with other results on the RIGHT side
+            overlapped_index = index;
+            while overlapped_index < len(results) and results[overlapped_index].index < (new_result.index + len(new_result.text)) :
+            
+                #Comapare length
+                #If old value is longer, discard the new_result and skip the remaining operation
+                if len(results[overlapped_index].text) >= len(new_result.text) : return original_results
+                overlapped_index += 1;
+            
+            #remove all overlapped results
+            results = results[:index] + results[overlapped_index:]
+        
+        if index-1 >= 0 :
+            
+            #Checking conflict with other results on the LEFT side
+            old_result = results[index-1]
+            
+            if new_result.index < (old_result.index + len(old_result.text)) :
+                
+                #Comapare length
+                # If old value is longer, discard the new_result
+                # Otherwise, discard the old_result
+                if len(old_result.text) >= len(new_result.text) : return original_results
+                else :
+                    results.pop(index-1);
+                    index = index-1
+            
+        results.insert(index, new_result)
+        return results
+        
         
         
     
