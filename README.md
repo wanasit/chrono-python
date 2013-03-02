@@ -1,4 +1,2 @@
-enml-py
-=======
+A natural language date parser. (Python version of chrono.js)
 
-Evernote's ENML library in Python.
