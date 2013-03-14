@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
-
+import sys,os
+sys.path.append(os.path.dirname(__file__))
 from parsers import IntegratedDateParser
-
 
 def parse(text, ref=None, timezone = None):
     
