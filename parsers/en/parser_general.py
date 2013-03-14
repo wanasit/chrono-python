@@ -63,7 +63,7 @@ class ENDateParserGeneral (DateParser):
                 
             #Set the time to midnight
             if 'hour' not in result.start :
-                result.start['day'] = date.date() + 1;
+                result.start['day'] = result.start['day'] + 1;
                 result.start['hour'] = 0
                 result.start['minute'] = 0
                 result.start['second'] = 0

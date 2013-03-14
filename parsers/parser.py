@@ -37,7 +37,7 @@ class DateParser(object):
         This function can return both [ParsingResult] or [None] depend on the extaction result"""
         
         match = re.search(self.pattern(),self.parsing_text)
-        
+
         if match is None:
             self.parsing_finished = True
             return None
@@ -69,8 +69,7 @@ class DateParser(object):
         while not self.parsing_finished:
             self.parse()
         
-    
-    
+
     def extract(self, index):
         """Try extracting date information from the text at given index - return ParsingResult if success, None otherwise"""
         pass

@@ -80,7 +80,6 @@ class TestBesicTimeParsingOperations(unittest.TestCase):
         self.assertEqual(result.start_date, datetime(2013, 2, 27, 21,8))
         
         results = chrono.parse('Test : 2013-2-27 21:08:12 AM')
-        for r in results : print r.text
         self.assertEqual(len(results), 1)
         self.assertNotIn('hour', results[0].start)
         
