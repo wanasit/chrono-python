@@ -60,6 +60,7 @@ class IntegratedDateParser(DateParser):
     def insert_result(results, new_result):
         
         original_results = results[:]
+        results          = results[:]
         
         #Find the place in the array that this result is belong to
         # Change to binary search later.

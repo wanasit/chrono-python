@@ -156,8 +156,7 @@ class DateParser(object):
         result.end['hour'] = hour
         result.end['minute'] = minute
         result.end['second'] = second
-            
-    
+             
     def find_concordance(self, result):
         """Find missing 'concordance' part of giving ParsingResult"""
         pass
@@ -165,8 +164,35 @@ class DateParser(object):
     
     def merge_overlap_results(self, result1, result2):
         """Try merging two overlaping results - return new ParsingResult if success, None otherwise"""
+        if result2.index < result1.index:
+            result1, result2 = result2, result1
+            
+        if result1.end or result2.end : return None
         
-        return None
+        begin = result1.index + len(result1.text)
+        end   = result2.index
+        text_between = self.original_text[begin:end]
+        OVERLAP_PATTERN = '^\s*(to|\-)\s*$'
+        
+        if re.match(OVERLAP_PATTERN, text_between, flags=re.IGNORECASE) is None:
+            return None
+        
+        merged_text = result1.text + text_between + result2.text
+        
+        if result1.start_date < result2.start_date :
+            
+            return ParsingResult(index=result1.index, 
+                                 text=merged_text, 
+                                 start=result1.start, 
+                                 end=result2.start, 
+                                 reference_date=result1.reference_date())
+        else:
+            
+            return ParsingResult(index=result1.index, 
+                                 text=merged_text, 
+                                 start=result2.start, 
+                                 end=result1.start, 
+                                 reference_date=result1.reference_date())
     
 
 class ParsingResult:
@@ -189,6 +215,9 @@ class ParsingResult:
     @property
     def text(self):
         return self._text
+    
+    def reference_date(self):
+        return self._reference_date
     
     @property
     def start(self):

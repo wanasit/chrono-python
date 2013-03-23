@@ -245,6 +245,22 @@ class TestBesicOperations(unittest.TestCase):
         self.assertEqual(result.start['year'], 2013)
         self.assertEqual(result.start_date, datetime(2013, 2, 28, 12))
         
+        
+        results = chrono.parse('Test : 2013-2-27 to 2013-2-28')
+        self.assertEqual(len(results), 1)
+        
+        result = results[0]
+        self.assertEqual(result.index, 7)
+        self.assertEqual(result.text, '2013-2-27 to 2013-2-28')
+        self.assertEqual(result.start['day'], 27)
+        self.assertEqual(result.start['month'], 2)
+        self.assertEqual(result.start['year'], 2013)
+        self.assertEqual(result.start_date, datetime(2013, 2, 27, 12))
+        self.assertEqual(result.end['day'], 28)
+        self.assertEqual(result.end['month'], 2)
+        self.assertEqual(result.end['year'], 2013)
+        self.assertEqual(result.end_date, datetime(2013, 2, 28, 12))
+        
         pass
     
     
