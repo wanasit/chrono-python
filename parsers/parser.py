@@ -36,7 +36,7 @@ class DateParser(object):
         """Countinue parsing the text, stop at the first detected pattern, and extract the information by self.extract(..)
         This function can return both [ParsingResult] or [None] depend on the extaction result"""
         
-        match = re.search(self.pattern(),self.parsing_text)
+        match = re.search(self.pattern(), self.parsing_text, flags=re.IGNORECASE)
 
         if match is None:
             self.parsing_finished = True
@@ -81,8 +81,8 @@ class DateParser(object):
         if ('hour' in result.start) and ( result.end is None or 'hour' not in result.end) :
             return
         
-        SUFFIX_PATTERN = '\s*(at|T|on|from)?\s*([0-9]{1,2})((\.|\:|\：)([0-9]{1,2})((\.|\:|\：)([0-9]{1,2}))?)?(\s*(AM|PM))?';
-        TO_SUFFIX_PATTERN = '\s*(\-|\~|\〜|to)?\s*([0-9]{1,2})((\.|\:|\：)([0-9]{1,2})((\.|\:|\：)([0-9]{1,2}))?)?(\s*(AM|PM))?';
+        SUFFIX_PATTERN = '\s*(at|T|on|from|\()?\s*([0-9]{1,2})((\.|\:|\：)([0-9]{1,2})((\.|\:|\：)([0-9]{1,2}))?)?(\s*(AM|PM))?';
+        TO_SUFFIX_PATTERN = '\s*(\-|\~|\〜|to)?\s*([0-9]{1,2})((\.|\:|\：)([0-9]{1,2})((\.|\:|\：)([0-9]{1,2}))?)?(\s*(AM|PM))?\)?';
         
         
         if len(self.original_text) < result.index + len(result.text) :
@@ -174,10 +174,27 @@ class DateParser(object):
         text_between = self.original_text[begin:end]
         OVERLAP_PATTERN = '^\s*(to|\-)\s*$'
         
+
+        
         if re.match(OVERLAP_PATTERN, text_between, flags=re.IGNORECASE) is None:
             return None
         
         merged_text = result1.text + text_between + result2.text
+        
+        
+        # If there is component implication, use the one with more confidence
+        components_1 = result1.start
+        components_2 = result2.start
+        
+        for component in result1.implied_components:
+            if component not in result2.implied_components:
+                components_1[component] = result2.start[component]
+                
+        for component in result2.implied_components:
+            if component not in result1.implied_components:
+                components_2[component] = result1.start[component]
+        
+        
         
         if result1.start_date < result2.start_date :
             
@@ -198,14 +215,30 @@ class DateParser(object):
 class ParsingResult:
     
 
-    def __init__(self, index=0, text='', start=None, end=None, reference_date=None, concordance=''):
+    def __init__(self, index=0, text='', start=None, end=None, reference_date=None, concordance='', implied_components=[]):
         self._index = index
         self._text  = text
         self._start = start
         self._end   = end
         self._concordance    = concordance
         self._reference_date = reference_date
+        self._implied = set(implied_components)
     
+    @staticmethod
+    def date_for_component(components):
+        
+        year    = components['year']
+        month   = components['month']
+        day     = components['day']
+        hour    = components.get('hour', 12)
+        minute  = components.get('minute',  0)
+        second  = components.get('second',  0)
+        
+        return datetime(year,month,day,hour,minute,second)
+    
+    @property
+    def implied_components(self):
+        return self._implied
     
     @property
     def index(self):
@@ -233,31 +266,15 @@ class ParsingResult:
         if self.start is None:
             return None
         
-        components = self.start
-        year    = components['year']
-        month   = components['month']
-        day     = components['day']
-        hour    = components.get('hour', 12)
-        minute  = components.get('minute',  0)
-        second  = components.get('second',  0)
-        
-        return datetime(year,month,day,hour,minute,second)
+        return ParsingResult.date_for_component(self.start)
     
     @property
     def end_date(self):
         
         if self.end is None:
             return None
-        
-        components = self.end
-        year    = components['year']
-        month   = components['month']
-        day     = components['day']
-        hour    = components.get('hour', 12)
-        minute  = components.get('minute',  0)
-        second  = components.get('second',  0)
-        
-        return datetime(year,month,day,hour,minute,second)
+
+        return ParsingResult.date_for_component(self.end)
     
     @property
     def concordance(self):
