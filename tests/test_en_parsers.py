@@ -197,6 +197,55 @@ class TestEnglishParser(unittest.TestCase):
         self.assertEqual(result.end_date, datetime(2014, 3, 2, 12))
     
     def test_4_middle_endian(self):
-        pass
-    
+        
+        results = chrono.parse('Test : March 24, 2013')
+        self.assertEqual(len(results), 1)
+        
+        result = results[0]
+        self.assertEqual(result.index, 7)
+        self.assertEqual(result.text, 'March 24, 2013')
+        self.assertEqual(result.start['day'], 24)
+        self.assertEqual(result.start['month'], 3)
+        self.assertEqual(result.start['year'], 2013)
+        self.assertEqual(result.start_date, datetime(2013, 3, 24, 12))
+        
+        results = chrono.parse('Test : mar 24 2013')
+        self.assertEqual(len(results), 1)
+        
+        result = results[0]
+        self.assertEqual(result.index, 7)
+        self.assertEqual(result.text, 'mar 24 2013')
+        self.assertEqual(result.start['day'], 24)
+        self.assertEqual(result.start['month'], 3)
+        self.assertEqual(result.start['year'], 2013)
+        self.assertEqual(result.start_date, datetime(2013, 3, 24, 12))
+        
+        
+        results = chrono.parse('Test : March 24, test', datetime(2000,10,1))
+        self.assertEqual(len(results), 1)
+        
+        result = results[0]
+        self.assertEqual(result.index, 7)
+        self.assertEqual(result.text, 'March 24')
+        self.assertEqual(result.start['day'], 24)
+        self.assertEqual(result.start['month'], 3)
+        self.assertEqual(result.start['year'], 2001)
+        self.assertEqual(result.start_date, datetime(2001, 3, 24, 12))
+        
+        results = chrono.parse('Test : Mar 21 to 25, 2013')
+        self.assertEqual(len(results), 1)
+        
+        result = results[0]
+        self.assertEqual(result.index, 7)
+        self.assertEqual(result.text, 'Mar 21 to 25, 2013')
+        self.assertEqual(result.start['day'], 21)
+        self.assertEqual(result.start['month'], 3)
+        self.assertEqual(result.start['year'], 2013)
+        self.assertEqual(result.start_date, datetime(2013, 3, 21, 12))
+        self.assertEqual(result.end['day'], 25)
+        self.assertEqual(result.end['month'], 3)
+        self.assertEqual(result.end['year'], 2013)
+        self.assertEqual(result.end_date, datetime(2013, 3, 25, 12))
+        
+        
     

@@ -81,8 +81,8 @@ class DateParser(object):
         if ('hour' in result.start) and ( result.end is None or 'hour' not in result.end) :
             return
         
-        SUFFIX_PATTERN = '\s*(at|T|on|from|\()?\s*([0-9]{1,2})((\.|\:|\：)([0-9]{1,2})((\.|\:|\：)([0-9]{1,2}))?)?(\s*(AM|PM))?';
-        TO_SUFFIX_PATTERN = '\s*(\-|\~|\〜|to)?\s*([0-9]{1,2})((\.|\:|\：)([0-9]{1,2})((\.|\:|\：)([0-9]{1,2}))?)?(\s*(AM|PM))?\)?';
+        SUFFIX_PATTERN = '\s*(at|T|on|from|\()?\s*([0-9]{1,2})((\.|\:|\Ôºö)([0-9]{1,2})((\.|\:|\Ôºö)([0-9]{1,2}))?)?(\s*(AM|PM))?';
+        TO_SUFFIX_PATTERN = '\s*(\-|\~|\„Äú|to)?\s*([0-9]{1,2})((\.|\:|\Ôºö)([0-9]{1,2})((\.|\:|\Ôºö)([0-9]{1,2}))?)?(\s*(AM|PM))?\)?';
         
         
         if len(self.original_text) < result.index + len(result.text) :
