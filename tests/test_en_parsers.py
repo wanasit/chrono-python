@@ -12,6 +12,17 @@ class TestEnglishParser(unittest.TestCase):
     
     def test_1_general_parsing(self):
         
+        results = chrono.parse('Test : today', datetime(2012,3,22))
+        self.assertEqual(len(results), 1)
+        
+        result = results[0]
+        self.assertEqual(result.index, 7)
+        self.assertEqual(result.text, 'today')
+        self.assertEqual(result.start['day'], 22)
+        self.assertEqual(result.start['month'], 3)
+        self.assertEqual(result.start['year'], 2012)
+        self.assertEqual(result.start_date, datetime(2012, 3, 22, 12))
+        
         pass
     
     

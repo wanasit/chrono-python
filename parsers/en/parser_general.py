@@ -20,7 +20,7 @@ class ENDateParserGeneral (DateParser):
         match = re.match(self.pattern(), self.original_text[index:])
         if match is None : return None
         
-        text = match.group(0)[: len(match.group(0)) - len(match.group(7)) ]
+        text = match.group(0)[: len(match.group(0)) - len(match.group(4)) ]
         
         date = None
         lowercase_text = text.lower()

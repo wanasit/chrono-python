@@ -159,8 +159,24 @@ class DateParser(object):
              
     def find_concordance(self, result):
         """Find missing 'concordance' part of giving ParsingResult"""
-        pass
-    
+        CONCORDANCE_LENGTH = 30
+        pre_text = self.original_text[ : result.index]
+        pre_text = re.sub('(\r\n|\n|\r)', ' ', pre_text)
+        pre_text = re.sub("\s+", ' ', pre_text)
+        
+        if len(pre_text) > CONCORDANCE_LENGTH:
+            pre_text = pre_text[len(pre_text)-CONCORDANCE_LENGTH +3 : ]
+            pre_text = '...' + pre_text
+        
+        pos_text = self.original_text[result.index + len(result.text): ]
+        pos_text = re.sub('(\r\n|\n|\r)', ' ', pos_text)
+        pos_text = re.sub("\s+", ' ', pos_text)
+        
+        if len(pos_text) > CONCORDANCE_LENGTH:
+            pos_text = pos_text[: CONCORDANCE_LENGTH-3]
+            pos_text = pos_text +'...'
+        
+        result.concordance = pre_text + result.text + pos_text
     
     def merge_overlap_results(self, result1, result2):
         """Try merging two overlaping results - return new ParsingResult if success, None otherwise"""
