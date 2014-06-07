@@ -7,6 +7,7 @@ setup(
     author='Wanasit Tanakitrungruang',
     license='LICENSE.txt',
     packages=['chrono'],
+    package_data = {'chrono': ['parsers/*']},
     url='https://github.com/wanasit/chrono-python',
     download_url='https://github.com/wanasit/chrono-python/tarball/0.0.1',
     keywords = ['parser', 'time', 'date', 'natural'],
