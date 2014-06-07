@@ -5,8 +5,8 @@ import re
 from datetime import datetime
 
 
-from parsed_result import ParsedResult
-from parsed_result import ParsedComponent
+from ..parsed_result import ParsedResult
+from ..parsed_result import ParsedComponent
 
 class Parser(object):
 
