@@ -6,8 +6,6 @@ import options
 from parsed_result import ParsedResult
 from parsed_result import ParsedComponent
 
-from parsers.parser import Parser
-
 class Chrono:
 
     def __init__(self, options):
