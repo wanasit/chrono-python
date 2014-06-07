@@ -19,7 +19,7 @@ class Chrono:
         results = []
         for parser in self.parsers:
             results += parser.execute(text, ref_date, options)
-
+        
         return results
 
 shared_instance = Chrono( options.standard_options() )

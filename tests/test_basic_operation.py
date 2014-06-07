@@ -5,9 +5,7 @@ import chrono
 
 from chrono import Parser
 from chrono import ParsedResult
-
 from chrono import options
-
 from datetime import datetime
 
 
@@ -17,13 +15,13 @@ class TestBesicOperations(unittest.TestCase):
         pass
 
 
-    def test_1_plain_parser(self):
+    def test_basic_0_plain_parser(self):
 
         parser = Parser()
         results = parser.execute('Hello World', datetime.now(), {})
         self.assertEqual(results, [])
 
-    def test_2_exmple_parser(self):
+    def test_basic_1_exmple_parser(self):
 
         parser = options.ENInternationalStandardParser()
         results = parser.execute('Hello World', datetime.now(), {})
@@ -37,7 +35,7 @@ class TestBesicOperations(unittest.TestCase):
         self.assertEqual(result.index, 7)
         self.assertEqual(result.text, '2013-2-27')
 
-    def test_4_chorono_functions(self):
+    def test_basic_2_chorono_functions(self):
 
         results = chrono.parse('Hello World')
         self.assertEqual(len(results), 0)

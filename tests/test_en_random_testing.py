@@ -10,7 +10,7 @@ class TestRandom(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_1_random_parsing(self):
+    def test_en_random_parsing_1(self):
 
         results = chrono.parse("""A Wiki is a website which is editable over the web by it's users.
         This allows information to be more rapidly updated than traditional websites.
