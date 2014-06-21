@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
+from datetime import datetime
+
 import options
 
 from parsed_result import ParsedResult
@@ -10,14 +12,28 @@ class Chrono:
 
     def __init__(self, options):
         self.options = options
-        self.parsers = [parser_cls() for parser_cls in options.parser_classes]
+        self.parsers  = options.parsers[:]
+        self.refiners = options.refiners[:] 
 
     def parse(self, text, ref_date, options):
 
+        if ref_date is None: ref_date = datetime.now()
+
         results = []
         for parser in self.parsers:
-            results += parser.execute(text, ref_date, options)
+            sub_results = parser.execute(text, ref_date, options)
+            sub_results = self.refine_results(sub_results, text, options)
+            results += sub_results
         
+        results = sorted(results, key=lambda x: x.index )
+        results = self.refine_results(results, text, options)
+        return results
+
+    def refine_results(self, results, text, options):
+
+        for refiner in self.refiners:
+            results = refiner.refine(results, text, options)
+
         return results
 
 shared_instance = Chrono( options.standard_options() )

@@ -10,6 +10,5 @@ class Filter (Refiner):
     def verify(self, result):
         return True
     
-    @overrides(Refiner)
     def refine(self, results, text, options):
-        return [r in results if self.verify(r)]
+        return [r for r in results if self.verify(r)]

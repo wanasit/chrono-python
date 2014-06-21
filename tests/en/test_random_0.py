@@ -5,7 +5,7 @@ import chrono
 
 from datetime import datetime
 
-class TestRandom(unittest.TestCase):
+class RandomTest1(unittest.TestCase):
 
     def setUp(self):
         pass
