@@ -49,4 +49,4 @@ def parse_date(text, ref_date=None, timezone = None):
     results = shared_instance.parse(text, ref_date, options)
 
     if len(results) == 0 : return None
-    return results[0].start_date
+    return results[0].start.date()
