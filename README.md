@@ -24,4 +24,11 @@ Just pass a string to function `parse` or `parse_date`.
 ```python
 import chrono
 
+chrono.parse('12 June')
+# return an array of ParsedResult
+# [<ParsedResult "12 June" : 2014-06-12 12:00:00 >] 
+
+chrono.parse_date('12 June')
+# return Python standard datetime.datetime
+# datetime.datetime(2014, 6, 12, 12, 0)
 ```
