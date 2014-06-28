@@ -1,9 +1,9 @@
 Chrono
 ======
 
-A natural language date parser. Chrono extracts date informations from any given text using low-level pattern matching. Thus, it's fast and doesn't has any dependency. 
+A natural language date parser. 
 
-Chrono supports a number of date and time formats, including :
+Chrono extracts date expression using low-level pattern matching. Thus, it's fast and doesn't has any dependency. Currenly, the supported formats include:
 
 * 2014-12-13 12:00:00
 * 10/13/2013
@@ -25,10 +25,10 @@ Just pass a string to function `parse` or `parse_date`.
 import chrono
 
 chrono.parse('12 June')
-# return an array of ParsedResult
+# return an array of [chrono.ParsedResult]
 # [<ParsedResult "12 June" : 2014-06-12 12:00:00 >] 
 
 chrono.parse_date('12 June')
-# return Python standard datetime.datetime
+# return a Python's standard datetime.datetime
 # datetime.datetime(2014, 6, 12, 12, 0)
 ```
