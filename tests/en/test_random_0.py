@@ -20,3 +20,12 @@ class RandomTest1(unittest.TestCase):
         as well as overall Foundation-level information, at the bottom of this page.""")
 
         self.assertEqual(len(results), 0)
+
+
+    def test_en_random_parsing_1(self):
+
+        results = chrono.parse("""An event on February 24, 2013, and another event on March 1, 2013""")
+
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0].text, 'February 24, 2013')
+        self.assertEqual(results[1].text, 'March 1, 2013')

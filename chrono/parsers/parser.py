@@ -18,24 +18,24 @@ class Parser(object):
 
 
     def execute(self, text, ref_date, options):
-        
+
         results = []
         pattern = re.compile(self.pattern(), re.IGNORECASE)
 
         offset = 0
-        
-        while len(text[offset:]) > 0:
+
+        while offset < len(text):
 
             result = None
-            match = pattern.search(text[offset:])
+            match = pattern.search(text, offset)
 
-            if match:
-                result = self.extract(text[offset:], ref_date, match, options)
+            if match is None:
+                return results
 
-            if result: 
-                result.index += offset
+            result = self.extract(text, ref_date, match, options)
+            
+            if result:
                 results.append(result)
-                
                 offset += result.index + len(result.text)
             else:
                 offset += 1

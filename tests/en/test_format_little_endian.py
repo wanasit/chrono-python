@@ -58,9 +58,21 @@ class LittleEndianFormatTest(unittest.TestCase):
         self.assertEqual(result.start.date(), datetime(2012, 3, 24, 12))
 
 
+        results = chrono.parse('Test : 24 March, test', datetime(2000,10,1))
+        self.assertEqual(len(results), 1)
+
+        result = results[0]
+        self.assertEqual(result.index, 7)
+        self.assertEqual(result.text, '24 March')
+        self.assertEqual(result.start.get('day'), 24)
+        self.assertEqual(result.start.get('month'), 3)
+        self.assertEqual(result.start.get('year'), 2001)
+        self.assertEqual(result.start.date(), datetime(2001, 3, 24, 12))
+
+
     def test_little_endian_range(self):
 
-        results = chrono.parse('Test : 24 - 25 Mar', datetime(2012,3,22)) 
+        results = chrono.parse('Test : 24 - 25 Mar', datetime(2012,3,22))
         self.assertEqual(len(results), 1)
 
         result = results[0]
@@ -124,4 +136,12 @@ class LittleEndianFormatTest(unittest.TestCase):
         self.assertEqual(result.end.get('year'), 2014)
         self.assertEqual(result.end.date(), datetime(2014, 3, 2, 11))
 
-    
+    def test_little_endian_with_imposible_date(self):
+        results = chrono.parse("32 August")
+        self.assertEquals(len(results), 0)
+
+        results = chrono.parse("32 August 2014");
+        self.assertEquals(len(results), 0);
+
+        results = chrono.parse("29 Feb 2014");
+        self.assertEquals(len(results), 0);

@@ -80,5 +80,6 @@ class SlashFormatTest(unittest.TestCase):
         self.assertEqual(result.end.date(), datetime(2013, 5, 10, 12))
 
     def test_slash_format_impossible(self):
+        
         results = chrono.parse('Impossible 2/29/2013')
         self.assertEqual(len(results), 0)

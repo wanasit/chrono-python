@@ -30,6 +30,8 @@ MONTH_NAMES = {
     "dec": 12
 }
 
+def month_index(month_name):
+    return MONTH_NAMES[month_name.lower()]
 
 def date_exist(year, month, day):
     try:
@@ -37,6 +39,29 @@ def date_exist(year, month, day):
     except ValueError:
         return False
 
+def find_closest_year(ref_date, month, day):
 
-def month_index(month_name):
-    return MONTH_NAMES[month_name.lower()]
+    year = None
+
+    if date_exist(ref_date.year, month, day):
+        year = ref_date.year
+
+    if date_exist(ref_date.year-1, month, day):
+        if year:
+            tdelta1 = datetime.datetime(year, month, day) - ref_date
+            tdelta2 = datetime.datetime(ref_date.year-1, month, day) - ref_date
+            if abs(tdelta2) < abs(tdelta1):
+                year = ref_date.year-1
+        else:
+            year = ref_date.year-1
+
+    if date_exist(ref_date.year+1, month, day):
+        if year:
+            tdelta1 = datetime.datetime(year, month, day) - ref_date
+            tdelta2 = datetime.datetime(ref_date.year+1, month, day) - ref_date
+            if abs(tdelta2) < abs(tdelta1):
+                year = ref_date.year+1
+        else:
+            year = ref_date.year+1
+
+    return year
