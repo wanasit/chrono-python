@@ -20,7 +20,7 @@ class Parser(object):
     def execute(self, text, ref_date, options):
 
         results = []
-        pattern = re.compile(self.pattern(), re.IGNORECASE)
+        pattern = re.compile(self.pattern(), re.IGNORECASE | re.UNICODE)
 
         offset = 0
 

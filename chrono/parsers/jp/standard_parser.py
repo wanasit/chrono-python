@@ -3,7 +3,7 @@
 
 import re
 import util
-
+import unicodedata
 from ..parser import Parser
 from ..parser import ParsedResult
 from ..parser import ParsedComponent
@@ -11,11 +11,12 @@ from ..parser import ParsedComponent
 from datetime import datetime
 from util import date_exist
 from util import find_closest_year
+from util import normalize
 
 class JPStandartDateFormatParser(Parser):
 
     def pattern(self):
-        return '(((平成|昭和)?([0-9０-９]{2,4})年|今年|去年|来年)|[^年]|^)([0-9０-９]{1,2}|今|先|来)月([0-9０-９]{1,2})日\s*(?:\((?:日|月|火|水|木|金|土)\))?'
+        return '(((平成|昭和)?([0-9]{2,4}|[０-９]{6,12})年|今年|去年|来年)|[^年]|^)([0-9]{1,2}|[０-９]{3,6}|今|先|来)月([0-9]{1,2}|[０-９]{3,6})日\s*(?:\((?:日|月|火|水|木|金|土)\))?'
 
     def extract(self, text, ref_date, match, options):
 
@@ -23,18 +24,18 @@ class JPStandartDateFormatParser(Parser):
         result.index = match.start()
         result.text  = match.group(0)
 
-        day   = int(match.group(6))
+        day   = int(normalize(match.group(6)))
         month = ref_date.month
         if match.group(5) == '先':
             month -= 1
         elif match.group(5) == '来':
             month += 1
         elif match.group(5) != '今':
-            month = int(match.group(5))
+            month = int(normalize(match.group(5)))
 
         year = None
         if match.group(4):
-            year = int(match.group(4))
+            year = int(normalize(match.group(4)))
 
             if match.group(3) == '平成':
                 year += 1989

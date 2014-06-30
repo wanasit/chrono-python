@@ -8,6 +8,8 @@ from parsers.en import ENMonthNameMiddleEndianParser
 from parsers.en import ENSlashDateFormatParser
 from parsers.en import ENTimeExpressionParser
 
+from parsers.jp import JPStandartDateFormatParser
+
 from refiners.en import ENRemoveOverlapRefiner
 from refiners.en import ENMergeDateTimeRefiner
 from refiners.en import ENMergeDateRangeRefiner
@@ -27,6 +29,7 @@ def standard_options():
     options.parsers.append(ENMonthNameMiddleEndianParser())
     options.parsers.append(ENSlashDateFormatParser())
     options.parsers.append(ENTimeExpressionParser())
+    options.parsers.append(JPStandartDateFormatParser())
 
     options.refiners.append(ENRemoveOverlapRefiner())
     options.refiners.append(ENMergeDateTimeRefiner())

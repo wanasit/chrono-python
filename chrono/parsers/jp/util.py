@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 
 import re
+import unicodedata
 import datetime
 
 MONTH_NAMES = {
@@ -29,6 +30,10 @@ MONTH_NAMES = {
     "december": 12,
     "dec": 12
 }
+
+def normalize(text):
+    return unicodedata.normalize('NFKC', text.decode('utf8'))
+
 
 def month_index(month_name):
     return MONTH_NAMES[month_name.lower()]
