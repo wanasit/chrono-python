@@ -1,12 +1,11 @@
 import unittest
 
-
 import chrono
 
 from datetime import datetime
 
-class MiddleEndianFormatTest(unittest.TestCase):
 
+class MiddleEndianFormatTest(unittest.TestCase):
     def setUp(self):
         pass
 
@@ -34,8 +33,7 @@ class MiddleEndianFormatTest(unittest.TestCase):
         self.assertEqual(result.start.get('year'), 2013)
         self.assertEqual(result.start.date(), datetime(2013, 3, 24, 12))
 
-
-        results = chrono.parse('Test : March 24, test', datetime(2000,10,1))
+        results = chrono.parse('Test : March 24, test', datetime(2000, 10, 1))
         self.assertEqual(len(results), 1)
 
         result = results[0]

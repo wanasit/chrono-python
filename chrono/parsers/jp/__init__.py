@@ -1,1 +1,1 @@
-from standard_parser import JPStandartDateFormatParser
+from .standard_parser import JPStandartDateFormatParser

@@ -6,9 +6,8 @@ from ..refiner import Refiner
 from ..refiner import ParsedResult
 from ..refiner import ParsedComponent
 
+
 class ENMergeDateRangeRefiner(Refiner):
-
-
     def refine(self, results, text, options):
         if len(results) < 2: return results
 
@@ -18,10 +17,11 @@ class ENMergeDateRangeRefiner(Refiner):
         i = 1
 
         while i < len(results):
-            prev_result = results[i-1]
+            prev_result = results[i - 1]
             curr_result = results[i]
 
-            if prev_result.end is None and curr_result.end is None and is_able_to_merge(text, prev_result, curr_result):
+            if prev_result.end is None and curr_result.end is None and is_able_to_merge(
+                    text, prev_result, curr_result):
                 prev_result = merge_result(text, prev_result, curr_result)
                 curr_result = None
                 i += 1
@@ -52,18 +52,19 @@ def merge_result(text, from_result, to_result):
         from_component, to_component = to_component, from_component
 
     result = from_result.copy()
-    result.start = from_component;
-    result.end = to_component;
-
+    result.start = from_component
+    result.end = to_component
 
     begin_index = min(from_result.index, to_result.index)
-    end_index   = max(from_result.index + len(from_result.text), to_result.index + len(to_result.text))
+    end_index = max(from_result.index + len(from_result.text),
+                    to_result.index + len(to_result.text))
     result.index = begin_index
-    result.text  = text[begin_index : end_index]
+    result.text = text[begin_index:end_index]
 
     return result
 
+
 def is_able_to_merge(text, result1, result2):
     pattern = re.compile("^\s*(and|to|-|ー)?\s*$", re.IGNORECASE)
-    text_between = text[result1.index + len(result1.text) : result2.index]
+    text_between = text[result1.index + len(result1.text):result2.index]
     return pattern.match(text_between)

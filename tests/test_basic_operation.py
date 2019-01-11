@@ -10,10 +10,8 @@ from datetime import datetime
 
 
 class TestBesicOperations(unittest.TestCase):
-
     def setUp(self):
         pass
-
 
     def test_basic_0_plain_parser(self):
 
@@ -26,7 +24,6 @@ class TestBesicOperations(unittest.TestCase):
         parser = options.ENInternationalStandardParser()
         results = parser.execute('Hello World', datetime.now(), {})
         self.assertEqual(results, [])
-
 
         results = parser.execute('Test : 2013-2-27', datetime.now(), {})
         self.assertGreater(len(results), 0)

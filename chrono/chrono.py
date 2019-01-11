@@ -3,17 +3,17 @@
 
 from datetime import datetime
 
-import options
+from . import options
 
-from parsed_result import ParsedResult
-from parsed_result import ParsedComponent
+from .parsed_result import ParsedResult
+from .parsed_result import ParsedComponent
+
 
 class Chrono:
-
     def __init__(self, options):
         self.options = options
-        self.parsers  = options.parsers[:]
-        self.refiners = options.refiners[:] 
+        self.parsers = options.parsers[:]
+        self.refiners = options.refiners[:]
 
     def parse(self, text, ref_date, options):
 
@@ -24,8 +24,8 @@ class Chrono:
             sub_results = parser.execute(text, ref_date, options)
             sub_results = self.refine_results(sub_results, text, options)
             results += sub_results
-        
-        results = sorted(results, key=lambda x: x.index )
+
+        results = sorted(results, key=lambda x: x.index)
         results = self.refine_results(results, text, options)
         return results
 
@@ -36,17 +36,18 @@ class Chrono:
 
         return results
 
-shared_instance = Chrono( options.standard_options() )
+
+shared_instance = Chrono(options.standard_options())
 
 
-def parse(text, ref_date=None, options = None):
+def parse(text, ref_date=None, options=None):
     results = shared_instance.parse(text, ref_date, options)
     return results
 
 
-def parse_date(text, ref_date=None, timezone = None):
+def parse_date(text, ref_date=None, timezone=None):
 
     results = shared_instance.parse(text, ref_date, options)
 
-    if len(results) == 0 : return None
+    if len(results) == 0: return None
     return results[0].start.date()

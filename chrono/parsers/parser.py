@@ -4,18 +4,16 @@
 import re
 from datetime import datetime
 
-
 from ..parsed_result import ParsedResult
 from ..parsed_result import ParsedComponent
 
-class Parser(object):
 
+class Parser(object):
     def pattern(self):
         return '$'
 
     def extract(self, text, ref_date, match, options):
         return None
-
 
     def execute(self, text, ref_date, options):
 
@@ -33,7 +31,7 @@ class Parser(object):
                 return results
 
             result = self.extract(text, ref_date, match, options)
-            
+
             if result:
                 results.append(result)
                 offset += result.index + len(result.text)
