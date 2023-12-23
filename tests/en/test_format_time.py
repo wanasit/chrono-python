@@ -1,12 +1,11 @@
 import unittest
 
-
 import chrono
 
 from datetime import datetime
 
-class TimeExpessionTest(unittest.TestCase):
 
+class TimeExpessionTest(unittest.TestCase):
     def setUp(self):
         pass
 

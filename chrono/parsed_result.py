@@ -3,9 +3,15 @@
 
 from datetime import datetime
 
-class ParsedComponent():
 
-    def __init__(self, year=None, month=None, day=None, hour=None, minute=None, second=None):
+class ParsedComponent():
+    def __init__(self,
+                 year=None,
+                 month=None,
+                 day=None,
+                 hour=None,
+                 minute=None,
+                 second=None):
         self.known_values = {}
         self.implied_values = {}
 
@@ -34,7 +40,7 @@ class ParsedComponent():
         return component in self.known_values
 
     def assign(self, component, value):
-        if component in self.implied_values: 
+        if component in self.implied_values:
             del self.implied_values[component]
         self.known_values[component] = value
 
@@ -49,17 +55,17 @@ class ParsedComponent():
 
     def copy(self):
         other = ParsedComponent()
-        other.known_values   = self.known_values.copy()
+        other.known_values = self.known_values.copy()
         other.implied_values = self.implied_values.copy()
         return other
 
-class ParsedResult():
 
+class ParsedResult():
     def __init__(self):
         self.index = 0
         self.text = None
         self.start = None
-        self.end   = None
+        self.end = None
 
     def __repr__(self):
         return self.__str__()
@@ -67,25 +73,21 @@ class ParsedResult():
     def __str__(self):
 
         if self.end is None:
-            return '<ParsedResult "{0}" : {1} >'.format(self.text, self.start.date()) 
-        
-        return '<ParsedResult "{0}" : {1} - {2} >'.format(self.text, self.start.date(), self.end.date()) 
+            return '<ParsedResult "{0}" : {1} >'.format(
+                self.text, self.start.date())
+
+        return '<ParsedResult "{0}" : {1} - {2} >'.format(
+            self.text, self.start.date(), self.end.date())
 
     def copy(self):
         other = ParsedResult()
         other.index = self.index
-        other.text  = self.text
+        other.text = self.text
 
-        if self.start: 
+        if self.start:
             other.start = self.start.copy()
 
-        if self.start: 
+        if self.start:
             other.start = self.start.copy()
 
         return other
-
-
-    
-    
-
-        

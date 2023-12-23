@@ -1,12 +1,11 @@
 import unittest
 
-
 import chrono
 
 from datetime import datetime
 
-class SlashFormatTest(unittest.TestCase):
 
+class SlashFormatTest(unittest.TestCase):
     def setUp(self):
         pass
 
@@ -61,7 +60,6 @@ class SlashFormatTest(unittest.TestCase):
         self.assertEqual(result.start.get('year'), 2013)
         self.assertEqual(result.start.date(), datetime(2013, 2, 27, 12))
 
-
     def test_slash_format_range(self):
         results = chrono.parse(' 5/1/2013 - 5/10/2013')
         self.assertEqual(len(results), 1)
@@ -80,6 +78,6 @@ class SlashFormatTest(unittest.TestCase):
         self.assertEqual(result.end.date(), datetime(2013, 5, 10, 12))
 
     def test_slash_format_impossible(self):
-        
+
         results = chrono.parse('Impossible 2/29/2013')
         self.assertEqual(len(results), 0)

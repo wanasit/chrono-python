@@ -9,12 +9,11 @@ from ..parser import ParsedComponent
 
 from datetime import datetime
 
+FIRST_REG_PATTERN = "((at|from|\W|^|T)\s*)([0-9]{1,2}|noon|midnight)((\.|\:|\：)([0-9]{2})((\.|\:|\：)([0-9]{2}))?)?(\s*(AM|PM))?(\W|$)"
+SECOND_REG_PATTERN = "\s*(\-|\~|\〜|to|\?)\s*([0-9]{1,2})((\.|\:|\：)([0-9]{2})((\.|\:|\：)([0-9]{2}))?)?(\s*(AM|PM))?\)?"
 
-FIRST_REG_PATTERN = "((at|from|\W|^|T)\s*)([0-9]{1,2}|noon|midnight)((\.|\:|\：)([0-9]{2})((\.|\:|\：)([0-9]{2}))?)?(\s*(AM|PM))?(\W|$)";
-SECOND_REG_PATTERN = "\s*(\-|\~|\〜|to|\?)\s*([0-9]{1,2})((\.|\:|\：)([0-9]{2})((\.|\:|\：)([0-9]{2}))?)?(\s*(AM|PM))?\)?";
 
 class ENTimeExpressionParser(Parser):
-
     def pattern(self):
         return FIRST_REG_PATTERN
 
@@ -32,20 +31,20 @@ class ENTimeExpressionParser(Parser):
         meridiem = None
 
         if match.group(3).lower() == "noon":
-            meridiem = 'pm';
-            hour = 12;
+            meridiem = 'pm'
+            hour = 12
         elif match.group(3).lower() == "midnight":
-            meridiem = 'am';
-            hour = 0;
+            meridiem = 'am'
+            hour = 0
         else:
             hour = int(match.group(3))
 
         if match.group(6):
             minute = int(match.group(6))
-            if(minute >= 60): return None
+            if (minute >= 60): return None
         elif hour > 100:
-            minute = hour%100
-            hour   = hour/100
+            minute = hour % 100
+            hour = hour / 100
 
         if match.group(9):
             second = int(match.group(9))
@@ -64,21 +63,20 @@ class ENTimeExpressionParser(Parser):
                 if hour != 12:
                     hour += 12
 
-
         if hour >= 24: return None
         if hour >= 12: meridiem = 'pm'
 
         result.text = match.group(0)
-        result.text = result.text[len(match.groups()[0]):len(result.text) - len(match.groups()[-1])]
+        result.text = result.text[len(match.groups()[0]):len(result.text) -
+                                  len(match.groups()[-1])]
         result.index = match.start() + len(match.group(1))
 
-        result.start.assign('hour', hour);
-        result.start.assign('minute', minute);
-        result.start.assign('second', second);
+        result.start.assign('hour', hour)
+        result.start.assign('minute', minute)
+        result.start.assign('second', second)
 
         if meridiem:
-            result.start.assign('meridiem', meridiem);
-
+            result.start.assign('meridiem', meridiem)
 
         second_pattern = re.compile(SECOND_REG_PATTERN, re.IGNORECASE)
 
@@ -95,25 +93,23 @@ class ENTimeExpressionParser(Parser):
         if match.group(5):
 
             minute = int(match.group(5))
-            if minute >= 60 : return None
+            if minute >= 60: return None
 
         elif hour > 100:
-            minute = hour%100
-            hour   = hour/100
-
+            minute = hour % 100
+            hour = hour / 100
 
         if match.group(8):
             second = int(matcher.group(8))
-            if second >= 60 : return None
-
+            if second >= 60: return None
 
         if match.group(10):
 
-            if hour > 12 : return None
+            if hour > 12: return None
             if match.group(10).lower() == "am":
                 meridiem = 'am'
                 if hour == 12:
-                    hour = 0 #!!!!!
+                    hour = 0  #!!!!!
 
             if match.group(10).lower() == "pm":
                 meridiem = 'pm'
@@ -123,24 +119,24 @@ class ENTimeExpressionParser(Parser):
 
                 if meridiem == 'am':
 
-                    result.start.imply('meridiem', 'am');
+                    result.start.imply('meridiem', 'am')
 
-                    if result.start.get('hour') == 12 :
+                    if result.start.get('hour') == 12:
                         result.start.assign('hour', 0)
-
 
                 if meridiem == 'pm':
 
-                    result.start.imply('meridiem', 'pm');
+                    result.start.imply('meridiem', 'pm')
 
-                    if result.start.get('hour') != 12 :
-                        result.start.assign('hour', result.start.get('hour') + 12)
+                    if result.start.get('hour') != 12:
+                        result.start.assign('hour',
+                                            result.start.get('hour') + 12)
 
         if hour >= 24: return None
         if hour >= 12: meridiem = 'pm'
 
         result.text = result.text + match.group()
-        result.end  = result.start.copy()
+        result.end = result.start.copy()
 
         result.end.assign('hour', hour)
         result.end.assign('minute', minute)

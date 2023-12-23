@@ -1,18 +1,17 @@
 import unittest
 
-
 import chrono
 
 from datetime import datetime
 
-class ISOFormatTest(unittest.TestCase):
 
+class ISOFormatTest(unittest.TestCase):
     def setUp(self):
         pass
 
     def test_iso_format(self):
 
-        results = chrono.parse('Test : 2013-3-22', datetime(2013,3,22))
+        results = chrono.parse('Test : 2013-3-22', datetime(2013, 3, 22))
         self.assertEqual(len(results), 1)
 
         result = results[0]

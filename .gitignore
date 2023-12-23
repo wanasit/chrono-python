@@ -6,3 +6,5 @@ reports/
 *.egg
 *.egg-info
 .pypirc
+env
+.vscode

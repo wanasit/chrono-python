@@ -4,8 +4,7 @@
 from ..parsed_result import ParsedResult
 from ..parsed_result import ParsedComponent
 
-class Refiner(object):
 
-    
+class Refiner(object):
     def refine(self, results, text, options):
         return results
