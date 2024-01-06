@@ -1,2 +1,0 @@
-include README.md LICENSE.txt
-recursive-include chrono/parsers *
