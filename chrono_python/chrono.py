@@ -3,7 +3,7 @@ import datetime
 from abc import abstractmethod, ABC
 
 from chrono_python.result import ParsedResult, ParsedRangeResult, ParsingMoment
-from chrono_python.types import Moment, DateTimeMoment
+from chrono_python.types import Moment, DateTimeMoment, Match
 
 
 class ParsingContext:
@@ -33,7 +33,7 @@ class Parser(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def extract(self, context: ParsingContext, match: re.Match):
+    def extract(self, context: ParsingContext, match: Match) -> ParsedResult | Moment | None:
         raise NotImplementedError()
 
 
@@ -79,13 +79,13 @@ class Chrono:
     def _execute_parser(context: ParsingContext, parser: Parser) -> list[ParsedResult]:
         results: list[ParsedResult] = []
         pattern = parser.pattern()
-
         offset = 0
         while offset < len(context.text):
             match = pattern.search(context.text, offset)
             if match is None:
-                return results
+                break
 
+            match = Match.from_match(match)
             result = parser.extract(context, match)
             if result is None:
                 offset += 1

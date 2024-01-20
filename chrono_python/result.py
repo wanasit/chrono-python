@@ -53,6 +53,9 @@ class ParsingMoment(Moment):
         self._known_values = known_values
         self._implied_values = implied_values if implied_values is not None else {}
 
+    def clone(self) -> 'ParsingMoment':
+        return ParsingMoment(self._reference, self._known_values.copy(), self._implied_values.copy())
+
     def get(self, component: DateTimeComponent) -> int | None:
         if component in self._known_values:
             return self._known_values[component]
