@@ -62,6 +62,35 @@ class DateTimeMoment(Moment):
         return self._precision
 
 
+class ReferenceMoment(Moment):
+
+    def __init__(self, reference: Moment, delta: dict[DateTimeComponent, int]):
+        self._reference = reference
+        self._delta = delta
+
+    def datetime(self) -> datetime.datetime:
+        ref_datetime = self._reference.datetime()
+
+        target_month = ref_datetime.month + self._delta.get(DateTimeComponent.MONTH, 0)
+        adjusted_year = ref_datetime.year + self._delta.get(DateTimeComponent.YEAR, 0) + target_month // 12
+        adjusted_month = target_month % 12
+
+        adjusted_datetime = ref_datetime.replace(
+            year=adjusted_year,
+            month=adjusted_month,
+        )
+        return adjusted_datetime + datetime.timedelta(
+            days=self._delta.get(DateTimeComponent.DAY, 0),
+            hours=self._delta.get(DateTimeComponent.HOUR, 0),
+            minutes=self._delta.get(DateTimeComponent.MINUTE, 0),
+            seconds=self._delta.get(DateTimeComponent.SECOND, 0),
+            milliseconds=self._delta.get(DateTimeComponent.MILLI_SECOND, 0)
+        )
+
+    def precision(self) -> DateTimePrecision:
+        return self._reference.precision()
+
+
 class Match:
     """A class represents the result of a regular expression match.
 

@@ -55,14 +55,16 @@ class Chrono:
         self.parsers = configuration.parsers[:]
         self.refiners = configuration.refiners[:]
 
-    def parse_date(self, text, reference: Moment | None) -> datetime.datetime | None:
+    def parse_date(self, text, reference: Moment | datetime.datetime | None) -> datetime.datetime | None:
         results = self.parse(text, reference)
         if len(results) > 0:
             return results[0].datetime()
         return None
 
-    def parse(self, text, reference: Moment | None) -> list[ParsedResult]:
+    def parse(self, text, reference: Moment | datetime.datetime | None) -> list[ParsedResult]:
         reference = reference if reference is not None else DateTimeMoment.now()
+        reference = DateTimeMoment.of(reference) if isinstance(reference, datetime.datetime) else reference
+
         context = ParsingContext(text, reference)
         results: list[ParsedResult] = []
         for parser in self.parsers:
