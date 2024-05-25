@@ -85,7 +85,7 @@ class Chrono:
             if match is None:
                 break
 
-            match = Match.from_match(match)
+            match = Match.from_re_match(match)
             result = parser.extract(context, match)
             if result is None:
                 offset += 1

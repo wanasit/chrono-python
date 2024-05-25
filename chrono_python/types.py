@@ -28,6 +28,8 @@ class DateTimePrecision(Enum):
 
 
 class Moment(ABC):
+    """An abstract class represents a moment or time at certain precision."""
+
     @abstractmethod
     def datetime(self) -> datetime.datetime:
         raise NotImplementedError()
@@ -38,6 +40,7 @@ class Moment(ABC):
 
 
 class DateTimeMoment(Moment):
+    """A typical implementation of `Moment` based-on `datetime.datetime`."""
 
     def __init__(self, dt: datetime.datetime, precision: DateTimePrecision):
         self._dt = dt
@@ -62,7 +65,7 @@ class DateTimeMoment(Moment):
 class Match:
     """A class represents the result of a regular expression match.
 
-    Chrono uses this class internally instead of directly use the re.Match.
+    Chrono uses this class internally instead of `re.Match` to enable modifying or augmenting the result.
     Each method in this class follow the re.Match's method of the same name.
 
     Ref: https://docs.python.org/3/library/re.html#match-objects
@@ -76,7 +79,7 @@ class Match:
         self._group_name_to_index = group_name_to_index
 
     @staticmethod
-    def from_match(match: re.Match) -> 'Match':
+    def from_re_match(match: re.Match) -> 'Match':
         group_spans = [match.span(i) for i in range(match.re.groups + 1)]
         group_name_to_index = {name: i for name, i in match.re.groupindex.items()}
         return Match(match.string, group_spans, group_name_to_index)

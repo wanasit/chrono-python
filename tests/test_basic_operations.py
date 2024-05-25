@@ -1,9 +1,8 @@
-
 import datetime
 import chrono_python as chrono
 
-def test_parse_function():
 
+def test_parse_function():
     results = chrono.parse('Hello World')
     assert len(results) == 0
 
@@ -13,10 +12,6 @@ def test_parse_function():
     result = results[0]
     assert result.index == 7
     assert result.text == '2013-2-27'
-
-
-
-
 
 #
 #

@@ -26,7 +26,7 @@ class AbstractParserWithWordBoundary(chrono.Parser):
     def has_inner_pattern_change(self) -> bool:
         """Override this method to return True when the inner pattern has changed.
 
-        By default, the class assumes that the inner pattern never change.
+        The default implementation returns `False` and, thus, assumes that the inner pattern never change.
         """
         return False
 
