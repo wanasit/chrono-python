@@ -40,6 +40,15 @@ def test_months_ago_more_than_12():
     assert result[0].moment.datetime() == datetime.datetime(2022, 8, 20, 12, 13)
 
 
+def test_weeks_ago():
+    ref = datetime.datetime(2024, 5, 20, 12, 13)
+    result = chrono.en.strict.parse('1 week ago', reference=ref)
+    assert result[0].moment.datetime() == datetime.datetime(2024, 5, 13, 12, 13)
+
+    result = chrono.en.casual.parse('1w ago', reference=ref)
+    assert result[0].moment.datetime() == datetime.datetime(2024, 5, 13, 12, 13)
+
+
 def test_days_ago():
     ref = datetime.datetime(2024, 5, 20, 12, 13)
     result = chrono.en.parse('12 days ago', reference=ref)

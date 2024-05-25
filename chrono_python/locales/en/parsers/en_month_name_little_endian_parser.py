@@ -2,6 +2,7 @@ import re
 
 from chrono_python import chrono
 from chrono_python.locales.en import constants
+from chrono_python.result import ParsingMoment
 from chrono_python.types import DateTimeComponent, Moment
 from chrono_python.utils import patterns, calendars
 
@@ -26,7 +27,7 @@ class ENMonthNameLittleEndianParser(chrono.Parser):
         if day > 31:
             return None
 
-        moment = chrono.ParsingMoment(context.reference, {})
+        moment = ParsingMoment(context.reference, {})
         moment.assign(DateTimeComponent.DAY, day)
         moment.assign(DateTimeComponent.MONTH, month)
 

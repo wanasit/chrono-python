@@ -2,7 +2,7 @@ import re
 import datetime
 from abc import abstractmethod, ABC
 
-from chrono_python.result import ParsedResult, ParsedRangeResult, ParsingMoment
+from chrono_python.result import ParsedResult, ParsedRangeResult
 from chrono_python.types import Moment, DateTimeMoment, Match
 
 

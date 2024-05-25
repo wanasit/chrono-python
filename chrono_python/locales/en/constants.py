@@ -1,6 +1,6 @@
 import re
 
-from chrono_python.types import DateTimeComponent
+from chrono_python.types import DateTimeUnit
 from chrono_python.utils import patterns
 
 FULL_MONTH_NAME_DICTIONARY = {
@@ -19,37 +19,38 @@ FULL_MONTH_NAME_DICTIONARY = {
 }
 
 FULL_TIME_UNIT_DICTIONARY = {
-    'second': DateTimeComponent.SECOND,
-    'seconds': DateTimeComponent.SECOND,
-    'minute': DateTimeComponent.MINUTE,
-    'minutes': DateTimeComponent.MINUTE,
-    'hour': DateTimeComponent.HOUR,
-    'hours': DateTimeComponent.HOUR,
-    'day': DateTimeComponent.DAY,
-    'days': DateTimeComponent.DAY,
-    'week': DateTimeComponent.WEEKDAY,
-    'month': DateTimeComponent.MONTH,
-    'months': DateTimeComponent.MONTH,
-    'year': DateTimeComponent.YEAR,
-    'years': DateTimeComponent.YEAR
+    'second': DateTimeUnit.SECOND,
+    'seconds': DateTimeUnit.SECOND,
+    'minute': DateTimeUnit.MINUTE,
+    'minutes': DateTimeUnit.MINUTE,
+    'hour': DateTimeUnit.HOUR,
+    'hours': DateTimeUnit.HOUR,
+    'day': DateTimeUnit.DAY,
+    'days': DateTimeUnit.DAY,
+    'week': DateTimeUnit.WEEK,
+    'weeks': DateTimeUnit.WEEK,
+    'month': DateTimeUnit.MONTH,
+    'months': DateTimeUnit.MONTH,
+    'year': DateTimeUnit.YEAR,
+    'years': DateTimeUnit.YEAR
 }
 
 TIME_UNIT_DICTIONARY = {
     **FULL_TIME_UNIT_DICTIONARY,
-    's': DateTimeComponent.SECOND,
-    'sec': DateTimeComponent.SECOND,
-    'm': DateTimeComponent.MINUTE,
-    'min': DateTimeComponent.MINUTE,
-    'mins': DateTimeComponent.MINUTE,
-    'h': DateTimeComponent.HOUR,
-    'hr': DateTimeComponent.HOUR,
-    'hrs': DateTimeComponent.HOUR,
-    'd': DateTimeComponent.DAY,
-    'w': DateTimeComponent.WEEKDAY,
-    'mon': DateTimeComponent.MONTH,
-    'y': DateTimeComponent.YEAR,
-    'yr': DateTimeComponent.YEAR,
-    'yrs': DateTimeComponent.YEAR
+    's': DateTimeUnit.SECOND,
+    'sec': DateTimeUnit.SECOND,
+    'm': DateTimeUnit.MINUTE,
+    'min': DateTimeUnit.MINUTE,
+    'mins': DateTimeUnit.MINUTE,
+    'h': DateTimeUnit.HOUR,
+    'hr': DateTimeUnit.HOUR,
+    'hrs': DateTimeUnit.HOUR,
+    'd': DateTimeUnit.DAY,
+    'w': DateTimeUnit.WEEK,
+    'mon': DateTimeUnit.MONTH,
+    'y': DateTimeUnit.YEAR,
+    'yr': DateTimeUnit.YEAR,
+    'yrs': DateTimeUnit.YEAR
 }
 
 PATTERN_ORDINAL_NUMBER: str = r'[0-9]{1,2}(?:st|nd|rd|th)?'
@@ -84,7 +85,7 @@ def parse_year(match_text: str) -> int:
     return int(year)
 
 
-def parse_time_units(match_text: str) -> dict[DateTimeComponent, int]:
+def parse_time_units(match_text: str) -> dict[DateTimeUnit, int]:
     result = {}
     remaining_text = match_text
     match = PATTERN_SINGLE_TIME_UNIT_COMPILED.search(remaining_text)

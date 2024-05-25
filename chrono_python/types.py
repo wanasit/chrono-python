@@ -16,6 +16,17 @@ class DateTimeComponent(Enum):
     TIMEZONE_OFFSET = 'timezone_offset'
 
 
+class DateTimeUnit(Enum):
+    YEAR = 'year'
+    MONTH = 'month'
+    DAY = 'day'
+    WEEK = 'week'
+    HOUR = 'hour'
+    MINUTE = 'minute'
+    SECOND = 'second'
+    MILLI_SECOND = 'millisecond'
+
+
 class DateTimePrecision(Enum):
     YEAR = 10
     MONTH = 20
@@ -64,15 +75,15 @@ class DateTimeMoment(Moment):
 
 class ReferenceMoment(Moment):
 
-    def __init__(self, reference: Moment, delta: dict[DateTimeComponent, int]):
+    def __init__(self, reference: Moment, delta: dict[DateTimeUnit, int]):
         self._reference = reference
         self._delta = delta
 
     def datetime(self) -> datetime.datetime:
         ref_datetime = self._reference.datetime()
 
-        target_month = ref_datetime.month + self._delta.get(DateTimeComponent.MONTH, 0)
-        adjusted_year = ref_datetime.year + self._delta.get(DateTimeComponent.YEAR, 0) + target_month // 12
+        target_month = ref_datetime.month + self._delta.get(DateTimeUnit.MONTH, 0)
+        adjusted_year = ref_datetime.year + self._delta.get(DateTimeUnit.YEAR, 0) + target_month // 12
         adjusted_month = target_month % 12
 
         adjusted_datetime = ref_datetime.replace(
@@ -80,15 +91,32 @@ class ReferenceMoment(Moment):
             month=adjusted_month,
         )
         return adjusted_datetime + datetime.timedelta(
-            days=self._delta.get(DateTimeComponent.DAY, 0),
-            hours=self._delta.get(DateTimeComponent.HOUR, 0),
-            minutes=self._delta.get(DateTimeComponent.MINUTE, 0),
-            seconds=self._delta.get(DateTimeComponent.SECOND, 0),
-            milliseconds=self._delta.get(DateTimeComponent.MILLI_SECOND, 0)
+            days=self._delta.get(DateTimeUnit.DAY, 0) + self._delta.get(DateTimeUnit.WEEK, 0) * 7,
+            hours=self._delta.get(DateTimeUnit.HOUR, 0),
+            minutes=self._delta.get(DateTimeUnit.MINUTE, 0),
+            seconds=self._delta.get(DateTimeUnit.SECOND, 0),
+            milliseconds=self._delta.get(DateTimeUnit.MILLI_SECOND, 0)
         )
 
     def precision(self) -> DateTimePrecision:
-        return self._reference.precision()
+        ref_precision = self._reference.precision()
+        if DateTimeUnit.MILLI_SECOND in self._delta and ref_precision >= DateTimePrecision.MILLI_SECOND:
+            return DateTimePrecision.MILLI_SECOND
+        if DateTimeUnit.SECOND in self._delta and ref_precision >= DateTimePrecision.SECOND:
+            return DateTimePrecision.SECOND
+        if DateTimeUnit.MINUTE in self._delta and ref_precision >= DateTimePrecision.MINUTE:
+            return DateTimePrecision.MINUTE
+        if DateTimeUnit.HOUR in self._delta and ref_precision >= DateTimePrecision.HOUR:
+            return DateTimePrecision.HOUR
+        if DateTimeUnit.DAY in self._delta and ref_precision >= DateTimePrecision.DAY:
+            return DateTimePrecision.DAY
+        if DateTimeUnit.WEEK in self._delta and ref_precision >= DateTimePrecision.WEEK:
+            return DateTimePrecision.WEEK
+        if DateTimeUnit.MONTH in self._delta and ref_precision >= DateTimePrecision.MONTH:
+            return DateTimePrecision.MONTH
+        if DateTimeUnit.YEAR in self._delta and ref_precision >= DateTimePrecision.YEAR:
+            return DateTimePrecision.YEAR
+        return ref_precision
 
 
 class Match:
