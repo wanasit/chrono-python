@@ -123,7 +123,7 @@ class Match:
     """A class represents the result of a regular expression match.
 
     Chrono uses this class internally instead of `re.Match` to enable modifying or augmenting the result.
-    Each method in this class follow the re.Match's method of the same name.
+    Every method follows the re.Match's method of the same name.
 
     Ref: https://docs.python.org/3/library/re.html#match-objects
     """

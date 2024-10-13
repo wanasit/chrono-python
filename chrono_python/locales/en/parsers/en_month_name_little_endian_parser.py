@@ -10,7 +10,7 @@ PATTERN = re.compile(
     f'({constants.PATTERN_ORDINAL_NUMBER})' +
     f'(?:\\s{{0,3}}(?:to|-|–|until|through|till)?\\s{{0,3}}({constants.PATTERN_ORDINAL_NUMBER}))?' +
     f'(?:-|/|\\s{{0,3}}(?:of)?\\s{{0,3}})' +
-    f'({patterns.match_any(constants.FULL_MONTH_NAME_DICTIONARY)})' +
+    f'({patterns.match_any(constants.MONTH_NAME_DICTIONARY)})' +
     f'(?:(?:-|/|,?\\s{{0,3}})({constants.PATTERN_YEAR}(?!\\S\\d)))?' +
     f'(?=\\W|$)',
     re.IGNORECASE
@@ -22,7 +22,7 @@ class ENMonthNameLittleEndianParser(chrono.Parser):
         return PATTERN
 
     def extract(self, context: chrono.ParsingContext, match: re.Match) -> chrono.ParsedResult | Moment | None:
-        month = constants.FULL_MONTH_NAME_DICTIONARY[match.group(3).lower()]
+        month = constants.MONTH_NAME_DICTIONARY[match.group(3).lower()]
         day = constants.parse_ordinal_number(match.group(1))
         if day > 31:
             return None
