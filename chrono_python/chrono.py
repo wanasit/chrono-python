@@ -1,9 +1,13 @@
+import logging
 import re
 import datetime
+import logging
 from abc import abstractmethod, ABC
 
 from chrono_python.result import ParsedResult, ParsedRangeResult
 from chrono_python.types import Moment, DateTimeMoment, Match
+
+logger = logging.getLogger(__name__)
 
 
 class ParsingContext:
@@ -96,6 +100,7 @@ class Chrono:
             if isinstance(result, Moment):
                 result = context.create_parsed_result(match.start(), match.end(), result)
 
+            logger.info(f'{parser.__class__.__name__} extracted (at index {result.index}): "{result.text}"')
             offset += result.index + len(result.text)
             results.append(result)
         return results
