@@ -148,6 +148,9 @@ class Match:
     def __getitem__(self, item):
         return self.group(item)
 
+    def groups(self) -> list[str | None]:
+        return [self.group(i) for i in range(len(self._group_spans))]
+
     def group(self, index: int | str) -> str | None:
         if isinstance(index, str):
             index = self._group_name_to_index[index]
