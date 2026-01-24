@@ -1,45 +1,26 @@
 import datetime
-from abc import ABC, abstractmethod
-from enum import Enum
+from dataclasses import dataclass
 
 from chrono_python.types import Moment, DateTimeComponent, DateTimePrecision
 
 
+@dataclass(frozen=True)
 class ParsedResult:
-    def __init__(self, index: int, text: str, moment: Moment):
-        self._index = index
-        self._text = text
-        self._moment = moment
-
-    @property
-    def index(self) -> int:
-        return self._index
-
-    @property
-    def text(self) -> str:
-        return self._text
-
-    @property
-    def moment(self) -> Moment:
-        return self._moment
+    index: int
+    text: str
+    moment: Moment
 
     def datetime(self) -> datetime.datetime:
-        return self._moment.datetime()
+        return self.moment.datetime()
 
 
+@dataclass(frozen=True)
 class ParsedRangeResult(ParsedResult):
-    def __init__(self, index: int, text: str, start: Moment, end: Moment):
-        super().__init__(index, text, start)
-        self._start = start
-        self._end = end
+    end: Moment
 
     @property
     def start(self) -> Moment:
-        return self._start
-
-    @property
-    def end(self) -> Moment:
-        return self._end
+        return self.moment
 
 
 class ParsingMoment(Moment):
