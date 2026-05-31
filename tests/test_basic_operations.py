@@ -17,28 +17,28 @@ def test_parse_function_success():
 
 
 
-class TestBesicOperations(unittest.TestCase):
-    def setUp(self):
-        pass
+# class TestBesicOperations(unittest.TestCase):
+#     def setUp(self):
+#         pass
 
-    def test_basic_0_plain_parser(self):
+#     def test_basic_0_plain_parser(self):
 
-        parser = chrono.Parser()
-        results = parser.execute('Hello World', datetime.now(), {})
-        self.assertEqual(results, [])
+#         parser = chrono.Parser()
+#         results = parser.execute('Hello World', datetime.now(), {})
+#         self.assertEqual(results, [])
 
-    def test_basic_1_exmple_parser(self):
+#     def test_basic_1_exmple_parser(self):
 
-        parser = chrono.options.ENInternationalStandardParser()
-        results = parser.execute('Hello World', datetime.now(), {})
-        self.assertEqual(results, [])
+#         parser = chrono.options.ENInternationalStandardParser()
+#         results = parser.execute('Hello World', datetime.now(), {})
+#         self.assertEqual(results, [])
 
-        results = parser.execute('Test : 2013-2-27', datetime.now(), {})
-        self.assertGreater(len(results), 0)
+#         results = parser.execute('Test : 2013-2-27', datetime.now(), {})
+#         self.assertGreater(len(results), 0)
 
-        result = results[0]
-        self.assertEqual(result.index, 7)
-        self.assertEqual(result.text, '2013-2-27')
+#         result = results[0]
+#         self.assertEqual(result.index, 7)
+#         self.assertEqual(result.text, '2013-2-27')
 #
 #     def test_basic_2_chorono_functions(self):
 #

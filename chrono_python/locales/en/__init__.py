@@ -8,6 +8,7 @@ from chrono_python.locales.en.parsers.en_time_unit_ago_parser import ENTimeUnitA
 configuration = chrono.Configuration(
     parsers=[
         common_parsers.ISOFormatParser(),
+        common_parsers.SlashDateFormatParser(little_endian=False),
         ENMonthNameLittleEndianParser(),
         ENMonthNameMiddleEndianParser(),
         ENTimeUnitAgoParser(),
