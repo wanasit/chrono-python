@@ -7,6 +7,7 @@ configuration = chrono.Configuration(
     parsers=[
         common_parsers.ISOFormatParser(),
         common_parsers.SlashDateFormatParser(little_endian=False),
+        common_parsers.TimeExprParser(),
         JPStandardParser(),
     ],
     refiners=[

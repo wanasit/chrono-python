@@ -13,7 +13,7 @@ class RemoveOverlapRefiner(chrono.Refiner):
         results.sort(key=lambda r: r.index)
         filtered_results: list[ParsedResult] = []
         previous_result: ParsedResult = results[0]
-        for result in results[:1]:
+        for result in results[1:]:
             # If the current result doesn't overlap with the previous one
             if result.index >= previous_result.index + len(previous_result.text):
                 filtered_results.append(previous_result)

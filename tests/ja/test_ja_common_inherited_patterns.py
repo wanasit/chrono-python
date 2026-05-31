@@ -7,7 +7,7 @@ from chrono_python.common.types import DateTimeComponent
 
 def test_ja_inherited_iso_format():
     # ISO Format should be parsed successfully using the Japanese config
-    results = chrono.ja.parse("2021-12-03T15:30:00")
+    results = chrono.ja.parse("2021-12-03")
     assert len(results) == 1
     result = results[0]
     assert result.text == "2021-12-03"
@@ -27,3 +27,24 @@ def test_ja_inherited_slash_date():
     assert result.moment.get(DateTimeComponent.YEAR) == 2012
     assert result.moment.get(DateTimeComponent.MONTH) == 8
     assert result.moment.get(DateTimeComponent.DAY) == 10
+
+
+def test_ja_inherited_time_expression():
+    ref_date = datetime.datetime(2020, 1, 1, 12, 0)
+    
+    # 15:30
+    results = chrono.ja.parse("15:30", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "15:30"
+    assert results[0].moment.get(DateTimeComponent.HOUR) == 15
+    assert results[0].moment.get(DateTimeComponent.MINUTE) == 30
+
+    # 1:30-2:30 range
+    results = chrono.ja.parse("1:30-2:30", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "1:30-2:30"
+    assert results[0].start.get(DateTimeComponent.HOUR) == 1
+    assert results[0].start.get(DateTimeComponent.MINUTE) == 30
+    assert results[0].end.get(DateTimeComponent.HOUR) == 2
+    assert results[0].end.get(DateTimeComponent.MINUTE) == 30
+

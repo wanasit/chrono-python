@@ -12,6 +12,13 @@ class DateTimeComponent(Enum):
     SECOND = 'second'
     MILLI_SECOND = 'millisecond'
     TIMEZONE_OFFSET = 'timezone_offset'
+    MERIDIEM = 'meridiem'
+
+
+class Meridiem(Enum):
+    AM = 0
+    PM = 1
+
 
 COMPONENT_PRECISION_MAP = {
     DateTimeComponent.YEAR: DateTimePrecision.YEAR,
@@ -22,6 +29,7 @@ COMPONENT_PRECISION_MAP = {
     DateTimeComponent.MINUTE: DateTimePrecision.MINUTE,
     DateTimeComponent.SECOND: DateTimePrecision.SECOND,
     DateTimeComponent.MILLI_SECOND: DateTimePrecision.MILLI_SECOND,
+    DateTimeComponent.MERIDIEM: DateTimePrecision.HOUR,
 }
 
 class ParsingDateTimeMoment(DateTimeMoment):
