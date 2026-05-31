@@ -2,7 +2,7 @@ import datetime
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict
+from typing import Mapping
 
 
 class DateTimeComponent(Enum):
@@ -38,7 +38,7 @@ class Timeunit(Enum):
     MILLI_SECOND = 'millisecond'
 
 
-type Duration= Dict[Timeunit, int]
+Duration = Mapping[Timeunit, int]
 
 
 class Moment(ABC):
@@ -84,7 +84,11 @@ class DateTimeMoment(Moment):
 
 @dataclass(frozen=True)
 class ReferenceMoment(Moment):
-    """A Moment represents time relative to another reference moment."""
+    """A Moment represents time relative to another reference moment.
+
+    While this class is frozen, the underlying reference could be mutable.
+    When the reference is update, the moment's value could also be changed.
+    """
     reference: Moment
     delta: Duration
 
@@ -108,7 +112,7 @@ class ReferenceMoment(Moment):
         )
 
     def precision(self) -> DateTimePrecision:
-        ref_precision = self._reference.precision()
+        ref_precision = self.reference.precision()
         for unit, precision in [
             (Timeunit.MILLI_SECOND, DateTimePrecision.MILLI_SECOND),
             (Timeunit.SECOND, DateTimePrecision.SECOND),

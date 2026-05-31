@@ -4,8 +4,9 @@ import datetime
 import logging
 from abc import abstractmethod, ABC
 
+from chrono_python.re import Match
 from chrono_python.result import ParsedResult, ParsedRangeResult
-from chrono_python.types import Moment, DateTimeMoment, Match
+from chrono_python.types import Moment, DateTimeMoment
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,8 @@ class ParsingContext:
 
 
 class Parser(ABC):
+    """A parser is used by Chrono to identify and extract potential results."""
+
     @abstractmethod
     def pattern(self) -> re.Pattern:
         raise NotImplementedError()
@@ -42,6 +45,7 @@ class Parser(ABC):
 
 
 class Refiner(ABC):
+    """A refiner is used by Chrono to refine (e.g. merge, filter, modify) the results"""
 
     @abstractmethod
     def refine(self, context: ParsingContext, results: list[ParsedResult]) -> list[ParsedResult]:
