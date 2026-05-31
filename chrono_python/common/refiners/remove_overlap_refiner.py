@@ -1,7 +1,7 @@
 from chrono_python import chrono
 from chrono_python.chrono import ParsingContext
-from chrono_python.result import ParsingMoment, ParsedResult
-from chrono_python.types import DateTimeComponent
+from chrono_python.common.types import ParsingDateTimeMoment, DateTimeComponent
+from chrono_python.types import ParsedResult
 
 
 class RemoveOverlapRefiner(chrono.Refiner):

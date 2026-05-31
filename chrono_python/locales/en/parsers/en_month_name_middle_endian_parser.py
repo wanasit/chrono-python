@@ -3,8 +3,8 @@ import re
 
 from chrono_python import chrono
 from chrono_python.locales.en import constants
-from chrono_python.result import ParsingMoment
-from chrono_python.types import DateTimeComponent, Moment
+from chrono_python.common.types import ParsingDateTimeMoment, DateTimeComponent
+from chrono_python.types import Moment
 from chrono_python.utils import patterns, calendars
 
 # Pattern for Month-Day-Year formats (e.g., "January 1st, 2023", "Jan 1 2023", "Feb 10-12, 2024")
@@ -46,7 +46,7 @@ class ENMonthNameMiddleEndianParser(chrono.Parser):
         if day > 31:  # Basic validation
             return None
 
-        moment = ParsingMoment(context.reference, {})
+        moment = ParsingDateTimeMoment(context.reference, {})
         moment.assign(DateTimeComponent.MONTH, month)
         moment.assign(DateTimeComponent.DAY, day)
 

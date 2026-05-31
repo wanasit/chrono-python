@@ -2,15 +2,19 @@ import datetime
 
 import chrono_python as chrono
 
-from chrono_python.types import Moment, DateTimeComponent, DateTimePrecision
-from chrono_python.result import ParsingMoment
+from chrono_python.types import Moment, DateTimePrecision, DateTimeMoment, ReferenceMoment
+from chrono_python.common.types import DateTimeComponent
 
 
 def test_years_ago():
     ref = datetime.datetime(2024, 5, 20, 12, 13)
 
     result = chrono.en.parse('10 years ago', reference=ref)
+    assert isinstance(result[0].moment, ReferenceMoment)
     assert result[0].moment.datetime() == datetime.datetime(2014, 5, 20, 12, 13)
+    assert result[0].moment.precision() == DateTimePrecision.YEAR
+
+
 
     result = chrono.en.casual.parse('10y ago', reference=ref)
     assert result[0].moment.datetime() == datetime.datetime(2014, 5, 20, 12, 13)

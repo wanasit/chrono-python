@@ -2,8 +2,8 @@ import datetime
 import chrono_python as chrono
 
 from chrono_python.chrono import Configuration, Chrono
-from chrono_python.types import DateTimeComponent, Moment
-from chrono_python.result import ParsingMoment
+from chrono_python.types import Moment, DateTimePrecision, DateTimeMoment
+from chrono_python.common.types import DateTimeComponent
 from chrono_python.common import parsers as common_parsers
 
 
@@ -13,12 +13,16 @@ def test_slash_shorten_dd_mm():
     assert len(results) == 1
     result = results[0]
     assert result.text == '8/10'
+    assert isinstance(result.moment, DateTimeMoment)
+    assert result.moment.datetime() == datetime.datetime(2012, 8, 10, 12, 0)
+    assert result.moment.precision() == DateTimePrecision.DAY
     assert result.moment.get(DateTimeComponent.YEAR) == 2012
     assert result.moment.get(DateTimeComponent.MONTH) == 8
     assert result.moment.get(DateTimeComponent.DAY) == 10
     assert result.moment.is_certain(DateTimeComponent.YEAR) is False
     assert result.moment.is_certain(DateTimeComponent.MONTH) is True
     assert result.moment.is_certain(DateTimeComponent.DAY) is True
+
 
 
 def test_slash_mm_dd_yyyy():

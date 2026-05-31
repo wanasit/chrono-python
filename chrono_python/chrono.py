@@ -4,9 +4,8 @@ import datetime
 import logging
 from abc import abstractmethod, ABC
 
-from chrono_python.re import Match
-from chrono_python.result import ParsedResult, ParsedRangeResult
-from chrono_python.types import Moment, DateTimeMoment
+from chrono_python.utils.re import Match
+from chrono_python.types import Moment, DateTimeMoment, ParsedResult, ParsedRangeResult
 
 logger = logging.getLogger(__name__)
 

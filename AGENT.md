@@ -26,10 +26,9 @@ poetry run pytest
 ```
 chrono_python/
 ├── chrono.py         # Main orchestrator (Chrono, Parser, Refiner, Configuration)
-├── result.py         # Output wrappers (ParsedResult, ParsedRangeResult, ParsingMoment)
-├── types.py          # Enums (DateTimeComponent, Timeunit) and datetime wrappers (DateTimeMoment)
-├── re.py             # Re.Match wrapper class (Match)
+├── types.py          # User-facing output wrappers (ParsedResult, ParsedRangeResult) and datetime wrappers (DateTimeMoment)
 ├── common/           # Shared, locale-agnostic logic
+│   ├── types.py      # Enums (DateTimeComponent) and internal parser/refiner types (ParsingDateTimeMoment)
 │   ├── parsers/      # Common parsers (ISOFormatParser, SlashDateFormatParser)
 │   └── refiners/     # Common refiners (RemoveOverlapRefiner)
 ├── locales/          # Language/Locale specific components
@@ -37,7 +36,8 @@ chrono_python/
 │   └── ja/           # Japanese configuration and locale parsers
 └── utils/            # Helper utilities
     ├── calendars.py  # Year offset and calculation helpers
-    └── patterns.py   # Pattern utilities
+    ├── patterns.py   # Pattern utilities
+    └── re.py         # Re.Match wrapper class (Match)
 ```
 
 ### Core Concepts
@@ -45,16 +45,21 @@ chrono_python/
    Identify date patterns in text. Must implement `pattern()` to return a compiled regex and `extract(context, match)` to output either `ParsedResult`, `Moment`, or `None`.
 2. **Refiners (`chrono.Refiner`)**:
    Post-process and merge/filter the parsed results (e.g. merging date and time expressions, or resolving overlaps).
-3. **ParsingMoment (`result.ParsingMoment`)**:
-   Tracks components of a date (e.g. Year, Month, Day) as either `known_values` (explicitly present in match) or `implied_values` (implied from reference date).
+3. **ParsedResult and ParsedRangeResult (`types.ParsedResult`, `types.ParsedRangeResult`)**:
+   Represent the final output structure of the parsing step, containing the matched index, matched text, and a `moment` (plus an optional `end` moment for ranges).
+4. **DateTimeMoment and ReferenceMoment (`types.DateTimeMoment`, `types.ReferenceMoment`)**:
+   - `DateTimeMoment`: Wraps an absolute datetime (with a specific precision).
+   - `ReferenceMoment`: Represents a relative duration shift (e.g., "10 years ago") relative to a reference moment.
+5. **ParsingDateTimeMoment (`common.types.ParsingDateTimeMoment`)**:
+   Extends `DateTimeMoment` and tracks components of a date (e.g., Year, Month, Day) as either `known_values` (explicitly present in match) or `implied_values` (implied from reference date).
+   - `ParsingDateTimeMoment.datetime()` computes a resolved `datetime.datetime` by applying the assigned and implied components over the reference date, with time defaulting to `12:00:00.000` when unspecified.
+   - Its precision represents the most precise component that is either assigned or implied.
 
 ---
 
 ## Key Context & Caveats
 
-1. **Commented out unittest code**:
-   The `TestBesicOperations` class in `tests/test_basic_operations.py` has been commented out because it was broken due to a missing `unittest` dependency import and needs to be rewritten later using the standard `pytest` structure. Do not uncomment it unless you are actively refactoring it.
-2. **Feature parity with TypeScript Chrono**:
+1. **Feature parity with TypeScript Chrono**:
    The Python version is currently a simplified, work-in-progress port of the JS/TS library. Options like `forwardDate` or a separate `GB` locale structure are not yet implemented.
-3. **ParsingMoment Evaluation**:
-   `ParsingMoment.datetime()` currently returns the reference datetime directly (`self._reference.datetime()`), which means `chrono.parse_date()` does not yet construct a fully resolved datetime from the extracted components. The current testing convention checks the parsed values directly using `.moment.get(DateTimeComponent.X)`.
+
+

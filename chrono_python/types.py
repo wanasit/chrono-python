@@ -5,16 +5,6 @@ from enum import Enum
 from typing import Mapping
 
 
-class DateTimeComponent(Enum):
-    YEAR = 'year'
-    MONTH = 'month'
-    WEEKDAY = 'weekday'
-    DAY = 'day'
-    HOUR = 'hour'
-    MINUTE = 'minute'
-    SECOND = 'second'
-    MILLI_SECOND = 'millisecond'
-    TIMEZONE_OFFSET = 'timezone_offset'
 
 class DateTimePrecision(Enum):
     YEAR = 10
@@ -62,24 +52,24 @@ class Moment(ABC):
 @dataclass(frozen=True)
 class DateTimeMoment(Moment):
     """A Moment based-on Python `datetime.datetime`."""
-    dt: datetime.datetime
-    precision: DateTimePrecision
+    _dt: datetime.datetime
+    _precision: DateTimePrecision
 
     @classmethod
     def of(cls,
            reference: datetime.datetime,
            precision: DateTimePrecision = DateTimePrecision.MILLI_SECOND) -> 'DateTimeMoment':
-        return cls(reference, precision)
+        return cls(_dt=reference, _precision=precision)
 
     @classmethod
     def now(cls):
-        return cls(datetime.datetime.now(), DateTimePrecision.MILLI_SECOND)
+        return cls(_dt=datetime.datetime.now(), _precision=DateTimePrecision.MILLI_SECOND)
 
     def datetime(self) -> datetime.datetime:
-        return self.dt
+        return self._dt
 
     def precision(self) -> DateTimePrecision:
-        return self.precision
+        return self._precision
 
 
 @dataclass(frozen=True)
@@ -126,3 +116,23 @@ class ReferenceMoment(Moment):
             if unit in self.delta and ref_precision.value >= precision.value:
                 return precision
         return ref_precision
+
+
+@dataclass(frozen=True)
+class ParsedResult:
+    index: int
+    text: str
+    moment: Moment
+
+    def datetime(self) -> datetime.datetime:
+        return self.moment.datetime()
+
+
+@dataclass(frozen=True)
+class ParsedRangeResult(ParsedResult):
+    end: Moment
+
+    @property
+    def start(self) -> Moment:
+        return self.moment
+
