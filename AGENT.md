@@ -62,4 +62,14 @@ chrono_python/
 1. **Feature parity with TypeScript Chrono**:
    The Python version is currently a simplified, work-in-progress port of the JS/TS library. Options like `forwardDate` or a separate `GB` locale structure are not yet implemented.
 
+---
+
+## Git & Commit Message Format
+
+Follow the existing commit message format conventions:
+- Use prefix `New:` for new features or implementations (e.g. `New: Time expr parsing`, `New: Merge date range refiners`).
+- Use prefix `New: (Locale)` for locale-specific features or implementations (e.g. `New: (JP) Setup Japanese merge date range refiner`).
+- Use prefix `Refactor:` for code cleanups or refactoring changes (e.g. `Refactor: Introduce CivilTime concept`).
+- Use prefix `Add:` or `Fix:` if adding tests or fixing issues (e.g. `Add test for parsers`).
+
 
