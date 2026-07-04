@@ -4,25 +4,49 @@ from chrono_python.common import refiners as common_refiners
 from chrono_python.locales.en.parsers.en_month_name_little_endian_parser import ENMonthNameLittleEndianParser
 from chrono_python.locales.en.parsers.en_month_name_middle_endian_parser import ENMonthNameMiddleEndianParser
 from chrono_python.locales.en.parsers.en_time_unit_ago_parser import ENTimeUnitAgoParser
+from chrono_python.locales.en.parsers.en_time_unit_casual_reference_parser import ENTimeUnitCasualReferenceParser
+from chrono_python.locales.en.parsers.en_time_unit_later_parser import ENTimeUnitLaterParser
+from chrono_python.locales.en.parsers.en_time_unit_within_parser import ENTimeUnitWithinParser
 from chrono_python.locales.en.parsers.en_time_expr_parser import ENTimeExprParser
 from chrono_python.locales.en.refiners import ENMergeDateRangeRefiner
 
-configuration = chrono.Configuration(
+strict_configuration = chrono.Configuration(
     parsers=[
         common_parsers.ISOFormatParser(),
         common_parsers.SlashDateFormatParser(little_endian=False),
         ENTimeExprParser(),
         ENMonthNameLittleEndianParser(),
         ENMonthNameMiddleEndianParser(),
-        ENTimeUnitAgoParser(),
+        ENTimeUnitWithinParser(allow_abbreviations=False),
+        ENTimeUnitAgoParser(allow_abbreviations=False),
+        ENTimeUnitLaterParser(allow_abbreviations=False),
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
         ENMergeDateRangeRefiner(),
     ])
-casual = chrono.Chrono(configuration)
-strict = chrono.Chrono(configuration)
+
+casual_configuration = chrono.Configuration(
+    parsers=[
+        common_parsers.ISOFormatParser(),
+        common_parsers.SlashDateFormatParser(little_endian=False),
+        ENTimeExprParser(),
+        ENMonthNameLittleEndianParser(),
+        ENMonthNameMiddleEndianParser(),
+        ENTimeUnitWithinParser(allow_abbreviations=True),
+        ENTimeUnitAgoParser(allow_abbreviations=True),
+        ENTimeUnitLaterParser(allow_abbreviations=True),
+        ENTimeUnitCasualReferenceParser(allow_abbreviations=True),
+    ],
+    refiners=[
+        common_refiners.RemoveOverlapRefiner(),
+        ENMergeDateRangeRefiner(),
+    ])
+
+casual = chrono.Chrono(casual_configuration)
+strict = chrono.Chrono(strict_configuration)
 
 
 def parse(*args, **kwargs) -> list[chrono.ParsedResult]:
     return casual.parse(*args, **kwargs)
+

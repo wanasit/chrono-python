@@ -26,6 +26,7 @@ class Timeunit(Enum):
     """
     Represents a unit of time used for duration and offset calculations.
     """
+    QUARTER = 'quarter'
     YEAR = 'year'
     MONTH = 'month'
     DAY = 'day'
@@ -103,7 +104,11 @@ class ReferenceMoment(Moment):
     def datetime(self) -> datetime.datetime:
         ref_datetime = self.reference.datetime()
 
-        target_month = ref_datetime.month + self.delta.get(Timeunit.MONTH, 0)
+        target_month = (
+            ref_datetime.month +
+            self.delta.get(Timeunit.MONTH, 0) +
+            self.delta.get(Timeunit.QUARTER, 0) * 3
+        )
         adjusted_year = ref_datetime.year + self.delta.get(Timeunit.YEAR, 0) + target_month // 12
         adjusted_month = target_month % 12
 
@@ -129,6 +134,7 @@ class ReferenceMoment(Moment):
             (Timeunit.DAY, DateTimePrecision.DAY),
             (Timeunit.WEEK, DateTimePrecision.WEEK),
             (Timeunit.MONTH, DateTimePrecision.MONTH),
+            (Timeunit.QUARTER, DateTimePrecision.MONTH),
             (Timeunit.YEAR, DateTimePrecision.YEAR),
         ]:
             if unit in self.delta and ref_precision.value >= precision.value:

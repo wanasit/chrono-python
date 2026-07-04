@@ -72,4 +72,13 @@ Follow the existing commit message format conventions:
 - Use prefix `Refactor:` for code cleanups or refactoring changes (e.g. `Refactor: Introduce CivilTime concept`).
 - Use prefix `Add:` or `Fix:` if adding tests or fixing issues (e.g. `Add test for parsers`).
 
+---
+
+## AI Agent Tool & Command Guidelines
+
+To ensure secure, auditable, and standard operations:
+- **Network Requests**: Do not run casual python commands to execute network calls (e.g. `python3 -c "import urllib..."`). Instead, use standard tools like `curl -L -k` or `wget`.
+- **Code Execution**: Do not run temporary python code snippets locally to check outputs or verify states. Modify the workspace code directly and use the proper verification tools (e.g. `poetry run pytest`).
+
+
 

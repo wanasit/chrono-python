@@ -5,26 +5,28 @@ from chrono_python.locales.en import constants
 from chrono_python.types import Moment, ReferenceMoment
 
 PATTERN = re.compile(
-    rf'({constants.TIME_UNITS_PATTERN})\s{{0,5}}(?:ago|before|earlier)(?=\W|$)',
+    rf'(this|last|past|next|after|\+|-)\s*({constants.TIME_UNITS_PATTERN})(?=\W|$)',
     re.IGNORECASE
 )
-STRICT_PATTERN = re.compile(
-    rf'({constants.TIME_UNITS_NO_ABBR_PATTERN})\s{{0,5}}(?:ago|before|earlier)(?=\W|$)',
+PATTERN_NO_ABBR = re.compile(
+    rf'(this|last|past|next|after|\+|-)\s*({constants.TIME_UNITS_NO_ABBR_PATTERN})(?=\W|$)',
     re.IGNORECASE
 )
 
 
-class ENTimeUnitAgoParser(AbstractParserWithWordBoundary):
+class ENTimeUnitCasualReferenceParser(AbstractParserWithWordBoundary):
     def __init__(self, allow_abbreviations: bool = True):
         super().__init__()
         self.allow_abbreviations = allow_abbreviations
 
     def inner_pattern(self) -> re.Pattern:
-        return PATTERN if self.allow_abbreviations else STRICT_PATTERN
+        return PATTERN if self.allow_abbreviations else PATTERN_NO_ABBR
 
     def inner_extract(self, context: chrono.ParsingContext, match: chrono.Match) -> chrono.ParsedResult | Moment | None:
-        duration = constants.parse_duration(match.group(1))
+        prefix = match.group(1).lower()
+        duration = constants.parse_duration(match.group(2))
         if not duration:
             return None
-        reversed_duration = {k: -v for k, v in duration.items()}
-        return ReferenceMoment(context.reference, reversed_duration)
+        if prefix in ('last', 'past', '-'):
+            duration = {k: -v for k, v in duration.items()}
+        return ReferenceMoment(context.reference, duration)

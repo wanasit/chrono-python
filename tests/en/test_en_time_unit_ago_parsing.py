@@ -93,8 +93,10 @@ def test_hours_mins_sec_ago():
     result = chrono.en.strict.parse('20 hours 12 minutes 3seconds ago', reference=ref)
     assert result[0].moment.datetime() == datetime.datetime(2024, 5, 19, 16, 0, 57)
 
-    result = chrono.en.strict.parse('20h 12m 3s ago', reference=ref)
+    result = chrono.en.casual.parse('20h 12m 3s ago', reference=ref)
     assert result[0].moment.datetime() == datetime.datetime(2024, 5, 19, 16, 0, 57)
 
-    result = chrono.en.strict.parse('20h12m3s ago', reference=ref)
+    result = chrono.en.casual.parse('20h12m3s ago', reference=ref)
     assert result[0].moment.datetime() == datetime.datetime(2024, 5, 19, 16, 0, 57)
+
+    assert len(chrono.en.strict.parse('20h 12m 3s ago', reference=ref)) == 0
