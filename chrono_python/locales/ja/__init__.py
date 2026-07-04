@@ -2,6 +2,7 @@ from chrono_python import chrono
 from chrono_python.common import parsers as common_parsers
 from chrono_python.common import refiners as common_refiners
 from chrono_python.locales.ja.parsers.jp_standard_parser import JPStandardParser
+from chrono_python.locales.ja.refiners import JPMergeDateRangeRefiner
 
 configuration = chrono.Configuration(
     parsers=[
@@ -12,6 +13,7 @@ configuration = chrono.Configuration(
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
+        JPMergeDateRangeRefiner(),
     ])
 
 casual = chrono.Chrono(configuration)
