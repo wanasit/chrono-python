@@ -2,7 +2,7 @@ import chrono_python as chrono
 import datetime
 
 from chrono_python.types import Moment, DateTimePrecision, DateTimeMoment
-from chrono_python.common.types import DateTimeComponent
+from chrono_python.common.types import CivilTimeComponent
 
 
 def test_date_little_endian_full():
@@ -14,9 +14,9 @@ def test_date_little_endian_full():
     assert isinstance(results[0].moment, DateTimeMoment)
     assert results[0].moment.datetime() == datetime.datetime(2012, 1, 20, 12, 0)
     assert results[0].moment.precision() == DateTimePrecision.DAY
-    assert results[0].moment.get(DateTimeComponent.YEAR) == 2012
-    assert results[0].moment.get(DateTimeComponent.MONTH) == 1
-    assert results[0].moment.get(DateTimeComponent.DAY) == 20
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 20
 
 
 
@@ -27,9 +27,9 @@ def test_date_little_endian_abbreviated_month():
     assert results[0].text == '20 Jan 2012'
 
     assert isinstance(results[0].moment, DateTimeMoment)
-    assert results[0].moment.get(DateTimeComponent.YEAR) == 2012
-    assert results[0].moment.get(DateTimeComponent.MONTH) == 1
-    assert results[0].moment.get(DateTimeComponent.DAY) == 20
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 20
 
 
 def test_date_little_endian_with_ordinal_date():
@@ -39,9 +39,9 @@ def test_date_little_endian_with_ordinal_date():
     assert results[0].text == '20th January 2012'
 
     assert isinstance(results[0].moment, DateTimeMoment)
-    assert results[0].moment.get(DateTimeComponent.YEAR) == 2012
-    assert results[0].moment.get(DateTimeComponent.MONTH) == 1
-    assert results[0].moment.get(DateTimeComponent.DAY) == 20
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 20
 
 
 def test_date_little_endian_with_hyphen_punctuation():
@@ -51,9 +51,9 @@ def test_date_little_endian_with_hyphen_punctuation():
     assert results[0].text == '20-Jan-2012'
 
     assert isinstance(results[0].moment, DateTimeMoment)
-    assert results[0].moment.get(DateTimeComponent.YEAR) == 2012
-    assert results[0].moment.get(DateTimeComponent.MONTH) == 1
-    assert results[0].moment.get(DateTimeComponent.DAY) == 20
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 20
 
 
 def test_date_little_endian_with_comma_punctuation():
@@ -62,9 +62,9 @@ def test_date_little_endian_with_comma_punctuation():
 
     assert results[0].text == '20th Jan, 2012'
     assert isinstance(results[0].moment, DateTimeMoment)
-    assert results[0].moment.get(DateTimeComponent.YEAR) == 2012
-    assert results[0].moment.get(DateTimeComponent.MONTH) == 1
-    assert results[0].moment.get(DateTimeComponent.DAY) == 20
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 20
 
 
 def test_date_middle_endian_full():
@@ -73,9 +73,9 @@ def test_date_middle_endian_full():
     assert results[0].text == 'January 20, 2012'
     moment = results[0].moment
     assert isinstance(moment, DateTimeMoment)
-    assert moment.get(DateTimeComponent.YEAR) == 2012
-    assert moment.get(DateTimeComponent.MONTH) == 1
-    assert moment.get(DateTimeComponent.DAY) == 20
+    assert moment.get(CivilTimeComponent.YEAR) == 2012
+    assert moment.get(CivilTimeComponent.MONTH) == 1
+    assert moment.get(CivilTimeComponent.DAY) == 20
 
 
 def test_date_middle_endian_abbreviated_month():
@@ -84,9 +84,9 @@ def test_date_middle_endian_abbreviated_month():
     assert results[0].text == 'Jan 20, 2012'
     moment = results[0].moment
     assert isinstance(moment, DateTimeMoment)
-    assert moment.get(DateTimeComponent.YEAR) == 2012
-    assert moment.get(DateTimeComponent.MONTH) == 1
-    assert moment.get(DateTimeComponent.DAY) == 20
+    assert moment.get(CivilTimeComponent.YEAR) == 2012
+    assert moment.get(CivilTimeComponent.MONTH) == 1
+    assert moment.get(CivilTimeComponent.DAY) == 20
 
 
 def test_date_middle_endian_with_ordinal_date():
@@ -95,9 +95,9 @@ def test_date_middle_endian_with_ordinal_date():
     assert results[0].text == 'January 20th, 2012'
     moment = results[0].moment
     assert isinstance(moment, DateTimeMoment)
-    assert moment.get(DateTimeComponent.YEAR) == 2012
-    assert moment.get(DateTimeComponent.MONTH) == 1
-    assert moment.get(DateTimeComponent.DAY) == 20
+    assert moment.get(CivilTimeComponent.YEAR) == 2012
+    assert moment.get(CivilTimeComponent.MONTH) == 1
+    assert moment.get(CivilTimeComponent.DAY) == 20
 
 
 def test_date_middle_endian_with_hyphen_punctuation_day_year():
@@ -106,9 +106,9 @@ def test_date_middle_endian_with_hyphen_punctuation_day_year():
     assert results[0].text == 'Jan-20-2012'
     moment = results[0].moment
     assert isinstance(moment, DateTimeMoment)
-    assert moment.get(DateTimeComponent.YEAR) == 2012
-    assert moment.get(DateTimeComponent.MONTH) == 1
-    assert moment.get(DateTimeComponent.DAY) == 20
+    assert moment.get(CivilTimeComponent.YEAR) == 2012
+    assert moment.get(CivilTimeComponent.MONTH) == 1
+    assert moment.get(CivilTimeComponent.DAY) == 20
 
 
 def test_date_middle_endian_with_slash_punctuation_day_year():
@@ -117,9 +117,9 @@ def test_date_middle_endian_with_slash_punctuation_day_year():
     assert results[0].text == 'Jan/20/2012'
     moment = results[0].moment
     assert isinstance(moment, DateTimeMoment)
-    assert moment.get(DateTimeComponent.YEAR) == 2012
-    assert moment.get(DateTimeComponent.MONTH) == 1
-    assert moment.get(DateTimeComponent.DAY) == 20
+    assert moment.get(CivilTimeComponent.YEAR) == 2012
+    assert moment.get(CivilTimeComponent.MONTH) == 1
+    assert moment.get(CivilTimeComponent.DAY) == 20
 
 
 def test_date_middle_endian_no_year():
@@ -130,10 +130,10 @@ def test_date_middle_endian_no_year():
     assert results[0].text == 'February 10th'
     moment = results[0].moment
     assert isinstance(moment, DateTimeMoment)
-    assert moment.is_certain(DateTimeComponent.YEAR) is False  # Year is implied
-    assert moment.get(DateTimeComponent.YEAR) == 2023  # Closest year to ref_date
-    assert moment.get(DateTimeComponent.MONTH) == 2
-    assert moment.get(DateTimeComponent.DAY) == 10
+    assert moment.is_certain(CivilTimeComponent.YEAR) is False  # Year is implied
+    assert moment.get(CivilTimeComponent.YEAR) == 2023  # Closest year to ref_date
+    assert moment.get(CivilTimeComponent.MONTH) == 2
+    assert moment.get(CivilTimeComponent.DAY) == 10
 
 
 def test_date_middle_endian_no_year_past_date_implies_next_year():
@@ -146,10 +146,10 @@ def test_date_middle_endian_no_year_past_date_implies_next_year():
 
     moment = results[0].moment
     assert isinstance(moment, DateTimeMoment)
-    assert moment.is_certain(DateTimeComponent.YEAR) is False
-    assert moment.get(DateTimeComponent.YEAR) == 2023
-    assert moment.get(DateTimeComponent.MONTH) == 12
-    assert moment.get(DateTimeComponent.DAY) == 25
+    assert moment.is_certain(CivilTimeComponent.YEAR) is False
+    assert moment.get(CivilTimeComponent.YEAR) == 2023
+    assert moment.get(CivilTimeComponent.MONTH) == 12
+    assert moment.get(CivilTimeComponent.DAY) == 25
 
 
 def test_date_middle_endian_no_year_future_date_implies_current_year():
@@ -160,10 +160,10 @@ def test_date_middle_endian_no_year_future_date_implies_current_year():
     assert results[0].text == 'January 5'
     moment = results[0].moment
     assert isinstance(moment, DateTimeMoment)
-    assert moment.is_certain(DateTimeComponent.YEAR) is False
-    assert moment.get(DateTimeComponent.YEAR) == 2023  # Should be current year
-    assert moment.get(DateTimeComponent.MONTH) == 1
-    assert moment.get(DateTimeComponent.DAY) == 5
+    assert moment.is_certain(CivilTimeComponent.YEAR) is False
+    assert moment.get(CivilTimeComponent.YEAR) == 2023  # Should be current year
+    assert moment.get(CivilTimeComponent.MONTH) == 1
+    assert moment.get(CivilTimeComponent.DAY) == 5
 
 
 def test_date_middle_endian_no_punctuation_between_month_day():
@@ -172,9 +172,9 @@ def test_date_middle_endian_no_punctuation_between_month_day():
     assert results[0].text == 'Sep15 2022'
     moment = results[0].moment
     assert isinstance(moment, DateTimeMoment)
-    assert moment.get(DateTimeComponent.YEAR) == 2022
-    assert moment.get(DateTimeComponent.MONTH) == 9
-    assert moment.get(DateTimeComponent.DAY) == 15
+    assert moment.get(CivilTimeComponent.YEAR) == 2022
+    assert moment.get(CivilTimeComponent.MONTH) == 9
+    assert moment.get(CivilTimeComponent.DAY) == 15
 
 
 def test_date_middle_endian_range():
@@ -187,10 +187,10 @@ def test_date_middle_endian_range():
     assert isinstance(start_moment, DateTimeMoment)
     assert isinstance(end_moment, DateTimeMoment)
 
-    assert start_moment.get(DateTimeComponent.YEAR) == 2023
-    assert start_moment.get(DateTimeComponent.MONTH) == 3
-    assert start_moment.get(DateTimeComponent.DAY) == 10
+    assert start_moment.get(CivilTimeComponent.YEAR) == 2023
+    assert start_moment.get(CivilTimeComponent.MONTH) == 3
+    assert start_moment.get(CivilTimeComponent.DAY) == 10
 
-    assert end_moment.get(DateTimeComponent.YEAR) == 2023
-    assert end_moment.get(DateTimeComponent.MONTH) == 3
-    assert end_moment.get(DateTimeComponent.DAY) == 12
+    assert end_moment.get(CivilTimeComponent.YEAR) == 2023
+    assert end_moment.get(CivilTimeComponent.MONTH) == 3
+    assert end_moment.get(CivilTimeComponent.DAY) == 12

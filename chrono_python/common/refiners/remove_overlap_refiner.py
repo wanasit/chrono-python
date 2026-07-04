@@ -1,6 +1,6 @@
 from chrono_python import chrono
 from chrono_python.chrono import ParsingContext
-from chrono_python.common.types import ParsingDateTimeMoment, DateTimeComponent
+from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.types import ParsedResult
 
 

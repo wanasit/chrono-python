@@ -28,7 +28,7 @@ chrono_python/
 ├── chrono.py         # Main orchestrator (Chrono, Parser, Refiner, Configuration)
 ├── types.py          # User-facing output wrappers (ParsedResult, ParsedRangeResult) and datetime wrappers (DateTimeMoment)
 ├── common/           # Shared, locale-agnostic logic
-│   ├── types.py      # Enums (DateTimeComponent) and internal parser/refiner types (ParsingDateTimeMoment)
+│   ├── types.py      # Enums (CivilTimeComponent) and internal parser/refiner types (ParsingCivilTimeMoment)
 │   ├── parsers/      # Common parsers (ISOFormatParser, SlashDateFormatParser)
 │   └── refiners/     # Common refiners (RemoveOverlapRefiner)
 ├── locales/          # Language/Locale specific components
@@ -50,9 +50,9 @@ chrono_python/
 4. **DateTimeMoment and ReferenceMoment (`types.DateTimeMoment`, `types.ReferenceMoment`)**:
    - `DateTimeMoment`: Wraps an absolute datetime (with a specific precision).
    - `ReferenceMoment`: Represents a relative duration shift (e.g., "10 years ago") relative to a reference moment.
-5. **ParsingDateTimeMoment (`common.types.ParsingDateTimeMoment`)**:
-   Extends `DateTimeMoment` and tracks components of a date (e.g., Year, Month, Day) as either `known_values` (explicitly present in match) or `implied_values` (implied from reference date).
-   - `ParsingDateTimeMoment.datetime()` computes a resolved `datetime.datetime` by applying the assigned and implied components over the reference date, with time defaulting to `12:00:00.000` when unspecified.
+5. **ParsingCivilTimeMoment (`common.types.ParsingCivilTimeMoment`)**:
+   Extends `DateTimeMoment` and tracks components of a date (e.g., Year, Month, Day) as either `known_values` (explicitly present in match) or `implied_values` (implied from reference date or other clues).
+   - `ParsingCivilTimeMoment.datetime()` computes a resolved `datetime.datetime` by applying the assigned and implied components over the reference date.
    - Its precision represents the most precise component that is either assigned or implied.
 
 ---

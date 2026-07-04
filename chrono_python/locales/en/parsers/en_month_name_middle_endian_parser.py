@@ -3,7 +3,7 @@ import re
 
 from chrono_python import chrono
 from chrono_python.locales.en import constants
-from chrono_python.common.types import ParsingDateTimeMoment, DateTimeComponent
+from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.types import Moment
 from chrono_python.utils import patterns, calendars
 
@@ -46,18 +46,18 @@ class ENMonthNameMiddleEndianParser(chrono.Parser):
         if day > 31:  # Basic validation
             return None
 
-        moment = ParsingDateTimeMoment(context.reference, {})
-        moment.assign(DateTimeComponent.MONTH, month)
-        moment.assign(DateTimeComponent.DAY, day)
+        moment = ParsingCivilTimeMoment(context.reference, {})
+        moment.assign(CivilTimeComponent.MONTH, month)
+        moment.assign(CivilTimeComponent.DAY, day)
 
         year_str = match.group(4)
         if year_str:
             logging.info(f'{match.groups()}')
             year = constants.parse_year(year_str)
-            moment.assign(DateTimeComponent.YEAR, year)
+            moment.assign(CivilTimeComponent.YEAR, year)
         else:
             year = calendars.find_year_closest_to_ref(context.reference, month, day)
-            moment.imply(DateTimeComponent.YEAR, year)
+            moment.imply(CivilTimeComponent.YEAR, year)
 
         # Handling date range (e.g., "January 1st to 5th")
         end_day_str = match.group(3)
@@ -74,7 +74,7 @@ class ENMonthNameMiddleEndianParser(chrono.Parser):
 
         # Create the end moment for the range. It shares the same month and year.
         end_moment = moment.clone()
-        end_moment.assign(DateTimeComponent.DAY, end_day)
+        end_moment.assign(CivilTimeComponent.DAY, end_day)
 
         # Further validation for end_day (e.g., end_day > day, end_day fits in month) could be added.
         # For now, consistent with the little-endian parser's approach.

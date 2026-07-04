@@ -2,7 +2,7 @@ import datetime
 import re
 from chrono_python.chrono import Chrono, Configuration, Parser, ParsingContext
 from chrono_python.types import Timeunit, ReferenceMoment, ParsedResult, DateTimeMoment, DateTimePrecision
-from chrono_python.common.types import ParsingDateTimeMoment, DateTimeComponent
+from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.utils.re import Match
 
 
@@ -21,11 +21,11 @@ def test_custom_parser_return_date():
         def pattern(self) -> re.Pattern:
             return re.compile(r'Chrismas', re.IGNORECASE)
 
-        def extract(self, context: ParsingContext, match: Match) -> ParsingDateTimeMoment | None:
-            moment = ParsingDateTimeMoment(context.reference, {})
-            moment.assign(DateTimeComponent.MONTH, 12)
-            moment.assign(DateTimeComponent.DAY, 25)
-            moment.imply(DateTimeComponent.YEAR, context.reference.datetime().year)
+        def extract(self, context: ParsingContext, match: Match) -> ParsingCivilTimeMoment | None:
+            moment = ParsingCivilTimeMoment(context.reference, {})
+            moment.assign(CivilTimeComponent.MONTH, 12)
+            moment.assign(CivilTimeComponent.DAY, 25)
+            moment.imply(CivilTimeComponent.YEAR, context.reference.datetime().year)
             return moment
 
     # A custom parser that detects only "Chrismas" and returns 12/25 and year implied from reference date
@@ -45,14 +45,14 @@ def test_custom_parser_return_date():
     assert result.moment.precision() == DateTimePrecision.DAY
 
     # Check component values
-    assert result.moment.get(DateTimeComponent.MONTH) == 12
-    assert result.moment.get(DateTimeComponent.DAY) == 25
-    assert result.moment.get(DateTimeComponent.YEAR) == 2025
+    assert result.moment.get(CivilTimeComponent.MONTH) == 12
+    assert result.moment.get(CivilTimeComponent.DAY) == 25
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2025
 
     # Check certainty
-    assert result.moment.is_certain(DateTimeComponent.MONTH) is True
-    assert result.moment.is_certain(DateTimeComponent.DAY) is True
-    assert result.moment.is_certain(DateTimeComponent.YEAR) is False
+    assert result.moment.is_certain(CivilTimeComponent.MONTH) is True
+    assert result.moment.is_certain(CivilTimeComponent.DAY) is True
+    assert result.moment.is_certain(CivilTimeComponent.YEAR) is False
 
 
 def test_custom_parser_return_ref():

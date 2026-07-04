@@ -1,8 +1,23 @@
+"""
+Internal types for chrono (or custom parsers/refiners), not intended for direct use by end users.
+"""
+
 import datetime
 from enum import Enum
 from chrono_python.types import Moment, DateTimeMoment, DateTimePrecision
 
-class DateTimeComponent(Enum):
+class Meridiem(Enum):
+    """
+    Represents the period of the day (AM or PM) in a 12-hour clock system.
+    """
+    AM = 0
+    PM = 1
+
+
+class CivilTimeComponent(Enum):
+    """
+    Represents individual fields of a human-readable calendar date and clock time (e.g., year, month, day, hour).
+    """
     YEAR = 'year'
     MONTH = 'month'
     WEEKDAY = 'weekday'
@@ -15,29 +30,23 @@ class DateTimeComponent(Enum):
     MERIDIEM = 'meridiem'
 
 
-class Meridiem(Enum):
-    AM = 0
-    PM = 1
+class ParsingCivilTimeMoment(DateTimeMoment):
+    """
+    A mutable DateTimeMoment that is represented by human-readable calendar and clock components (e.g., year, month, day, hour).
 
+    Unlike `datetime` or system epoch, this class represents time from the perspective of a human reading a calendar and clock. 
+    This follows the concept of `CivilTime` in Abseil, or `Temporal.PlainDateTime`/`Temporal.LocalDateTime` in JavaScript.
 
-COMPONENT_PRECISION_MAP = {
-    DateTimeComponent.YEAR: DateTimePrecision.YEAR,
-    DateTimeComponent.MONTH: DateTimePrecision.MONTH,
-    DateTimeComponent.DAY: DateTimePrecision.DAY,
-    DateTimeComponent.WEEKDAY: DateTimePrecision.DAY,
-    DateTimeComponent.HOUR: DateTimePrecision.HOUR,
-    DateTimeComponent.MINUTE: DateTimePrecision.MINUTE,
-    DateTimeComponent.SECOND: DateTimePrecision.SECOND,
-    DateTimeComponent.MILLI_SECOND: DateTimePrecision.MILLI_SECOND,
-    DateTimeComponent.MERIDIEM: DateTimePrecision.HOUR,
-}
+    The time components made of this moment are separated into two groups:
+        1. `known_values`: components that are explicitly set by the user.
+        2. `implied_values`: components that are inferred and weaker than known_values.
+    """
 
-class ParsingDateTimeMoment(DateTimeMoment):
-
-    def __init__(self,
+    def __init__(
+                 self,
                  reference: Moment,
-                 known_values: dict[DateTimeComponent, int],
-                 implied_values: dict[DateTimeComponent, int] | None = None
+                 known_values: dict[CivilTimeComponent, int],
+                 implied_values: dict[CivilTimeComponent, int] | None = None
                  ):
         # Initialize the frozen DateTimeMoment base class
         super().__init__(_dt=reference.datetime(), _precision=DateTimePrecision.MILLI_SECOND)
@@ -49,26 +58,26 @@ class ParsingDateTimeMoment(DateTimeMoment):
         # Bypass the frozen class restrictions on subclass attributes
         object.__setattr__(self, name, value)
 
-    def clone(self) -> 'ParsingDateTimeMoment':
-        return ParsingDateTimeMoment(self._reference, self._known_values.copy(), self._implied_values.copy())
+    def clone(self) -> 'ParsingCivilTimeMoment':
+        return ParsingCivilTimeMoment(self._reference, self._known_values.copy(), self._implied_values.copy())
 
-    def get(self, component: DateTimeComponent) -> int | None:
+    def get(self, component: CivilTimeComponent) -> int | None:
         if component in self._known_values:
             return self._known_values[component]
         if component in self._implied_values:
             return self._implied_values[component]
         return None
 
-    def is_certain(self, component: DateTimeComponent) -> bool:
+    def is_certain(self, component: CivilTimeComponent) -> bool:
         return component in self._known_values
 
-    def assign(self, component: DateTimeComponent, value: int) -> 'ParsingDateTimeMoment':
+    def assign(self, component: CivilTimeComponent, value: int) -> 'ParsingCivilTimeMoment':
         if component in self._implied_values:
             del self._implied_values[component]
         self._known_values[component] = value
         return self
 
-    def imply(self, component: DateTimeComponent, value: int) -> 'ParsingDateTimeMoment':
+    def imply(self, component: CivilTimeComponent, value: int) -> 'ParsingCivilTimeMoment':
         if component not in self._known_values:
             self._implied_values[component] = value
         return self
@@ -89,31 +98,31 @@ class ParsingDateTimeMoment(DateTimeMoment):
     def datetime(self) -> datetime.datetime:
         ref_dt = self._reference.datetime()
         
-        year = self.get(DateTimeComponent.YEAR)
+        year = self.get(CivilTimeComponent.YEAR)
         if year is None:
             year = ref_dt.year
             
-        month = self.get(DateTimeComponent.MONTH)
+        month = self.get(CivilTimeComponent.MONTH)
         if month is None:
             month = ref_dt.month
             
-        day = self.get(DateTimeComponent.DAY)
+        day = self.get(CivilTimeComponent.DAY)
         if day is None:
             day = ref_dt.day
             
-        hour = self.get(DateTimeComponent.HOUR)
+        hour = self.get(CivilTimeComponent.HOUR)
         if hour is None:
             hour = 12
             
-        minute = self.get(DateTimeComponent.MINUTE)
+        minute = self.get(CivilTimeComponent.MINUTE)
         if minute is None:
             minute = 0
             
-        second = self.get(DateTimeComponent.SECOND)
+        second = self.get(CivilTimeComponent.SECOND)
         if second is None:
             second = 0
             
-        millisecond = self.get(DateTimeComponent.MILLI_SECOND)
+        millisecond = self.get(CivilTimeComponent.MILLI_SECOND)
         microsecond = millisecond * 1000 if millisecond is not None else 0
         
         return datetime.datetime(
@@ -128,3 +137,18 @@ class ParsingDateTimeMoment(DateTimeMoment):
         )
 
 
+
+COMPONENT_PRECISION_MAP = {
+    CivilTimeComponent.YEAR: DateTimePrecision.YEAR,
+    CivilTimeComponent.MONTH: DateTimePrecision.MONTH,
+    CivilTimeComponent.DAY: DateTimePrecision.DAY,
+    CivilTimeComponent.WEEKDAY: DateTimePrecision.DAY,
+    CivilTimeComponent.HOUR: DateTimePrecision.HOUR,
+    CivilTimeComponent.MINUTE: DateTimePrecision.MINUTE,
+    CivilTimeComponent.SECOND: DateTimePrecision.SECOND,
+    CivilTimeComponent.MILLI_SECOND: DateTimePrecision.MILLI_SECOND,
+    CivilTimeComponent.MERIDIEM: DateTimePrecision.HOUR,
+}
+"""
+Mapping from CivilTimeComponent to its precision (DateTimePrecision).
+"""

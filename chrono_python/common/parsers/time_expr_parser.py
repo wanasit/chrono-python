@@ -1,6 +1,6 @@
 import re
 from chrono_python import chrono
-from chrono_python.common.types import ParsingDateTimeMoment, DateTimeComponent, Meridiem
+from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent, Meridiem
 from chrono_python.types import Moment, DateTimePrecision
 from chrono_python.utils.re import Match
 
@@ -157,8 +157,8 @@ class TimeExprParser(chrono.Parser):
 
     def extract_primary_time_components(
         self, context: chrono.ParsingContext, match: Match
-    ) -> ParsingDateTimeMoment | None:
-        components = ParsingDateTimeMoment(context.reference, {})
+    ) -> ParsingCivilTimeMoment | None:
+        components = ParsingCivilTimeMoment(context.reference, {})
         minute = 0
         meridiem = None
 
@@ -250,16 +250,16 @@ class TimeExprParser(chrono.Parser):
                 if hour != 12:
                     hour += 12
 
-        components.assign(DateTimeComponent.HOUR, hour)
-        components.assign(DateTimeComponent.MINUTE, minute)
+        components.assign(CivilTimeComponent.HOUR, hour)
+        components.assign(CivilTimeComponent.MINUTE, minute)
 
         if meridiem is not None:
-            components.assign(DateTimeComponent.MERIDIEM, meridiem)
+            components.assign(CivilTimeComponent.MERIDIEM, meridiem)
         else:
             if hour < 12:
-                components.imply(DateTimeComponent.MERIDIEM, Meridiem.AM)
+                components.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
             else:
-                components.imply(DateTimeComponent.MERIDIEM, Meridiem.PM)
+                components.imply(CivilTimeComponent.MERIDIEM, Meridiem.PM)
 
         # ----- Millisecond
         millisecond_str = match.group(MILLI_SECOND_GROUP)
@@ -267,7 +267,7 @@ class TimeExprParser(chrono.Parser):
             millisecond = int(millisecond_str[:3])
             if millisecond >= 1000:
                 return None
-            components.assign(DateTimeComponent.MILLI_SECOND, millisecond)
+            components.assign(CivilTimeComponent.MILLI_SECOND, millisecond)
 
         # ----- Second
         second_str = match.group(SECOND_GROUP)
@@ -275,22 +275,22 @@ class TimeExprParser(chrono.Parser):
             second = int(second_str)
             if second >= 60:
                 return None
-            components.assign(DateTimeComponent.SECOND, second)
+            components.assign(CivilTimeComponent.SECOND, second)
 
 
 
         # Imply year, month, day from reference
         ref_dt = context.reference.datetime()
-        components.imply(DateTimeComponent.YEAR, ref_dt.year)
-        components.imply(DateTimeComponent.MONTH, ref_dt.month)
-        components.imply(DateTimeComponent.DAY, ref_dt.day)
+        components.imply(CivilTimeComponent.YEAR, ref_dt.year)
+        components.imply(CivilTimeComponent.MONTH, ref_dt.month)
+        components.imply(CivilTimeComponent.DAY, ref_dt.day)
 
         return components
 
     def extract_following_time_components(
         self, context: chrono.ParsingContext, match: Match, result: chrono.ParsedResult
-    ) -> ParsingDateTimeMoment | None:
-        components = ParsingDateTimeMoment(context.reference, {})
+    ) -> ParsingCivilTimeMoment | None:
+        components = ParsingCivilTimeMoment(context.reference, {})
 
         # ----- Millisecond
         millisecond_str = match.group(MILLI_SECOND_GROUP)
@@ -298,7 +298,7 @@ class TimeExprParser(chrono.Parser):
             millisecond = int(millisecond_str[:3])
             if millisecond >= 1000:
                 return None
-            components.assign(DateTimeComponent.MILLI_SECOND, millisecond)
+            components.assign(CivilTimeComponent.MILLI_SECOND, millisecond)
 
         # ----- Second
         second_str = match.group(SECOND_GROUP)
@@ -306,7 +306,7 @@ class TimeExprParser(chrono.Parser):
             second = int(second_str)
             if second >= 60:
                 return None
-            components.assign(DateTimeComponent.SECOND, second)
+            components.assign(CivilTimeComponent.SECOND, second)
 
         hour_str = match.group(HOUR_GROUP)
         if hour_str is None:
@@ -332,15 +332,15 @@ class TimeExprParser(chrono.Parser):
         # Helper to imply next day safely
         def imply_next_day(moment_to_imply):
             ref_dt = context.reference.datetime()
-            y = moment_to_imply.get(DateTimeComponent.YEAR) or ref_dt.year
-            m = moment_to_imply.get(DateTimeComponent.MONTH) or ref_dt.month
-            d_val = moment_to_imply.get(DateTimeComponent.DAY) or ref_dt.day
+            y = moment_to_imply.get(CivilTimeComponent.YEAR) or ref_dt.year
+            m = moment_to_imply.get(CivilTimeComponent.MONTH) or ref_dt.month
+            d_val = moment_to_imply.get(CivilTimeComponent.DAY) or ref_dt.day
             from datetime import date, timedelta
             try:
                 next_date = date(y, m, d_val) + timedelta(days=1)
-                moment_to_imply.imply(DateTimeComponent.DAY, next_date.day)
-                moment_to_imply.imply(DateTimeComponent.MONTH, next_date.month)
-                moment_to_imply.imply(DateTimeComponent.YEAR, next_date.year)
+                moment_to_imply.imply(CivilTimeComponent.DAY, next_date.day)
+                moment_to_imply.imply(CivilTimeComponent.MONTH, next_date.month)
+                moment_to_imply.imply(CivilTimeComponent.YEAR, next_date.year)
             except ValueError:
                 pass
 
@@ -355,7 +355,7 @@ class TimeExprParser(chrono.Parser):
                 meridiem = Meridiem.AM
                 if hour == 12:
                     hour = 0
-                    if not components.is_certain(DateTimeComponent.DAY):
+                    if not components.is_certain(CivilTimeComponent.DAY):
                         imply_next_day(components)
 
             elif ampm == "p":
@@ -363,46 +363,46 @@ class TimeExprParser(chrono.Parser):
                 if hour != 12:
                     hour += 12
 
-            if not result.moment.is_certain(DateTimeComponent.MERIDIEM):
+            if not result.moment.is_certain(CivilTimeComponent.MERIDIEM):
                 if meridiem == Meridiem.AM:
-                    result.moment.imply(DateTimeComponent.MERIDIEM, Meridiem.AM)
-                    if result.moment.get(DateTimeComponent.HOUR) == 12:
-                        result.moment.assign(DateTimeComponent.HOUR, 0)
+                    result.moment.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
+                    if result.moment.get(CivilTimeComponent.HOUR) == 12:
+                        result.moment.assign(CivilTimeComponent.HOUR, 0)
                 else:
-                    result.moment.imply(DateTimeComponent.MERIDIEM, Meridiem.PM)
-                    if result.moment.get(DateTimeComponent.HOUR) != 12:
+                    result.moment.imply(CivilTimeComponent.MERIDIEM, Meridiem.PM)
+                    if result.moment.get(CivilTimeComponent.HOUR) != 12:
                         result.moment.assign(
-                            DateTimeComponent.HOUR,
-                            result.moment.get(DateTimeComponent.HOUR) + 12
+                            CivilTimeComponent.HOUR,
+                            result.moment.get(CivilTimeComponent.HOUR) + 12
                         )
 
-        components.assign(DateTimeComponent.HOUR, hour)
-        components.assign(DateTimeComponent.MINUTE, minute)
+        components.assign(CivilTimeComponent.HOUR, hour)
+        components.assign(CivilTimeComponent.MINUTE, minute)
 
         if meridiem is not None:
-            components.assign(DateTimeComponent.MERIDIEM, meridiem)
+            components.assign(CivilTimeComponent.MERIDIEM, meridiem)
         else:
             start_at_pm = (
-                result.moment.is_certain(DateTimeComponent.MERIDIEM) and
-                result.moment.get(DateTimeComponent.HOUR) > 12
+                result.moment.is_certain(CivilTimeComponent.MERIDIEM) and
+                result.moment.get(CivilTimeComponent.HOUR) > 12
             )
             if start_at_pm:
-                if result.moment.get(DateTimeComponent.HOUR) - 12 > hour:
+                if result.moment.get(CivilTimeComponent.HOUR) - 12 > hour:
                     # 10pm - 1 (am)
-                    components.imply(DateTimeComponent.MERIDIEM, Meridiem.AM)
+                    components.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
                 elif hour <= 12:
-                    components.assign(DateTimeComponent.HOUR, hour + 12)
-                    components.assign(DateTimeComponent.MERIDIEM, Meridiem.PM)
+                    components.assign(CivilTimeComponent.HOUR, hour + 12)
+                    components.assign(CivilTimeComponent.MERIDIEM, Meridiem.PM)
             elif hour > 12:
-                components.imply(DateTimeComponent.MERIDIEM, Meridiem.PM)
+                components.imply(CivilTimeComponent.MERIDIEM, Meridiem.PM)
             elif hour <= 12:
-                components.imply(DateTimeComponent.MERIDIEM, Meridiem.AM)
+                components.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
 
         # Imply year, month, day from reference
         ref_dt = context.reference.datetime()
-        components.imply(DateTimeComponent.YEAR, ref_dt.year)
-        components.imply(DateTimeComponent.MONTH, ref_dt.month)
-        components.imply(DateTimeComponent.DAY, ref_dt.day)
+        components.imply(CivilTimeComponent.YEAR, ref_dt.year)
+        components.imply(CivilTimeComponent.MONTH, ref_dt.month)
+        components.imply(CivilTimeComponent.DAY, ref_dt.day)
 
         if components.datetime() < result.moment.datetime():
             imply_next_day(components)

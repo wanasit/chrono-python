@@ -3,7 +3,7 @@ import datetime
 import chrono_python as chrono
 
 from chrono_python.types import Moment, DateTimePrecision, DateTimeMoment, ReferenceMoment
-from chrono_python.common.types import DateTimeComponent
+from chrono_python.common.types import CivilTimeComponent
 
 
 def test_years_ago():

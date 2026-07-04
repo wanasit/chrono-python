@@ -1,9 +1,8 @@
 import datetime
-import pytest
 
 import chrono_python as chrono
 from chrono_python.types import DateTimeMoment, DateTimePrecision
-from chrono_python.common.types import DateTimeComponent
+from chrono_python.common.types import CivilTimeComponent
 
 
 def test_single_expression():
@@ -15,12 +14,12 @@ def test_single_expression():
     result = results[0]
     assert result.index == 5
     assert result.text == "2012年3月31日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2012
-    assert result.moment.get(DateTimeComponent.MONTH) == 3
-    assert result.moment.get(DateTimeComponent.DAY) == 31
-    assert result.moment.is_certain(DateTimeComponent.YEAR) is True
-    assert result.moment.is_certain(DateTimeComponent.MONTH) is True
-    assert result.moment.is_certain(DateTimeComponent.DAY) is True
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 3
+    assert result.moment.get(CivilTimeComponent.DAY) == 31
+    assert result.moment.is_certain(CivilTimeComponent.YEAR) is True
+    assert result.moment.is_certain(CivilTimeComponent.MONTH) is True
+    assert result.moment.is_certain(CivilTimeComponent.DAY) is True
     assert result.moment.datetime() == datetime.datetime(2012, 3, 31, 12, 0)
 
     # 2012年９月3日
@@ -29,12 +28,12 @@ def test_single_expression():
     result = results[0]
     assert result.index == 5
     assert result.text == "2012年９月3日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2012
-    assert result.moment.get(DateTimeComponent.MONTH) == 9
-    assert result.moment.get(DateTimeComponent.DAY) == 3
-    assert result.moment.is_certain(DateTimeComponent.YEAR) is True
-    assert result.moment.is_certain(DateTimeComponent.MONTH) is True
-    assert result.moment.is_certain(DateTimeComponent.DAY) is True
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 9
+    assert result.moment.get(CivilTimeComponent.DAY) == 3
+    assert result.moment.is_certain(CivilTimeComponent.YEAR) is True
+    assert result.moment.is_certain(CivilTimeComponent.MONTH) is True
+    assert result.moment.is_certain(CivilTimeComponent.DAY) is True
     assert result.moment.datetime() == datetime.datetime(2012, 9, 3, 12, 0)
 
     # 2020年2月29日 with ref in 2019
@@ -44,9 +43,9 @@ def test_single_expression():
     result = results[0]
     assert result.index == 5
     assert result.text == "2020年2月29日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2020
-    assert result.moment.get(DateTimeComponent.MONTH) == 2
-    assert result.moment.get(DateTimeComponent.DAY) == 29
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2020
+    assert result.moment.get(CivilTimeComponent.MONTH) == 2
+    assert result.moment.get(CivilTimeComponent.DAY) == 29
     assert result.moment.datetime() == datetime.datetime(2020, 2, 29, 12, 0)
 
     # ９月3日 (No year)
@@ -55,12 +54,12 @@ def test_single_expression():
     result = results[0]
     assert result.index == 5
     assert result.text == "９月3日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2012
-    assert result.moment.get(DateTimeComponent.MONTH) == 9
-    assert result.moment.get(DateTimeComponent.DAY) == 3
-    assert result.moment.is_certain(DateTimeComponent.YEAR) is False
-    assert result.moment.is_certain(DateTimeComponent.MONTH) is True
-    assert result.moment.is_certain(DateTimeComponent.DAY) is True
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 9
+    assert result.moment.get(CivilTimeComponent.DAY) == 3
+    assert result.moment.is_certain(CivilTimeComponent.YEAR) is False
+    assert result.moment.is_certain(CivilTimeComponent.MONTH) is True
+    assert result.moment.is_certain(CivilTimeComponent.DAY) is True
     assert result.moment.datetime() == datetime.datetime(2012, 9, 3, 12, 0)
 
 
@@ -73,10 +72,10 @@ def test_era_expressions():
     result = results[0]
     assert result.index == 5
     assert result.text == "平成26年12月29日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2014
-    assert result.moment.get(DateTimeComponent.MONTH) == 12
-    assert result.moment.get(DateTimeComponent.DAY) == 29
-    assert result.moment.is_certain(DateTimeComponent.YEAR) is True
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2014
+    assert result.moment.get(CivilTimeComponent.MONTH) == 12
+    assert result.moment.get(CivilTimeComponent.DAY) == 29
+    assert result.moment.is_certain(CivilTimeComponent.YEAR) is True
     assert result.moment.datetime() == datetime.datetime(2014, 12, 29, 12, 0)
 
     # 昭和６４年１月７日 (Showa 64 = 1925 + 64 = 1989)
@@ -85,9 +84,9 @@ def test_era_expressions():
     result = results[0]
     assert result.index == 5
     assert result.text == "昭和６４年１月７日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 1989
-    assert result.moment.get(DateTimeComponent.MONTH) == 1
-    assert result.moment.get(DateTimeComponent.DAY) == 7
+    assert result.moment.get(CivilTimeComponent.YEAR) == 1989
+    assert result.moment.get(CivilTimeComponent.MONTH) == 1
+    assert result.moment.get(CivilTimeComponent.DAY) == 7
     assert result.moment.datetime() == datetime.datetime(1989, 1, 7, 12, 0)
 
     # 令和元年5月1日 (Reiwa 1/Gannen = 2018 + 1 = 2019)
@@ -96,9 +95,9 @@ def test_era_expressions():
     result = results[0]
     assert result.index == 5
     assert result.text == "令和元年5月1日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2019
-    assert result.moment.get(DateTimeComponent.MONTH) == 5
-    assert result.moment.get(DateTimeComponent.DAY) == 1
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2019
+    assert result.moment.get(CivilTimeComponent.MONTH) == 5
+    assert result.moment.get(CivilTimeComponent.DAY) == 1
     assert result.moment.datetime() == datetime.datetime(2019, 5, 1, 12, 0)
 
     # 令和2年5月1日 (Reiwa 2 = 2018 + 2 = 2020)
@@ -107,10 +106,10 @@ def test_era_expressions():
     result = results[0]
     assert result.index == 5
     assert result.text == "令和2年5月1日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2020
-    assert result.moment.get(DateTimeComponent.MONTH) == 5
-    assert result.moment.get(DateTimeComponent.DAY) == 1
-    assert result.moment.is_certain(DateTimeComponent.YEAR) is True
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2020
+    assert result.moment.get(CivilTimeComponent.MONTH) == 5
+    assert result.moment.get(CivilTimeComponent.DAY) == 1
+    assert result.moment.is_certain(CivilTimeComponent.YEAR) is True
     assert result.moment.datetime() == datetime.datetime(2020, 5, 1, 12, 0)
 
 
@@ -123,9 +122,9 @@ def test_relative_year_expressions():
     result = results[0]
     assert result.index == 5
     assert result.text == "同年7月27日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2012
-    assert result.moment.get(DateTimeComponent.MONTH) == 7
-    assert result.moment.get(DateTimeComponent.DAY) == 27
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 7
+    assert result.moment.get(CivilTimeComponent.DAY) == 27
     assert result.moment.datetime() == datetime.datetime(2012, 7, 27, 12, 0)
 
     # 本年7月27日
@@ -134,9 +133,9 @@ def test_relative_year_expressions():
     result = results[0]
     assert result.index == 5
     assert result.text == "本年7月27日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2012
-    assert result.moment.get(DateTimeComponent.MONTH) == 7
-    assert result.moment.get(DateTimeComponent.DAY) == 27
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 7
+    assert result.moment.get(CivilTimeComponent.DAY) == 27
     assert result.moment.datetime() == datetime.datetime(2012, 7, 27, 12, 0)
 
     # 今年7月27日
@@ -145,9 +144,9 @@ def test_relative_year_expressions():
     result = results[0]
     assert result.index == 5
     assert result.text == "今年7月27日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2012
-    assert result.moment.get(DateTimeComponent.MONTH) == 7
-    assert result.moment.get(DateTimeComponent.DAY) == 27
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 7
+    assert result.moment.get(CivilTimeComponent.DAY) == 27
     assert result.moment.datetime() == datetime.datetime(2012, 7, 27, 12, 0)
 
     # 今年11月27日 with ref in Jan
@@ -157,9 +156,9 @@ def test_relative_year_expressions():
     result = results[0]
     assert result.index == 0
     assert result.text == "今年11月27日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2012
-    assert result.moment.get(DateTimeComponent.MONTH) == 11
-    assert result.moment.get(DateTimeComponent.DAY) == 27
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 11
+    assert result.moment.get(CivilTimeComponent.DAY) == 27
     assert result.moment.datetime() == datetime.datetime(2012, 11, 27, 12, 0)
 
 
@@ -172,9 +171,9 @@ def test_expression_without_year():
     result = results[0]
     assert result.index == 0
     assert result.text == "7月27日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2012
-    assert result.moment.get(DateTimeComponent.MONTH) == 7
-    assert result.moment.get(DateTimeComponent.DAY) == 27
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 7
+    assert result.moment.get(CivilTimeComponent.DAY) == 27
     assert result.moment.datetime() == datetime.datetime(2012, 7, 27, 12, 0)
 
     # 11月27日 with ref in Jan 2012 (Nov 27, 2011 is closer than Nov 27, 2012)
@@ -184,7 +183,7 @@ def test_expression_without_year():
     result = results[0]
     assert result.index == 0
     assert result.text == "11月27日"
-    assert result.moment.get(DateTimeComponent.YEAR) == 2011
-    assert result.moment.get(DateTimeComponent.MONTH) == 11
-    assert result.moment.get(DateTimeComponent.DAY) == 27
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2011
+    assert result.moment.get(CivilTimeComponent.MONTH) == 11
+    assert result.moment.get(CivilTimeComponent.DAY) == 27
     assert result.moment.datetime() == datetime.datetime(2011, 11, 27, 12, 0)

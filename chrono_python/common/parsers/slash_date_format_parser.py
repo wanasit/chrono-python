@@ -1,7 +1,7 @@
 import re
 
 from chrono_python import chrono
-from chrono_python.common.types import ParsingDateTimeMoment, DateTimeComponent
+from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.types import Moment
 from chrono_python.utils import calendars
 
@@ -79,16 +79,16 @@ class SlashDateFormatParser(chrono.Parser):
         if day < 1 or day > 31:
             return None
 
-        moment = ParsingDateTimeMoment(context.reference, {})
-        moment.assign(DateTimeComponent.DAY, day)
-        moment.assign(DateTimeComponent.MONTH, month)
+        moment = ParsingCivilTimeMoment(context.reference, {})
+        moment.assign(CivilTimeComponent.DAY, day)
+        moment.assign(CivilTimeComponent.MONTH, month)
 
         if match.group(4):
             raw_year = int(match.group(4))
             year = calendars.find_most_likely_ad_year(raw_year)
-            moment.assign(DateTimeComponent.YEAR, year)
+            moment.assign(CivilTimeComponent.YEAR, year)
         else:
             year = calendars.find_year_closest_to_ref(context.reference, month, day)
-            moment.imply(DateTimeComponent.YEAR, year)
+            moment.imply(CivilTimeComponent.YEAR, year)
 
         return context.create_parsed_result(index, index_end, moment)

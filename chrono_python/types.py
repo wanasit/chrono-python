@@ -7,6 +7,11 @@ from typing import Mapping
 
 
 class DateTimePrecision(Enum):
+    """
+    Represents the level of precision of a parsed date or time.
+
+    The numeric value indicate the level of granularity (higher the more fine-grained).
+    """
     YEAR = 10
     MONTH = 20
     WEEK = 30
@@ -18,6 +23,9 @@ class DateTimePrecision(Enum):
 
 
 class Timeunit(Enum):
+    """
+    Represents a unit of time used for duration and offset calculations.
+    """
     YEAR = 'year'
     MONTH = 'month'
     DAY = 'day'
@@ -29,6 +37,7 @@ class Timeunit(Enum):
 
 
 Duration = Mapping[Timeunit, int]
+"""Type alias representing a duration mapping from Timeunit to its integer quantity."""
 
 
 class Moment(ABC):
@@ -63,12 +72,21 @@ class DateTimeMoment(Moment):
 
     @classmethod
     def now(cls):
+        """
+        Creates a DateTimeMoment representing the current system time.
+        """
         return cls(_dt=datetime.datetime.now(), _precision=DateTimePrecision.MILLI_SECOND)
 
     def datetime(self) -> datetime.datetime:
+        """
+        Returns the python datetime representing this moment.
+        """
         return self._dt
 
     def precision(self) -> DateTimePrecision:
+        """
+        Returns the precision of this moment.
+        """
         return self._precision
 
 
@@ -120,6 +138,9 @@ class ReferenceMoment(Moment):
 
 @dataclass(frozen=True)
 class ParsedResult:
+    """
+    Represents the result of parsing a date/time expression.
+    """
     index: int
     text: str
     moment: Moment
@@ -130,6 +151,9 @@ class ParsedResult:
 
 @dataclass(frozen=True)
 class ParsedRangeResult(ParsedResult):
+    """
+    Represents the result of parsing a date/time range expression (e.g., 'from X to Y').
+    """
     end: Moment
 
     @property

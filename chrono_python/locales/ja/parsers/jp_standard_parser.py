@@ -1,7 +1,7 @@
 import re
 
 from chrono_python import chrono
-from chrono_python.common.types import ParsingDateTimeMoment, DateTimeComponent
+from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.types import Moment
 from chrono_python.utils import calendars
 from chrono_python.locales.ja.constants import to_hankaku
@@ -32,15 +32,15 @@ class JPStandardParser(chrono.Parser):
         month = int(to_hankaku(match.group(MONTH_GROUP)))
         day = int(to_hankaku(match.group(DAY_GROUP)))
 
-        moment = ParsingDateTimeMoment(context.reference, {})
-        moment.assign(DateTimeComponent.MONTH, month)
-        moment.assign(DateTimeComponent.DAY, day)
+        moment = ParsingCivilTimeMoment(context.reference, {})
+        moment.assign(CivilTimeComponent.MONTH, month)
+        moment.assign(CivilTimeComponent.DAY, day)
 
         special_year = match.group(SPECIAL_YEAR_GROUP)
         typical_year = match.group(TYPICAL_YEAR_GROUP)
 
         if special_year and special_year in ("同", "今", "本"):
-            moment.assign(DateTimeComponent.YEAR, context.reference.datetime().year)
+            moment.assign(CivilTimeComponent.YEAR, context.reference.datetime().year)
         elif typical_year:
             year_num_text = match.group(YEAR_NUMBER_GROUP)
             year = 1 if year_num_text == "元" else int(to_hankaku(year_num_text))
@@ -53,9 +53,9 @@ class JPStandardParser(chrono.Parser):
             elif era == "昭和":
                 year += 1925
                 
-            moment.assign(DateTimeComponent.YEAR, year)
+            moment.assign(CivilTimeComponent.YEAR, year)
         else:
             year = calendars.find_year_closest_to_ref(context.reference, month, day)
-            moment.imply(DateTimeComponent.YEAR, year)
+            moment.imply(CivilTimeComponent.YEAR, year)
 
         return moment

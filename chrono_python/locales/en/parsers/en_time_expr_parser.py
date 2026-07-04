@@ -2,7 +2,7 @@ import re
 
 from chrono_python import chrono
 from chrono_python.common.parsers.time_expr_parser import TimeExprParser
-from chrono_python.common.types import ParsingDateTimeMoment, DateTimeComponent, Meridiem
+from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent, Meridiem
 from chrono_python.utils.re import Match
 
 
@@ -20,7 +20,7 @@ class ENTimeExprParser(TimeExprParser):
 
     def extract_primary_time_components(
         self, context: chrono.ParsingContext, match: Match
-    ) -> ParsingDateTimeMoment | None:
+    ) -> ParsingCivilTimeMoment | None:
         components = super().extract_primary_time_components(context, match)
         if components is None:
             return None
@@ -28,19 +28,19 @@ class ENTimeExprParser(TimeExprParser):
         # Custom morning/afternoon/night handling if present in the matched segment
         match_str_lower = match.group(0).lower()
         if "night" in match_str_lower:
-            hour = components.get(DateTimeComponent.HOUR)
+            hour = components.get(CivilTimeComponent.HOUR)
             if hour is not None:
                 if 6 <= hour < 12:
-                    components.assign(DateTimeComponent.HOUR, hour + 12)
-                    components.assign(DateTimeComponent.MERIDIEM, Meridiem.PM)
+                    components.assign(CivilTimeComponent.HOUR, hour + 12)
+                    components.assign(CivilTimeComponent.MERIDIEM, Meridiem.PM)
                 elif hour < 6:
-                    components.assign(DateTimeComponent.MERIDIEM, Meridiem.AM)
+                    components.assign(CivilTimeComponent.MERIDIEM, Meridiem.AM)
         elif "afternoon" in match_str_lower:
-            components.assign(DateTimeComponent.MERIDIEM, Meridiem.PM)
-            hour = components.get(DateTimeComponent.HOUR)
+            components.assign(CivilTimeComponent.MERIDIEM, Meridiem.PM)
+            hour = components.get(CivilTimeComponent.HOUR)
             if hour is not None and 0 <= hour <= 6:
-                components.assign(DateTimeComponent.HOUR, hour + 12)
+                components.assign(CivilTimeComponent.HOUR, hour + 12)
         elif "morning" in match_str_lower:
-            components.assign(DateTimeComponent.MERIDIEM, Meridiem.AM)
+            components.assign(CivilTimeComponent.MERIDIEM, Meridiem.AM)
 
         return components
