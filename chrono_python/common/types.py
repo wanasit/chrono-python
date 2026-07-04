@@ -71,6 +71,24 @@ class ParsingCivilTimeMoment(DateTimeMoment):
     def is_certain(self, component: CivilTimeComponent) -> bool:
         return component in self._known_values
 
+    def list(self, only_certain: bool = True) -> list[CivilTimeComponent]:
+        if only_certain:
+            return list(self._known_values.keys())
+        return list(set(self._known_values.keys()) | set(self._implied_values.keys()))
+
+    def is_only_weekday_component(self) -> bool:
+        return (
+            self.is_certain(CivilTimeComponent.WEEKDAY)
+            and not self.is_certain(CivilTimeComponent.DAY)
+            and not self.is_certain(CivilTimeComponent.MONTH)
+        )
+
+    def is_date_with_unknown_year(self) -> bool:
+        return (
+            self.is_certain(CivilTimeComponent.MONTH)
+            and not self.is_certain(CivilTimeComponent.YEAR)
+        )
+
     def assign(self, component: CivilTimeComponent, value: int) -> 'ParsingCivilTimeMoment':
         if component in self._implied_values:
             del self._implied_values[component]

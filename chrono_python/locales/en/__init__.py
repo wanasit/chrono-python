@@ -5,6 +5,7 @@ from chrono_python.locales.en.parsers.en_month_name_little_endian_parser import 
 from chrono_python.locales.en.parsers.en_month_name_middle_endian_parser import ENMonthNameMiddleEndianParser
 from chrono_python.locales.en.parsers.en_time_unit_ago_parser import ENTimeUnitAgoParser
 from chrono_python.locales.en.parsers.en_time_expr_parser import ENTimeExprParser
+from chrono_python.locales.en.refiners import ENMergeDateRangeRefiner
 
 configuration = chrono.Configuration(
     parsers=[
@@ -17,6 +18,7 @@ configuration = chrono.Configuration(
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
+        ENMergeDateRangeRefiner(),
     ])
 casual = chrono.Chrono(configuration)
 strict = chrono.Chrono(configuration)
