@@ -1,3 +1,29 @@
+NUMBER = {
+    "零": 0,
+    "〇": 0,
+    "一": 1,
+    "二": 2,
+    "三": 3,
+    "四": 4,
+    "五": 5,
+    "六": 6,
+    "七": 7,
+    "八": 8,
+    "九": 9,
+    "十": 10,
+}
+
+WEEKDAY_OFFSET = {
+    "日": 0,
+    "月": 1,
+    "火": 2,
+    "水": 3,
+    "木": 4,
+    "金": 5,
+    "土": 6,
+}
+
+
 def to_hankaku(text: str) -> str:
     """Convert Zenkaku (full-width) alphanumeric characters to Hankaku (half-width).
     
@@ -14,8 +40,6 @@ def to_hankaku(text: str) -> str:
     res = []
     for char in text:
         cp = ord(char)
-        # Check if code point is in the specified character classes:
-        # [\uFF01\uFF03-\uFF06\uFF08\uFF09\uFF0C-\uFF19\uFF1C-\uFF1F\uFF21-\uFF3B\uFF3D\uFF3F\uFF41-\uFF5B\uFF5D\uFF5E]
         if (cp == 0xFF01 or 
             0xFF03 <= cp <= 0xFF06 or 
             cp == 0xFF08 or cp == 0xFF09 or 
@@ -30,3 +54,13 @@ def to_hankaku(text: str) -> str:
             res.append(char)
             
     return "".join(res)
+
+
+def ja_string_to_number(text: str) -> int:
+    number = 0
+    for char in text:
+        if char == "十":
+            number = NUMBER[char] if number == 0 else number * NUMBER[char]
+        else:
+            number += NUMBER.get(char, 0)
+    return number

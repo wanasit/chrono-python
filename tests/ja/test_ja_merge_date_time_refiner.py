@@ -1,0 +1,30 @@
+import datetime
+import chrono_python as chrono
+from chrono_python.common.types import CivilTimeComponent, Meridiem
+
+
+def test_ja_merge_date_time():
+    ref_date = datetime.datetime(2012, 3, 20, 12, 0)
+
+    # 2012年3月31日の午後3時
+    results = chrono.ja.parse("2012年3月31日の午後3時", ref_date)
+    assert len(results) == 1
+    result = results[0]
+    assert result.text == "2012年3月31日の午後3時"
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 3
+    assert result.moment.get(CivilTimeComponent.DAY) == 31
+    assert result.moment.get(CivilTimeComponent.HOUR) == 15
+    assert result.moment.datetime().minute == 0
+    assert result.moment.get(CivilTimeComponent.MERIDIEM) == Meridiem.PM
+
+    # 7月27日 10時
+    results = chrono.ja.parse("7月27日 10時", ref_date)
+    assert len(results) == 1
+    result = results[0]
+    assert result.text == "7月27日 10時"
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 7
+    assert result.moment.get(CivilTimeComponent.DAY) == 27
+    assert result.moment.get(CivilTimeComponent.HOUR) == 10
+    assert result.moment.get(CivilTimeComponent.MERIDIEM) == Meridiem.AM

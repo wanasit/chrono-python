@@ -83,6 +83,21 @@ class ParsingCivilTimeMoment(DateTimeMoment):
             and not self.is_certain(CivilTimeComponent.MONTH)
         )
 
+    def is_only_date(self) -> bool:
+        return (
+            not self.is_certain(CivilTimeComponent.HOUR)
+            and not self.is_certain(CivilTimeComponent.MINUTE)
+            and not self.is_certain(CivilTimeComponent.SECOND)
+        )
+
+    def is_only_time(self) -> bool:
+        return (
+            not self.is_certain(CivilTimeComponent.WEEKDAY)
+            and not self.is_certain(CivilTimeComponent.DAY)
+            and not self.is_certain(CivilTimeComponent.MONTH)
+            and not self.is_certain(CivilTimeComponent.YEAR)
+        )
+
     def is_date_with_unknown_year(self) -> bool:
         return (
             self.is_certain(CivilTimeComponent.MONTH)
