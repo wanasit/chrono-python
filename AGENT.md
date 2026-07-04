@@ -30,12 +30,13 @@ chrono_python/
 ├── common/           # Shared, locale-agnostic logic
 │   ├── types.py      # Enums (CivilTimeComponent) and internal parser/refiner types (ParsingCivilTimeMoment)
 │   ├── parsers/      # Common parsers (ISOFormatParser, SlashDateFormatParser)
-│   └── refiners/     # Common refiners (RemoveOverlapRefiner)
+│   ├── refiners/     # Common refiners (RemoveOverlapRefiner)
+│   ├── calendars.py  # Year offset and calculation helpers
+│   └── weekdays.py   # Weekday calculation helpers
 ├── locales/          # Language/Locale specific components
 │   ├── en/           # English configuration, constants, and locale parsers
 │   └── ja/           # Japanese configuration and locale parsers
 └── utils/            # Helper utilities
-    ├── calendars.py  # Year offset and calculation helpers
     ├── patterns.py   # Pattern utilities
     └── re.py         # Re.Match wrapper class (Match)
 ```

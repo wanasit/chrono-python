@@ -5,7 +5,8 @@ from chrono_python import chrono
 from chrono_python.locales.en import constants
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.types import Moment
-from chrono_python.utils import patterns, calendars
+from chrono_python.utils import patterns
+from chrono_python.common import calendars
 
 # Pattern for Month-Day-Year formats (e.g., "January 1st, 2023", "Jan 1 2023", "Feb 10-12, 2024")
 # Examples:

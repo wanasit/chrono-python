@@ -3,7 +3,7 @@ import re
 from chrono_python import chrono
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.types import Moment
-from chrono_python.utils import calendars
+from chrono_python.common import calendars
 
 # Regex matching date formats with slash "/", dot ".", or hyphen "-"
 # e.g., 7/10, 7/12/2020, 7.12.2020, 30-12-16

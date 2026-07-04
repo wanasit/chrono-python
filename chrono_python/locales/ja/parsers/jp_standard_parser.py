@@ -3,7 +3,7 @@ import re
 from chrono_python import chrono
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.types import Moment
-from chrono_python.utils import calendars
+from chrono_python.common import calendars
 from chrono_python.locales.ja.constants import to_hankaku
 
 # Regex matching Japanese standard date format (e.g. 令和元年5月1日, 2012年3月31日, 7月27日)

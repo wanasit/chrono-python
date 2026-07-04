@@ -1,7 +1,7 @@
 import re
 from chrono_python import chrono
 from chrono_python.locales.ja.constants import WEEKDAY_OFFSET
-from chrono_python.utils.weekdays import create_parsing_components_at_weekday
+from chrono_python.common.weekdays import create_parsing_components_at_weekday
 from chrono_python.types import Moment
 
 # Pattern matching Japanese weekdays with optional prefixes (e.g., 前の火曜日, 今週土曜)

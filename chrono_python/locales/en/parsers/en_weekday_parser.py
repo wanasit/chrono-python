@@ -3,7 +3,7 @@ from chrono_python import chrono
 from chrono_python.common.parsers.abstract_parser_with_word_boundary import AbstractParserWithWordBoundary
 from chrono_python.locales.en.constants import WEEKDAY_DICTIONARY
 from chrono_python.utils import patterns
-from chrono_python.utils.weekdays import create_parsing_components_at_weekday
+from chrono_python.common.weekdays import create_parsing_components_at_weekday
 from chrono_python.types import Moment
 
 PATTERN = re.compile(
