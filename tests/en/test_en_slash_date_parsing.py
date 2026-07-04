@@ -69,7 +69,7 @@ def test_slash_two_digit_year():
     # 30-12-16 has month=30, day=12, year=16.
     # Month > 12 triggers swap: month=12, day=30.
     # Year <= 50 triggers find_most_likely_ad_year: 16 -> 2016.
-    results = chrono.parse('Friday 30-12-16')
+    results = chrono.parse('30-12-16')
     assert len(results) == 1
     result = results[0]
     assert result.text == '30-12-16'

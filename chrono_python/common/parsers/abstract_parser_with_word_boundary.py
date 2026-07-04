@@ -46,7 +46,12 @@ class AbstractParserWithWordBoundary(chrono.Parser):
     # noinspection PyProtectedMember
     def extract(self, context: chrono.ParsingContext, match: chrono.Match):
         inner_match = _create_inner_match_remove_group(match)
-        return self.inner_extract(context, inner_match)
+        result = self.inner_extract(context, inner_match)
+        if result is None:
+            return None
+        if isinstance(result, Moment):
+            return context.create_parsed_result(inner_match.start(), inner_match.end(), result)
+        return result
 
 
 # noinspection PyProtectedMember

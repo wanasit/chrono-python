@@ -8,6 +8,7 @@ from chrono_python.locales.en.parsers.en_time_unit_casual_reference_parser impor
 from chrono_python.locales.en.parsers.en_time_unit_later_parser import ENTimeUnitLaterParser
 from chrono_python.locales.en.parsers.en_time_unit_within_parser import ENTimeUnitWithinParser
 from chrono_python.locales.en.parsers.en_time_expr_parser import ENTimeExprParser
+from chrono_python.locales.en.parsers.en_weekday_parser import ENWeekdayParser
 from chrono_python.locales.en.refiners import ENMergeDateRangeRefiner, ENMergeDateTimeRefiner
 
 strict_configuration = chrono.Configuration(
@@ -15,6 +16,7 @@ strict_configuration = chrono.Configuration(
         common_parsers.ISOFormatParser(),
         common_parsers.SlashDateFormatParser(little_endian=False),
         ENTimeExprParser(),
+        ENWeekdayParser(),
         ENMonthNameLittleEndianParser(),
         ENMonthNameMiddleEndianParser(),
         ENTimeUnitWithinParser(allow_abbreviations=False),
@@ -23,6 +25,7 @@ strict_configuration = chrono.Configuration(
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
+        common_refiners.MergeWeekdayComponentRefiner(),
         ENMergeDateTimeRefiner(),
         ENMergeDateRangeRefiner(),
     ])
@@ -32,6 +35,7 @@ casual_configuration = chrono.Configuration(
         common_parsers.ISOFormatParser(),
         common_parsers.SlashDateFormatParser(little_endian=False),
         ENTimeExprParser(),
+        ENWeekdayParser(),
         ENMonthNameLittleEndianParser(),
         ENMonthNameMiddleEndianParser(),
         ENTimeUnitWithinParser(allow_abbreviations=True),
@@ -41,6 +45,7 @@ casual_configuration = chrono.Configuration(
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
+        common_refiners.MergeWeekdayComponentRefiner(),
         ENMergeDateTimeRefiner(),
         ENMergeDateRangeRefiner(),
     ])

@@ -3,6 +3,35 @@ import re
 from chrono_python.types import Timeunit
 from chrono_python.utils import patterns
 
+WEEKDAY_DICTIONARY = {
+    'sunday': 0,
+    'sun': 0,
+    'sun.': 0,
+    'monday': 1,
+    'mon': 1,
+    'mon.': 1,
+    'tuesday': 2,
+    'tue': 2,
+    'tue.': 2,
+    'wednesday': 3,
+    'wed': 3,
+    'wed.': 3,
+    'thursday': 4,
+    'thurs': 4,
+    'thurs.': 4,
+    'thur': 4,
+    'thur.': 4,
+    'thu': 4,
+    'thu.': 4,
+    'friday': 5,
+    'fri': 5,
+    'fri.': 5,
+    'saturday': 6,
+    'sat': 6,
+    'sat.': 6,
+}
+
+
 FULL_MONTH_NAME_DICTIONARY = {
     'january': 1,
     'february': 2,
