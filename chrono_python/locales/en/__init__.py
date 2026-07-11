@@ -21,7 +21,7 @@ strict_configuration = chrono.Configuration(
         ENMonthNameMiddleEndianParser(),
         ENTimeUnitWithinParser(allow_abbreviations=False),
         ENTimeUnitAgoParser(allow_abbreviations=False),
-        ENTimeUnitLaterParser(allow_abbreviations=False),
+        ENTimeUnitLaterParser(allow_abbreviations=False, allow_casual_suffix=False),
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
@@ -40,7 +40,7 @@ casual_configuration = chrono.Configuration(
         ENMonthNameMiddleEndianParser(),
         ENTimeUnitWithinParser(allow_abbreviations=True),
         ENTimeUnitAgoParser(allow_abbreviations=True),
-        ENTimeUnitLaterParser(allow_abbreviations=True),
+        ENTimeUnitLaterParser(allow_abbreviations=True, allow_casual_suffix=True),
         ENTimeUnitCasualReferenceParser(allow_abbreviations=True),
     ],
     refiners=[

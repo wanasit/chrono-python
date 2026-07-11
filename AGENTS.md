@@ -63,6 +63,13 @@ chrono_python/
 1. **Feature parity with TypeScript Chrono**:
    The Python version is currently a simplified, work-in-progress port of the JS/TS library. Options like `forwardDate` or a separate `GB` locale structure are not yet implemented.
 
+2. **Pattern Compilation & Options**:
+   Avoid storing static, global compiled regexes (e.g. `PATTERN = re.compile(...)`) at the module level when they depend on configuration flags (like `allow_abbreviations` or `allow_casual_suffix`).
+   Instead:
+   - Define a file-local helper `compile_pattern(...)` that accepts option flags and returns a compiled `re.Pattern`.
+   - Call `compile_pattern` inside the parser class's constructor `__init__` and store the result as `self._pattern`.
+   - Do not name the attribute `self.pattern` because it shadows the inherited `pattern()` method.
+
 ---
 
 ## Git & Commit Message Format

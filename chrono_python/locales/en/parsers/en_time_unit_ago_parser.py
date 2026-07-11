@@ -4,23 +4,24 @@ from chrono_python.common.parsers.abstract_parser_with_word_boundary import Abst
 from chrono_python.locales.en import constants
 from chrono_python.types import Moment, ReferenceMoment
 
-PATTERN = re.compile(
-    rf'({constants.TIME_UNITS_PATTERN})\s{{0,5}}(?:ago|before|earlier)(?=\W|$)',
-    re.IGNORECASE
-)
-STRICT_PATTERN = re.compile(
-    rf'({constants.TIME_UNITS_NO_ABBR_PATTERN})\s{{0,5}}(?:ago|before|earlier)(?=\W|$)',
-    re.IGNORECASE
-)
+def compile_pattern(timeunit_pattern: str) -> re.Pattern:
+    return re.compile(
+        rf'({timeunit_pattern})\s{{0,5}}'
+        rf'(?:ago|before|earlier)'
+        rf'(?=\W|$)',
+        re.IGNORECASE
+    )
 
 
 class ENTimeUnitAgoParser(AbstractParserWithWordBoundary):
     def __init__(self, allow_abbreviations: bool = True):
         super().__init__()
-        self.allow_abbreviations = allow_abbreviations
+        self._pattern = compile_pattern(
+            constants.TIME_UNITS_PATTERN if allow_abbreviations else constants.TIME_UNITS_NO_ABBR_PATTERN
+        )
 
     def inner_pattern(self) -> re.Pattern:
-        return PATTERN if self.allow_abbreviations else STRICT_PATTERN
+        return self._pattern
 
     def inner_extract(self, context: chrono.ParsingContext, match: chrono.Match) -> chrono.ParsedResult | Moment | None:
         duration = constants.parse_duration(match.group(1))

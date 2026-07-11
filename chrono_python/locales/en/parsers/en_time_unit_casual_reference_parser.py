@@ -4,23 +4,24 @@ from chrono_python.common.parsers.abstract_parser_with_word_boundary import Abst
 from chrono_python.locales.en import constants
 from chrono_python.types import Moment, ReferenceMoment
 
-PATTERN = re.compile(
-    rf'(this|last|past|next|after|\+|-)\s*({constants.TIME_UNITS_PATTERN})(?=\W|$)',
-    re.IGNORECASE
-)
-PATTERN_NO_ABBR = re.compile(
-    rf'(this|last|past|next|after|\+|-)\s*({constants.TIME_UNITS_NO_ABBR_PATTERN})(?=\W|$)',
-    re.IGNORECASE
-)
+def compile_pattern(timeunit_pattern: str) -> re.Pattern:
+    return re.compile(
+        rf'(this|last|past|next|after|\+|-)\s*'
+        rf'({timeunit_pattern})'
+        rf'(?=\W|$)',
+        re.IGNORECASE
+    )
 
 
 class ENTimeUnitCasualReferenceParser(AbstractParserWithWordBoundary):
     def __init__(self, allow_abbreviations: bool = True):
         super().__init__()
-        self.allow_abbreviations = allow_abbreviations
+        self._pattern = compile_pattern(
+            constants.TIME_UNITS_PATTERN if allow_abbreviations else constants.TIME_UNITS_NO_ABBR_PATTERN
+        )
 
     def inner_pattern(self) -> re.Pattern:
-        return PATTERN if self.allow_abbreviations else PATTERN_NO_ABBR
+        return self._pattern
 
     def inner_extract(self, context: chrono.ParsingContext, match: chrono.Match) -> chrono.ParsedResult | Moment | None:
         prefix = match.group(1).lower()
