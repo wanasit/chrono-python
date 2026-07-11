@@ -19,6 +19,11 @@ poetry run pytest
 ```
 *Note: Test logging is configured to `DEBUG` level via `pytest.ini`.*
 
+### Test File Naming Convention
+Test files must describe the behavior they are testing (rather than the names of the parser/refiner classes), ending with a verb in `-ing` form (e.g. `_parsing.py`, `_filtering.py`, `_merging.py`). For example:
+- `test_en_unlikely_format_filtering.py` (testing filtering behavior) instead of `test_en_unlikely_format_filter.py` (class).
+- `test_en_date_range_merging.py` (testing merging behavior) instead of `test_en_merge_date_range_refiner.py` (class).
+
 ---
 
 ## Directory Structure & Architecture
