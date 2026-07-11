@@ -28,3 +28,35 @@ def test_ja_merge_date_time():
     assert result.moment.get(CivilTimeComponent.DAY) == 27
     assert result.moment.get(CivilTimeComponent.HOUR) == 10
     assert result.moment.get(CivilTimeComponent.MERIDIEM) == Meridiem.AM
+
+
+def test_ja_merge_casual_date_time():
+    from chrono_python.types import DateTimePrecision
+
+    ref_date = datetime.datetime(2012, 8, 9, 12, 0) # Thursday Aug 9, 2012
+
+    # 今日の午後3時
+    results = chrono.ja.parse("今日の午後3時", ref_date)
+    assert len(results) == 1
+    result = results[0]
+    assert result.text == "今日の午後3時"
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 8
+    assert result.moment.get(CivilTimeComponent.DAY) == 9
+    assert result.moment.get(CivilTimeComponent.HOUR) == 15
+    assert result.moment.get(CivilTimeComponent.MERIDIEM) == Meridiem.PM
+    # since PM 3 o'clock is specified, hour and meridiem are known, and minute is assigned to 0, so precision is MINUTE
+    assert result.moment.precision() == DateTimePrecision.MINUTE
+
+    # 明日の10:30
+    results = chrono.ja.parse("明日の10:30", ref_date)
+    assert len(results) == 1
+    result = results[0]
+    assert result.text == "明日の10:30"
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2012
+    assert result.moment.get(CivilTimeComponent.MONTH) == 8
+    assert result.moment.get(CivilTimeComponent.DAY) == 10
+    assert result.moment.get(CivilTimeComponent.HOUR) == 10
+    assert result.moment.get(CivilTimeComponent.MINUTE) == 30
+    # since 10:30 is specified, precision is MINUTE
+    assert result.moment.precision() == DateTimePrecision.MINUTE

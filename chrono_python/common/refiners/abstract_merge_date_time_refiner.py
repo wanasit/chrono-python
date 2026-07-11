@@ -5,20 +5,16 @@ from abc import ABC, abstractmethod
 from chrono_python import chrono
 from chrono_python.chrono import ParsingContext
 from chrono_python.common.refiners.abstract_merging_refiner import AbstractMergingRefiner
-from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent, Meridiem
+from chrono_python.common.types import CivilTimeMoment, ParsingCivilTimeMoment, CivilTimeComponent, Meridiem
 from chrono_python.types import ParsedResult, ParsedRangeResult
 
 
 def assign_similar_date(component: ParsingCivilTimeMoment, target: datetime.datetime):
-    component.assign(CivilTimeComponent.DAY, target.day)
-    component.assign(CivilTimeComponent.MONTH, target.month)
-    component.assign(CivilTimeComponent.YEAR, target.year)
+    component.assign_similar_date(target)
 
 
 def imply_similar_date(component: ParsingCivilTimeMoment, target: datetime.datetime):
-    component.imply(CivilTimeComponent.DAY, target.day)
-    component.imply(CivilTimeComponent.MONTH, target.month)
-    component.imply(CivilTimeComponent.YEAR, target.year)
+    component.imply_similar_date(target)
 
 
 def merge_date_time_component(
@@ -80,7 +76,7 @@ def merge_date_time_result(date_result: ParsedResult, time_result: ParsedResult)
     start_date = date_result.moment
     start_time = time_result.moment
 
-    if isinstance(start_date, ParsingCivilTimeMoment) and isinstance(start_time, ParsingCivilTimeMoment):
+    if isinstance(start_date, CivilTimeMoment) and isinstance(start_time, CivilTimeMoment):
         merged_start = merge_date_time_component(start_date, start_time)
     else:
         merged_start = start_date
@@ -90,7 +86,7 @@ def merge_date_time_result(date_result: ParsedResult, time_result: ParsedResult)
         end_date = date_result.end if isinstance(date_result, ParsedRangeResult) else date_result.moment
         end_time = time_result.end if isinstance(time_result, ParsedRangeResult) else time_result.moment
 
-        if isinstance(end_date, ParsingCivilTimeMoment) and isinstance(end_time, ParsingCivilTimeMoment):
+        if isinstance(end_date, CivilTimeMoment) and isinstance(end_time, CivilTimeMoment):
             merged_end = merge_date_time_component(end_date, end_time)
 
             if not isinstance(date_result, ParsedRangeResult) and merged_end.datetime() < merged_start.datetime():
@@ -120,7 +116,7 @@ class AbstractMergeDateTimeRefiner(AbstractMergingRefiner, ABC):
     def should_merge_results(self, text_between: str, current_result: ParsedResult, next_result: ParsedResult, context: ParsingContext) -> bool:
         curr_moment = current_result.moment
         next_moment = next_result.moment
-        if not isinstance(curr_moment, ParsingCivilTimeMoment) or not isinstance(next_moment, ParsingCivilTimeMoment):
+        if not isinstance(curr_moment, CivilTimeMoment) or not isinstance(next_moment, CivilTimeMoment):
             return False
 
         has_date_time = (curr_moment.is_only_date() and next_moment.is_only_time()) or (next_moment.is_only_date() and curr_moment.is_only_time())

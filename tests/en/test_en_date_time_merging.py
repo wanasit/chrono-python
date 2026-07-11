@@ -44,3 +44,35 @@ def test_en_merge_date_time_range_increment():
     assert result.end.get(CivilTimeComponent.MONTH) == 2
     assert result.end.get(CivilTimeComponent.DAY) == 14  # next day
     assert result.end.get(CivilTimeComponent.HOUR) == 1
+
+
+def test_en_merge_casual_date_time():
+    from chrono_python.types import DateTimePrecision
+    
+    ref_date = datetime.datetime(2020, 7, 10, 12, 0)
+
+    # today at 8pm
+    results = chrono.parse("today at 8pm", ref_date)
+    assert len(results) == 1
+    result = results[0]
+    assert result.text == "today at 8pm"
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2020
+    assert result.moment.get(CivilTimeComponent.MONTH) == 7
+    assert result.moment.get(CivilTimeComponent.DAY) == 10
+    assert result.moment.get(CivilTimeComponent.HOUR) == 20
+    assert result.moment.get(CivilTimeComponent.MERIDIEM) == Meridiem.PM
+    # since we specify "at 8pm", the hour and meridiem are known, and minute is assigned to 0, so precision is MINUTE
+    assert result.moment.precision() == DateTimePrecision.MINUTE
+
+    # tomorrow at 10:30
+    results = chrono.parse("tomorrow at 10:30", ref_date)
+    assert len(results) == 1
+    result = results[0]
+    assert result.text == "tomorrow at 10:30"
+    assert result.moment.get(CivilTimeComponent.YEAR) == 2020
+    assert result.moment.get(CivilTimeComponent.MONTH) == 7
+    assert result.moment.get(CivilTimeComponent.DAY) == 11
+    assert result.moment.get(CivilTimeComponent.HOUR) == 10
+    assert result.moment.get(CivilTimeComponent.MINUTE) == 30
+    # since we specify "at 10:30", hour and minute are known, so precision is MINUTE
+    assert result.moment.precision() == DateTimePrecision.MINUTE

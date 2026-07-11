@@ -30,9 +30,9 @@ class CivilTimeComponent(Enum):
     MERIDIEM = 'meridiem'
 
 
-class ParsingCivilTimeMoment(DateTimeMoment):
+class CivilTimeMoment(DateTimeMoment):
     """
-    A mutable DateTimeMoment that is represented by human-readable calendar and clock components (e.g., year, month, day, hour).
+    An immutable DateTimeMoment that is represented by human-readable calendar and clock components (e.g., year, month, day, hour).
 
     Unlike `datetime` or system epoch, this class represents time from the perspective of a human reading a calendar and clock. 
     This follows the concept of `CivilTime` in Abseil, or `Temporal.PlainDateTime`/`Temporal.LocalDateTime` in JavaScript.
@@ -50,16 +50,21 @@ class ParsingCivilTimeMoment(DateTimeMoment):
                  ):
         # Initialize the frozen DateTimeMoment base class
         super().__init__(_dt=reference.datetime(), _precision=DateTimePrecision.MILLI_SECOND)
-        self._reference = reference
-        self._known_values = known_values
-        self._implied_values = implied_values if implied_values is not None else {}
+        object.__setattr__(self, '_reference', reference)
+        object.__setattr__(self, '_known_values', known_values.copy())
+        object.__setattr__(self, '_implied_values', implied_values.copy() if implied_values is not None else {})
 
     def __setattr__(self, name, value):
-        # Bypass the frozen class restrictions on subclass attributes
-        object.__setattr__(self, name, value)
+        raise AttributeError("CivilTimeMoment is immutable. Use to_mutable() to modify.")
 
-    def clone(self) -> 'ParsingCivilTimeMoment':
+    def clone(self) -> 'CivilTimeMoment':
+        return CivilTimeMoment(self._reference, self._known_values.copy(), self._implied_values.copy())
+
+    def to_mutable(self) -> 'ParsingCivilTimeMoment':
         return ParsingCivilTimeMoment(self._reference, self._known_values.copy(), self._implied_values.copy())
+
+    def freeze(self) -> 'CivilTimeMoment':
+        return self
 
     def get(self, component: CivilTimeComponent) -> int | None:
         if component in self._known_values:
@@ -104,21 +109,9 @@ class ParsingCivilTimeMoment(DateTimeMoment):
             and not self.is_certain(CivilTimeComponent.YEAR)
         )
 
-    def assign(self, component: CivilTimeComponent, value: int) -> 'ParsingCivilTimeMoment':
-        if component in self._implied_values:
-            del self._implied_values[component]
-        self._known_values[component] = value
-        return self
-
-    def imply(self, component: CivilTimeComponent, value: int) -> 'ParsingCivilTimeMoment':
-        if component not in self._known_values:
-            self._implied_values[component] = value
-        return self
-
     def precision(self) -> DateTimePrecision:
         max_precision = None
-        all_components = set(self._known_values.keys()) | set(self._implied_values.keys())
-        for component in all_components:
+        for component in self._known_values.keys():
             precision = COMPONENT_PRECISION_MAP.get(component)
             if precision is not None:
                 if max_precision is None or precision.value > max_precision.value:
@@ -170,6 +163,105 @@ class ParsingCivilTimeMoment(DateTimeMoment):
         )
 
 
+class ParsingCivilTimeMoment(CivilTimeMoment):
+    """
+    A mutable CivilTimeMoment that can be updated during parsing.
+    """
+
+    def __init__(
+                 self,
+                 reference: Moment,
+                 known_values: dict[CivilTimeComponent, int],
+                 implied_values: dict[CivilTimeComponent, int] | None = None
+                 ):
+        super().__init__(reference, known_values, implied_values)
+
+    def __setattr__(self, name, value):
+        # Bypass the frozen class restrictions on subclass attributes
+        object.__setattr__(self, name, value)
+
+    def clone(self) -> 'ParsingCivilTimeMoment':
+        return ParsingCivilTimeMoment(self._reference, self._known_values.copy(), self._implied_values.copy())
+
+    def to_mutable(self) -> 'ParsingCivilTimeMoment':
+        return self
+
+    def freeze(self) -> CivilTimeMoment:
+        return CivilTimeMoment(self._reference, self._known_values, self._implied_values)
+
+    def assign(self, component: CivilTimeComponent, value: int) -> 'ParsingCivilTimeMoment':
+        if component in self._implied_values:
+            del self._implied_values[component]
+        self._known_values[component] = value
+        return self
+
+    def imply(self, component: CivilTimeComponent, value: int) -> 'ParsingCivilTimeMoment':
+        if component not in self._known_values:
+            self._implied_values[component] = value
+        return self
+
+    def delete(self, component: CivilTimeComponent) -> 'ParsingCivilTimeMoment':
+        if component in self._known_values:
+            del self._known_values[component]
+        if component in self._implied_values:
+            del self._implied_values[component]
+        return self
+
+    def assign_similar_date(self, target: datetime.datetime | Moment) -> 'ParsingCivilTimeMoment':
+        dt = target.datetime() if isinstance(target, Moment) else target
+        prec = target.precision() if isinstance(target, Moment) else DateTimePrecision.MILLI_SECOND
+        
+        if prec.value >= DateTimePrecision.YEAR.value:
+            self.assign(CivilTimeComponent.YEAR, dt.year)
+        if prec.value >= DateTimePrecision.MONTH.value:
+            self.assign(CivilTimeComponent.MONTH, dt.month)
+        if prec.value >= DateTimePrecision.DAY.value or prec == DateTimePrecision.WEEK:
+            self.assign(CivilTimeComponent.DAY, dt.day)
+        return self
+
+    def assign_similar_time(self, target: datetime.datetime | Moment) -> 'ParsingCivilTimeMoment':
+        dt = target.datetime() if isinstance(target, Moment) else target
+        prec = target.precision() if isinstance(target, Moment) else DateTimePrecision.MILLI_SECOND
+        
+        if prec.value >= DateTimePrecision.HOUR.value:
+            self.assign(CivilTimeComponent.HOUR, dt.hour)
+            self.assign(CivilTimeComponent.MERIDIEM, Meridiem.AM if dt.hour < 12 else Meridiem.PM)
+        if prec.value >= DateTimePrecision.MINUTE.value:
+            self.assign(CivilTimeComponent.MINUTE, dt.minute)
+        if prec.value >= DateTimePrecision.SECOND.value:
+            self.assign(CivilTimeComponent.SECOND, dt.second)
+        if prec.value >= DateTimePrecision.MILLI_SECOND.value:
+            self.assign(CivilTimeComponent.MILLI_SECOND, dt.microsecond // 1000)
+        return self
+
+    def imply_similar_date(self, target: datetime.datetime | Moment) -> 'ParsingCivilTimeMoment':
+        dt = target.datetime() if isinstance(target, Moment) else target
+        prec = target.precision() if isinstance(target, Moment) else DateTimePrecision.MILLI_SECOND
+        
+        if prec.value >= DateTimePrecision.YEAR.value:
+            self.imply(CivilTimeComponent.YEAR, dt.year)
+        if prec.value >= DateTimePrecision.MONTH.value:
+            self.imply(CivilTimeComponent.MONTH, dt.month)
+        if prec.value >= DateTimePrecision.DAY.value or prec == DateTimePrecision.WEEK:
+            self.imply(CivilTimeComponent.DAY, dt.day)
+        return self
+
+    def imply_similar_time(self, target: datetime.datetime | Moment) -> 'ParsingCivilTimeMoment':
+        dt = target.datetime() if isinstance(target, Moment) else target
+        prec = target.precision() if isinstance(target, Moment) else DateTimePrecision.MILLI_SECOND
+        
+        if prec.value >= DateTimePrecision.HOUR.value:
+            self.imply(CivilTimeComponent.HOUR, dt.hour)
+            self.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM if dt.hour < 12 else Meridiem.PM)
+        if prec.value >= DateTimePrecision.MINUTE.value:
+            self.imply(CivilTimeComponent.MINUTE, dt.minute)
+        if prec.value >= DateTimePrecision.SECOND.value:
+            self.imply(CivilTimeComponent.SECOND, dt.second)
+        if prec.value >= DateTimePrecision.MILLI_SECOND.value:
+            self.imply(CivilTimeComponent.MILLI_SECOND, dt.microsecond // 1000)
+        return self
+
+
 
 COMPONENT_PRECISION_MAP = {
     CivilTimeComponent.YEAR: DateTimePrecision.YEAR,
@@ -180,7 +272,7 @@ COMPONENT_PRECISION_MAP = {
     CivilTimeComponent.MINUTE: DateTimePrecision.MINUTE,
     CivilTimeComponent.SECOND: DateTimePrecision.SECOND,
     CivilTimeComponent.MILLI_SECOND: DateTimePrecision.MILLI_SECOND,
-    CivilTimeComponent.MERIDIEM: DateTimePrecision.HOUR,
+    CivilTimeComponent.MERIDIEM: DateTimePrecision.DAY,
 }
 """
 Mapping from CivilTimeComponent to its precision (DateTimePrecision).

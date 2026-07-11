@@ -58,10 +58,15 @@ chrono_python/
 4. **DateTimeMoment and ReferenceMoment (`types.DateTimeMoment`, `types.ReferenceMoment`)**:
    - `DateTimeMoment`: Wraps an absolute datetime (with a specific precision).
    - `ReferenceMoment`: Represents a relative duration shift (e.g., "10 years ago") relative to a reference moment.
-5. **ParsingCivilTimeMoment (`common.types.ParsingCivilTimeMoment`)**:
-   Extends `DateTimeMoment` and tracks components of a date (e.g., Year, Month, Day) as either `known_values` (explicitly present in match) or `implied_values` (implied from reference date or other clues).
-   - `ParsingCivilTimeMoment.datetime()` computes a resolved `datetime.datetime` by applying the assigned and implied components over the reference date.
-   - Its precision represents the most precise component that is either assigned or implied.
+5. **CivilTimeMoment and ParsingCivilTimeMoment (`common.types.CivilTimeMoment`, `common.types.ParsingCivilTimeMoment`)**:
+   - `CivilTimeMoment` (immutable) inherits from `DateTimeMoment` and tracks date/time components as either `known_values` (explicitly present in match) or `implied_values` (implied from reference date or other clues).
+   - `ParsingCivilTimeMoment` (mutable subclass) is used during the parsing/merging phase.
+   - Calling `.freeze()` on a mutable moment returns an immutable `CivilTimeMoment`, while `.to_mutable()` returns a mutable instance.
+   - `precision()` only considers components in `known_values` (certain components) and falls back to the reference moment's precision if no components are known.
+   - `CivilTimeComponent.MERIDIEM` maps to `DateTimePrecision.DAY` (since meridiem alone does not specify an hour and should only lead to day-level precision).
+   - Helper methods are provided for copying components while respecting target precision:
+     - `assign_similar_date(target)` / `imply_similar_date(target)`
+     - `assign_similar_time(target)` / `imply_similar_time(target)`
 
 ---
 

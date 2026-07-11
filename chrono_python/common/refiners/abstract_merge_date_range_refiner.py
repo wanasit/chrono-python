@@ -3,7 +3,7 @@ import datetime
 from abc import ABC, abstractmethod
 from chrono_python.chrono import ParsingContext
 from chrono_python.common.refiners.abstract_merging_refiner import AbstractMergingRefiner
-from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
+from chrono_python.common.types import CivilTimeMoment, ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.types import ParsedResult, ParsedRangeResult
 
 
@@ -41,7 +41,7 @@ class AbstractMergeDateRangeRefiner(AbstractMergingRefiner, ABC):
         to_moment = to_result.moment.clone() if hasattr(to_result.moment, 'clone') else to_result.moment
 
         # Merge known components to implied components if they are not weekday-only
-        if isinstance(from_moment, ParsingCivilTimeMoment) and isinstance(to_moment, ParsingCivilTimeMoment):
+        if isinstance(from_moment, CivilTimeMoment) and isinstance(to_moment, CivilTimeMoment):
             if not from_moment.is_only_weekday_component() and not to_moment.is_only_weekday_component():
                 for key in to_moment.list(only_certain=True):
                     if not from_moment.is_certain(key):
@@ -54,20 +54,20 @@ class AbstractMergeDateRangeRefiner(AbstractMergingRefiner, ABC):
             from_date = from_moment.datetime()
             to_date = to_moment.datetime()
 
-            if isinstance(to_moment, ParsingCivilTimeMoment) and to_moment.is_only_weekday_component() and add_duration(to_date, day=7) > from_date:
+            if isinstance(to_moment, CivilTimeMoment) and to_moment.is_only_weekday_component() and add_duration(to_date, day=7) > from_date:
                 to_date = add_duration(to_date, day=7)
                 to_moment.imply(CivilTimeComponent.DAY, to_date.day)
                 to_moment.imply(CivilTimeComponent.MONTH, to_date.month)
                 to_moment.imply(CivilTimeComponent.YEAR, to_date.year)
-            elif isinstance(from_moment, ParsingCivilTimeMoment) and from_moment.is_only_weekday_component() and add_duration(from_date, day=-7) < to_date:
+            elif isinstance(from_moment, CivilTimeMoment) and from_moment.is_only_weekday_component() and add_duration(from_date, day=-7) < to_date:
                 from_date = add_duration(from_date, day=-7)
                 from_moment.imply(CivilTimeComponent.DAY, from_date.day)
                 from_moment.imply(CivilTimeComponent.MONTH, from_date.month)
                 from_moment.imply(CivilTimeComponent.YEAR, from_date.year)
-            elif isinstance(to_moment, ParsingCivilTimeMoment) and to_moment.is_date_with_unknown_year() and add_duration(to_date, year=1) > from_date:
+            elif isinstance(to_moment, CivilTimeMoment) and to_moment.is_date_with_unknown_year() and add_duration(to_date, year=1) > from_date:
                 to_date = add_duration(to_date, year=1)
                 to_moment.imply(CivilTimeComponent.YEAR, to_date.year)
-            elif isinstance(from_moment, ParsingCivilTimeMoment) and from_moment.is_date_with_unknown_year() and add_duration(from_date, year=-1) < to_date:
+            elif isinstance(from_moment, CivilTimeMoment) and from_moment.is_date_with_unknown_year() and add_duration(from_date, year=-1) < to_date:
                 from_date = add_duration(from_date, year=-1)
                 from_moment.imply(CivilTimeComponent.YEAR, from_date.year)
             else:

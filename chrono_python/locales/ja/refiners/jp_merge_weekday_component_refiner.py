@@ -1,7 +1,7 @@
 import re
 from chrono_python.chrono import ParsingContext
 from chrono_python.common.refiners.abstract_merging_refiner import AbstractMergingRefiner
-from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
+from chrono_python.common.types import CivilTimeMoment, ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.types import ParsedResult, ParsedRangeResult
 
 
@@ -10,7 +10,7 @@ class JPMergeWeekdayComponentRefiner(AbstractMergingRefiner):
         current_moment = current_result.moment
         next_moment = next_result.moment
 
-        if not (isinstance(current_moment, ParsingCivilTimeMoment) and isinstance(next_moment, ParsingCivilTimeMoment)):
+        if not (isinstance(current_moment, CivilTimeMoment) and isinstance(next_moment, CivilTimeMoment)):
             return False
 
         normal_date_then_weekday = (
