@@ -46,6 +46,8 @@ chrono_python/
    Identify date patterns in text. Must implement `pattern()` to return a compiled regex and `extract(context, match)` to output either `ParsedResult`, `Moment`, or `None`.
 2. **Refiners (`chrono.Refiner`)**:
    Post-process and merge/filter the parsed results (e.g. merging date and time expressions, or resolving overlaps).
+   - **Filters (`common.refiners.AbstractFilter` or `Filter`)**:
+     A specialized type of `Refiner` to discard invalid or unlikely matches. Subclasses implement `is_valid(context, result) -> bool` to determine if a candidate `ParsedResult` should be kept.
 3. **ParsedResult and ParsedRangeResult (`types.ParsedResult`, `types.ParsedRangeResult`)**:
    Represent the final output structure of the parsing step, containing the matched index, matched text, and a `moment` (plus an optional `end` moment for ranges).
 4. **DateTimeMoment and ReferenceMoment (`types.DateTimeMoment`, `types.ReferenceMoment`)**:

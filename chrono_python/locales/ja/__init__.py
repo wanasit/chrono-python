@@ -5,7 +5,7 @@ from chrono_python.locales.ja.parsers.jp_standard_parser import JPStandardParser
 from chrono_python.locales.ja.parsers.jp_time_expr_parser import JPTimeExprParser
 from chrono_python.locales.ja.parsers.jp_weekday_parser import JPWeekdayParser
 from chrono_python.locales.ja.refiners.jp_merge_weekday_component_refiner import JPMergeWeekdayComponentRefiner
-from chrono_python.locales.ja.refiners import JPMergeDateRangeRefiner, JPMergeDateTimeRefiner
+from chrono_python.locales.ja.refiners import JPMergeDateRangeRefiner, JPMergeDateTimeRefiner, JPUnlikelyFormatFilter
 
 configuration = chrono.Configuration(
     parsers=[
@@ -20,6 +20,7 @@ configuration = chrono.Configuration(
         JPMergeWeekdayComponentRefiner(),
         JPMergeDateTimeRefiner(),
         JPMergeDateRangeRefiner(),
+        JPUnlikelyFormatFilter(),
     ])
 
 casual = chrono.Chrono(configuration)

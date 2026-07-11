@@ -1,3 +1,4 @@
 from .remove_overlap_refiner import RemoveOverlapRefiner
 from .abstract_merge_date_range_refiner import AbstractMergeDateRangeRefiner
 from .merge_weekday_component_refiner import MergeWeekdayComponentRefiner
+from .abstract_filter import AbstractFilter, Filter
