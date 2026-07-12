@@ -133,10 +133,13 @@ def test_weekday_with_casual_time():
     results = chrono.parse('Lets meet on Tuesday morning', ref_date)
     assert len(results) == 1
     assert results[0].index == 10
-    assert results[0].text == 'on Tuesday'
-    assert results[0].moment.datetime() == datetime.datetime(2015, 4, 21, 12, 0)
+    assert results[0].text == 'on Tuesday morning'
+    assert results[0].moment.datetime() == datetime.datetime(2015, 4, 21, 6, 0)
     assert results[0].moment.get(CivilTimeComponent.WEEKDAY) == 2
-    assert results[0].moment.get(CivilTimeComponent.HOUR) is None
+    assert results[0].moment.get(CivilTimeComponent.HOUR) == 6
+    assert results[0].moment.precision() == DateTimePrecision.DAY
+    assert not results[0].moment.is_certain(CivilTimeComponent.HOUR)
+    assert results[0].moment.is_certain(CivilTimeComponent.MERIDIEM)
 
 
 def test_weekday_overlap():

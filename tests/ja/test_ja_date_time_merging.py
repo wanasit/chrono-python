@@ -60,3 +60,37 @@ def test_ja_merge_casual_date_time():
     assert result.moment.get(CivilTimeComponent.MINUTE) == 30
     # since 10:30 is specified, precision is MINUTE
     assert result.moment.precision() == DateTimePrecision.MINUTE
+
+
+def test_ja_merge_casual_date_and_casual_time():
+    ref_date = datetime.datetime(2016, 10, 1, 8, 0)
+
+    # 今日の夕方
+    results = chrono.ja.parse("今日の夕方", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "今日の夕方"
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2016
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 10
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 1
+    assert results[0].moment.get(CivilTimeComponent.HOUR) == 18
+    assert results[0].datetime() == datetime.datetime(2016, 10, 1, 18, 0)
+
+    # 昨日の夜
+    results = chrono.ja.parse("昨日の夜", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "昨日の夜"
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2016
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 9
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 30
+    assert results[0].moment.get(CivilTimeComponent.HOUR) == 20
+    assert results[0].datetime() == datetime.datetime(2016, 9, 30, 20, 0)
+
+    # 明日の朝
+    results = chrono.ja.parse("明日の朝", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "明日の朝"
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2016
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 10
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 2
+    assert results[0].moment.get(CivilTimeComponent.HOUR) == 6
+    assert results[0].datetime() == datetime.datetime(2016, 10, 2, 6, 0)

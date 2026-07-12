@@ -1,6 +1,6 @@
 import datetime
 import chrono_python as chrono
-from chrono_python.types import ParsedResult, ParsedRangeResult, DateTimeMoment
+from chrono_python.types import ParsedResult, ParsedRangeResult, DateTimeMoment, DateTimePrecision
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.chrono import ParsingContext
 from chrono_python.locales.en.refiners import ENMergeDateRangeRefiner
@@ -117,3 +117,43 @@ def test_swap_fallback():
     assert isinstance(result[0], ParsedRangeResult)
     assert result[0].start.datetime() == datetime.datetime(2020, 2, 13, 12, 0)
     assert result[0].end.datetime() == datetime.datetime(2020, 2, 15, 12, 0)
+
+
+def test_en_casual_time_range_merging():
+    ref_date = datetime.datetime(2012, 8, 4, 12, 0)
+
+    # today morning to tomorrow
+    results = chrono.parse("annual leave from today morning to tomorrow", ref_date)
+    assert len(results) == 1
+    result = results[0]
+    assert result.text == "today morning to tomorrow"
+    assert isinstance(result, ParsedRangeResult)
+    assert result.start.get(CivilTimeComponent.MONTH) == 8
+    assert result.start.get(CivilTimeComponent.DAY) == 4
+    assert result.start.get(CivilTimeComponent.HOUR) == 6
+    assert not result.start.is_certain(CivilTimeComponent.HOUR)
+    assert result.start.precision() == DateTimePrecision.DAY
+
+    assert result.end.get(CivilTimeComponent.MONTH) == 8
+    assert result.end.get(CivilTimeComponent.DAY) == 5
+    assert result.end.get(CivilTimeComponent.HOUR) == 12
+    assert not result.end.is_certain(CivilTimeComponent.HOUR)
+    assert result.end.precision() == DateTimePrecision.DAY
+
+    # today to tomorrow afternoon
+    results = chrono.parse("annual leave from today to tomorrow afternoon", ref_date)
+    assert len(results) == 1
+    result = results[0]
+    assert result.text == "today to tomorrow afternoon"
+    assert isinstance(result, ParsedRangeResult)
+    assert result.start.get(CivilTimeComponent.MONTH) == 8
+    assert result.start.get(CivilTimeComponent.DAY) == 4
+    assert result.start.get(CivilTimeComponent.HOUR) == 12
+    assert not result.start.is_certain(CivilTimeComponent.HOUR)
+    assert result.start.precision() == DateTimePrecision.DAY
+
+    assert result.end.get(CivilTimeComponent.MONTH) == 8
+    assert result.end.get(CivilTimeComponent.DAY) == 5
+    assert result.end.get(CivilTimeComponent.HOUR) == 15
+    assert not result.end.is_certain(CivilTimeComponent.HOUR)
+    assert result.end.precision() == DateTimePrecision.DAY

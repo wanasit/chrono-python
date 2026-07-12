@@ -76,3 +76,25 @@ def test_en_merge_casual_date_time():
     assert result.moment.get(CivilTimeComponent.MINUTE) == 30
     # since we specify "at 10:30", hour and minute are known, so precision is MINUTE
     assert result.moment.precision() == DateTimePrecision.MINUTE
+
+
+def test_en_merge_casual_date_and_casual_time():
+    ref_date = datetime.datetime(2016, 10, 1, 8, 0)
+
+    # this evening
+    results = chrono.parse("this evening", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "this evening"
+    assert results[0].datetime() == datetime.datetime(2016, 10, 1, 20, 0)
+
+    # yesterday afternoon
+    results = chrono.parse("yesterday afternoon", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "yesterday afternoon"
+    assert results[0].datetime() == datetime.datetime(2016, 9, 30, 15, 0)
+
+    # tomorrow morning
+    results = chrono.parse("tomorrow morning", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "tomorrow morning"
+    assert results[0].datetime() == datetime.datetime(2016, 10, 2, 6, 0)

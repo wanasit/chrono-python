@@ -10,6 +10,7 @@ from chrono_python.locales.en.parsers.en_time_unit_within_parser import ENTimeUn
 from chrono_python.locales.en.parsers.en_time_expr_parser import ENTimeExprParser
 from chrono_python.locales.en.parsers.en_weekday_parser import ENWeekdayParser
 from chrono_python.locales.en.parsers.en_casual_date_parser import ENCasualDateParser
+from chrono_python.locales.en.parsers.en_casual_time_parser import ENCasualTimeParser
 from chrono_python.locales.en.refiners import ENMergeDateRangeRefiner, ENMergeDateTimeRefiner, ENUnlikelyFormatFilter
 
 strict_configuration = chrono.Configuration(
@@ -45,6 +46,7 @@ casual_configuration = chrono.Configuration(
         ENTimeUnitLaterParser(allow_abbreviations=True, allow_casual_suffix=True),
         ENTimeUnitCasualReferenceParser(allow_abbreviations=True),
         ENCasualDateParser(),
+        ENCasualTimeParser(),
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
