@@ -9,7 +9,7 @@ from chrono_python.common import calendars
 
 PATTERN = re.compile(
     f'({constants.PATTERN_ORDINAL_NUMBER})' +
-    f'(?:\\s{{0,3}}(?:to|-|–|until|through|till)?\\s{{0,3}}({constants.PATTERN_ORDINAL_NUMBER}))?' +
+    f'(?:\\s{{0,3}}(?:to|-|–|until|through|till)\\s{{0,3}}({constants.PATTERN_ORDINAL_NUMBER}))?' +
     f'(?:-|/|\\s{{0,3}}(?:of)?\\s{{0,3}})' +
     f'({patterns.match_any(constants.MONTH_NAME_DICTIONARY)})' +
     f'(?:(?:-|/|,?\\s{{0,3}})({constants.PATTERN_YEAR}(?!\\S\\d)))?' +

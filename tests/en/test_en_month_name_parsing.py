@@ -194,3 +194,49 @@ def test_date_middle_endian_range():
     assert end_moment.get(CivilTimeComponent.YEAR) == 2023
     assert end_moment.get(CivilTimeComponent.MONTH) == 3
     assert end_moment.get(CivilTimeComponent.DAY) == 12
+
+
+def test_month_name_before_year():
+    # January, 2012
+    results = chrono.parse('January, 2012')
+    assert len(results) == 1
+    assert results[0].text == 'January, 2012'
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 1
+    assert results[0].moment.is_certain(CivilTimeComponent.DAY) is False
+
+    # January 2012
+    results = chrono.parse('January 2012')
+    assert len(results) == 1
+    assert results[0].text == 'January 2012'
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 1
+
+    # in Jan
+    ref_date = datetime.datetime(2023, 5, 1, 12, 0, 0)
+    results = chrono.parse('in Jan', ref_date)
+    assert len(results) == 1
+    assert results[0].text == 'Jan'
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2023
+
+
+def test_month_name_after_year():
+    # 2012 January
+    results = chrono.parse('2012 January')
+    assert len(results) == 1
+    assert results[0].text == '2012 January'
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 1
+    assert results[0].moment.is_certain(CivilTimeComponent.DAY) is False
+
+    # 2012 of January
+    results = chrono.parse('2012 of January')
+    assert len(results) == 1
+    assert results[0].text == '2012 of January'
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+

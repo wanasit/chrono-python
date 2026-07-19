@@ -18,7 +18,7 @@ PATTERN = re.compile(
     f'(?:\\s*[,-/]?\\s*)' +
     f'({constants.PATTERN_ORDINAL_NUMBER})' +  # Group 2: Day
     (f'(?:'
-     + f'\\s{{0,3}}(?:to|-|–|until|through|till)?\\s{{0,3}}'
+     + f'\\s{{0,3}}(?:to|-|–|until|through|till)\\s{{0,3}}'
      + f'({constants.PATTERN_ORDINAL_NUMBER})'  # Group 3: (Optional) End Day
      + f')?') +
     (f'(?:'
