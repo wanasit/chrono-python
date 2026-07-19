@@ -6,18 +6,18 @@ from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponen
 from chrono_python.common.parsers.abstract_parser_with_word_boundary import AbstractParserWithWordBoundary
 from chrono_python.utils import patterns
 
-YEAR_PATTERN = r'(?:[1-9][0-9]{0,3}\s{0,2}(?:BE|AD|BC|BCE|CE)|[1-9][0-9]{3})'
+_YEAR_PATTERN = r'(?:[1-9][0-9]{0,3}\s{0,2}(?:BE|AD|BC|BCE|CE)|[1-9][0-9]{3})'
 
 PATTERN = re.compile(
-    f'({YEAR_PATTERN})' +
+    f'({_YEAR_PATTERN})' +
     r'(?:\s*[-.\/,]?\s*|\s+of\s+)' +
     f'({patterns.match_any(constants.MONTH_NAME_DICTIONARY)})' +
     r'(?=[^\s\w]|\s+[^0-9]|\s+$|$)',
     re.IGNORECASE
 )
 
-YEAR_GROUP = 1
-MONTH_NAME_GROUP = 2
+_YEAR_GROUP = 1
+_MONTH_NAME_GROUP = 2
 
 
 class ENMonthNameAfterYear(AbstractParserWithWordBoundary):
@@ -25,8 +25,8 @@ class ENMonthNameAfterYear(AbstractParserWithWordBoundary):
         return PATTERN
 
     def inner_extract(self, context: chrono.ParsingContext, match: chrono.Match) -> chrono.ParsedResult | None:
-        year = constants.parse_year(match[YEAR_GROUP])
-        month_name = match[MONTH_NAME_GROUP].lower()
+        year = constants.parse_year(match[_YEAR_GROUP])
+        month_name = match[_MONTH_NAME_GROUP].lower()
         month = constants.MONTH_NAME_DICTIONARY[month_name]
 
         moment = ParsingCivilTimeMoment(context.reference, {})

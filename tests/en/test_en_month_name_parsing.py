@@ -205,6 +205,7 @@ def test_month_name_before_year():
     assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
     assert results[0].moment.get(CivilTimeComponent.DAY) == 1
     assert results[0].moment.is_certain(CivilTimeComponent.DAY) is False
+    assert results[0].moment.precision() == DateTimePrecision.MONTH
 
     # January 2012
     results = chrono.parse('January 2012')
@@ -213,6 +214,7 @@ def test_month_name_before_year():
     assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
     assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
     assert results[0].moment.get(CivilTimeComponent.DAY) == 1
+    assert results[0].moment.precision() == DateTimePrecision.MONTH
 
     # in Jan
     ref_date = datetime.datetime(2023, 5, 1, 12, 0, 0)
@@ -221,6 +223,7 @@ def test_month_name_before_year():
     assert results[0].text == 'Jan'
     assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
     assert results[0].moment.get(CivilTimeComponent.YEAR) == 2023
+    assert results[0].moment.precision() == DateTimePrecision.MONTH
 
 
 def test_month_name_after_year():
@@ -232,6 +235,7 @@ def test_month_name_after_year():
     assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
     assert results[0].moment.get(CivilTimeComponent.DAY) == 1
     assert results[0].moment.is_certain(CivilTimeComponent.DAY) is False
+    assert results[0].moment.precision() == DateTimePrecision.MONTH
 
     # 2012 of January
     results = chrono.parse('2012 of January')
@@ -239,4 +243,4 @@ def test_month_name_after_year():
     assert results[0].text == '2012 of January'
     assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
     assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
-
+    assert results[0].moment.precision() == DateTimePrecision.MONTH

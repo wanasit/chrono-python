@@ -18,9 +18,9 @@ PATTERN = re.compile(
     re.IGNORECASE
 )
 
-PREFIX_GROUP = 1
-MONTH_NAME_GROUP = 2
-YEAR_GROUP = 3
+_PREFIX_GROUP = 1
+_MONTH_NAME_GROUP = 2
+_YEAR_GROUP = 3
 
 
 class ENMonthNameBeforeYear(AbstractParserWithWordBoundary):
@@ -28,14 +28,14 @@ class ENMonthNameBeforeYear(AbstractParserWithWordBoundary):
         return PATTERN
 
     def inner_extract(self, context: chrono.ParsingContext, match: chrono.Match) -> chrono.ParsedResult | None:
-        month_name = match[MONTH_NAME_GROUP].lower()
+        month_name = match[_MONTH_NAME_GROUP].lower()
 
         # skip some unlikely words "jan", "mar", ..
         if len(match[0]) <= 3 and month_name not in constants.FULL_MONTH_NAME_DICTIONARY:
             return None
 
         # Calculate custom start and end index
-        prefix_len = len(match[PREFIX_GROUP]) if match[PREFIX_GROUP] else 0
+        prefix_len = len(match[_PREFIX_GROUP]) if match[_PREFIX_GROUP] else 0
         start_index = match.start() + prefix_len
         end_index = match.end()
 
@@ -45,8 +45,8 @@ class ENMonthNameBeforeYear(AbstractParserWithWordBoundary):
         month = constants.MONTH_NAME_DICTIONARY[month_name]
         moment.assign(CivilTimeComponent.MONTH, month)
 
-        if match[YEAR_GROUP]:
-            year = constants.parse_year(match[YEAR_GROUP])
+        if match[_YEAR_GROUP]:
+            year = constants.parse_year(match[_YEAR_GROUP])
             moment.assign(CivilTimeComponent.YEAR, year)
         else:
             year = calendars.find_year_closest_to_ref(context.reference, month, 1)

@@ -24,6 +24,13 @@ Test files must describe the behavior they are testing (rather than the names of
 - `test_en_unlikely_format_filtering.py` (testing filtering behavior) instead of `test_en_unlikely_format_filter.py` (class).
 - `test_en_date_range_merging.py` (testing merging behavior) instead of `test_en_merge_date_range_refiner.py` (class).
 
+### Parser Class Naming Convention
+Parser classes should use a descriptive name based on the relative position of the date/time components rather than endianness:
+- `MonthNameAfterDate` (formerly `MonthNameLittleEndianParser`) for day-first formats (e.g., "20 January").
+- `MonthNameBeforeDate` (formerly `MonthNameMiddleEndianParser`) for month-first formats (e.g., "January 20").
+- `MonthNameBeforeYear` for month-before-year formats (e.g., "January 2012").
+- `MonthNameAfterYear` for year-before-month formats (e.g., "2012 January").
+
 ---
 
 ## Directory Structure & Architecture
