@@ -18,7 +18,7 @@ PATTERN = re.compile(
 )
 
 
-class ENMonthNameLittleEndianParser(chrono.Parser):
+class ENMonthNameAfterDate(chrono.Parser):
     def pattern(self) -> re.Pattern:
         return PATTERN
 

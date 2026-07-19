@@ -30,7 +30,7 @@ PATTERN = re.compile(
 )
 
 
-class ENMonthNameMiddleEndianParser(chrono.Parser):
+class ENMonthNameBeforeDate(chrono.Parser):
     def pattern(self) -> re.Pattern:
         return PATTERN
 

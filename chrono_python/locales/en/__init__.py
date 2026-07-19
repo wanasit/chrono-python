@@ -1,8 +1,8 @@
 from chrono_python import chrono
 from chrono_python.common import parsers as common_parsers
 from chrono_python.common import refiners as common_refiners
-from chrono_python.locales.en.parsers.en_month_name_little_endian_parser import ENMonthNameLittleEndianParser
-from chrono_python.locales.en.parsers.en_month_name_middle_endian_parser import ENMonthNameMiddleEndianParser
+from chrono_python.locales.en.parsers.en_month_name_after_date import ENMonthNameAfterDate
+from chrono_python.locales.en.parsers.en_month_name_before_date import ENMonthNameBeforeDate
 from chrono_python.locales.en.parsers.en_time_unit_ago_parser import ENTimeUnitAgoParser
 from chrono_python.locales.en.parsers.en_time_unit_casual_reference_parser import ENTimeUnitCasualReferenceParser
 from chrono_python.locales.en.parsers.en_time_unit_later_parser import ENTimeUnitLaterParser
@@ -19,8 +19,8 @@ strict_configuration = chrono.Configuration(
         common_parsers.SlashDateFormatParser(little_endian=False),
         ENTimeExprParser(),
         ENWeekdayParser(),
-        ENMonthNameLittleEndianParser(),
-        ENMonthNameMiddleEndianParser(),
+        ENMonthNameAfterDate(),
+        ENMonthNameBeforeDate(),
         ENTimeUnitWithinParser(allow_abbreviations=False),
         ENTimeUnitAgoParser(allow_abbreviations=False),
         ENTimeUnitLaterParser(allow_abbreviations=False, allow_casual_suffix=False),
@@ -39,8 +39,8 @@ casual_configuration = chrono.Configuration(
         common_parsers.SlashDateFormatParser(little_endian=False),
         ENTimeExprParser(),
         ENWeekdayParser(),
-        ENMonthNameLittleEndianParser(),
-        ENMonthNameMiddleEndianParser(),
+        ENMonthNameAfterDate(),
+        ENMonthNameBeforeDate(),
         ENTimeUnitWithinParser(allow_abbreviations=True),
         ENTimeUnitAgoParser(allow_abbreviations=True),
         ENTimeUnitLaterParser(allow_abbreviations=True, allow_casual_suffix=True),
