@@ -1,7 +1,8 @@
 from chrono_python import chrono
 from chrono_python.common import parsers as common_parsers
 from chrono_python.common import refiners as common_refiners
-from chrono_python.locales.ja.parsers.jp_standard_parser import JPStandardParser
+from chrono_python.locales.ja.parsers.jp_year_month_date_parser import JPYearMonthDateParser
+from chrono_python.locales.ja.parsers.jp_year_month_parser import JPYearMonthParser
 from chrono_python.locales.ja.parsers.jp_time_expr_parser import JPTimeExprParser
 from chrono_python.locales.ja.parsers.jp_weekday_parser import JPWeekdayParser
 from chrono_python.locales.ja.parsers.jp_casual_date_parser import JPCasualDateParser
@@ -17,7 +18,8 @@ strict_configuration = chrono.Configuration(
         JPTimeExprParser(),
         JPWeekdayParser(),
         JPWeekdayWithParenthesesParser(),
-        JPStandardParser(),
+        JPYearMonthDateParser(),
+        JPYearMonthParser(),
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
@@ -36,7 +38,8 @@ casual_configuration = chrono.Configuration(
         JPTimeExprParser(),
         JPWeekdayParser(),
         JPWeekdayWithParenthesesParser(),
-        JPStandardParser(),
+        JPYearMonthDateParser(),
+        JPYearMonthParser(),
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),

@@ -30,6 +30,8 @@ Parser classes should use a descriptive name based on the relative position of t
 - `MonthNameBeforeDate` (formerly `MonthNameMiddleEndianParser`) for month-first formats (e.g., "January 20").
 - `MonthNameBeforeYear` for month-before-year formats (e.g., "January 2012").
 - `MonthNameAfterYear` for year-before-month formats (e.g., "2012 January").
+- `JPYearMonthDateParser` (formerly `JPStandardParser`) for year-month-date formats (e.g., "2012年3月31日").
+- `JPYearMonthParser` for year-month formats (e.g., "2026年4月").
 
 ---
 
