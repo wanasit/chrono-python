@@ -31,8 +31,12 @@ strict_configuration = chrono.Configuration(
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
+        common_refiners.ExtractTimezoneOffsetRefiner(),
+        common_refiners.RemoveOverlapRefiner(),
         common_refiners.MergeWeekdayComponentRefiner(),
         ENMergeDateTimeRefiner(),
+        common_refiners.ExtractTimezoneAbbrRefiner(),
+        common_refiners.RemoveOverlapRefiner(),
         ENMergeDateRangeRefiner(),
         ENUnlikelyFormatFilter(),
     ])
@@ -56,8 +60,12 @@ casual_configuration = chrono.Configuration(
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
+        common_refiners.ExtractTimezoneOffsetRefiner(),
+        common_refiners.RemoveOverlapRefiner(),
         common_refiners.MergeWeekdayComponentRefiner(),
         ENMergeDateTimeRefiner(),
+        common_refiners.ExtractTimezoneAbbrRefiner(),
+        common_refiners.RemoveOverlapRefiner(),
         ENMergeDateRangeRefiner(),
         ENUnlikelyFormatFilter(),
     ])

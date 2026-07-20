@@ -22,6 +22,19 @@ class DateTimePrecision(Enum):
     MILLI_SECOND = 80
 
 
+class Weekday(Enum):
+    """
+    Represents a day of the week, starting with Sunday as 0.
+    """
+    SUNDAY = 0
+    MONDAY = 1
+    TUESDAY = 2
+    WEDNESDAY = 3
+    THURSDAY = 4
+    FRIDAY = 5
+    SATURDAY = 6
+
+
 class Timeunit(Enum):
     """
     Represents a unit of time used for duration and offset calculations.

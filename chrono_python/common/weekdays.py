@@ -1,6 +1,7 @@
+import datetime
 from datetime import timedelta
-from chrono_python.types import Moment
-from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
+from chrono_python.types import Moment, DateTimeMoment, Weekday
+from chrono_python.common.types import CivilTimeMoment, ParsingCivilTimeMoment, CivilTimeComponent
 
 def create_parsing_components_at_weekday(
     reference: Moment,
@@ -82,3 +83,69 @@ def get_backward_days_to_weekday(ref_dt, weekday: int) -> int:
     if backward_count >= 0:
         backward_count -= 7
     return backward_count
+
+
+def nth_weekday_of_month(year: int, month: int, weekday: Weekday, n: int, hour: int = 0) -> CivilTimeMoment:
+    """
+    Return day-level precision moment at the date.
+    """
+    weekday_val = weekday.value
+    day_of_month = 0
+    i = 0
+    while i < n:
+        day_of_month += 1
+        dt = datetime.datetime(year, month, day_of_month)
+        dt_weekday = (dt.weekday() + 1) % 7
+        if dt_weekday == weekday_val:
+            i += 1
+
+    target_dt = datetime.datetime(year, month, day_of_month, hour)
+    ref = DateTimeMoment.of(target_dt)
+    known = {
+        CivilTimeComponent.YEAR: year,
+        CivilTimeComponent.MONTH: month,
+        CivilTimeComponent.DAY: day_of_month,
+    }
+    implied = {
+        CivilTimeComponent.HOUR: hour
+    }
+    return CivilTimeMoment(ref, known, implied)
+
+
+def last_weekday_of_month(year: int, month: int, weekday: Weekday, hour: int = 0) -> CivilTimeMoment:
+    """
+    Return day-level precision moment at the date.
+    """
+    weekday_val = weekday.value
+    one_indexed_weekday = 7 if weekday_val == 0 else weekday_val
+    if month == 12:
+        next_month_year = year + 1
+        next_month = 1
+    else:
+        next_month_year = year
+        next_month = month + 1
+
+    next_month_first = datetime.datetime(next_month_year, next_month, 1, 12)
+    first_weekday_next_month = next_month_first.weekday() + 1
+    
+    if first_weekday_next_month == one_indexed_weekday:
+        day_diff = 7
+    elif first_weekday_next_month < one_indexed_weekday:
+        day_diff = 7 + first_weekday_next_month - one_indexed_weekday
+    else:
+        day_diff = first_weekday_next_month - one_indexed_weekday
+
+    target_date = next_month_first - datetime.timedelta(days=day_diff)
+    day_of_month = target_date.day
+
+    target_dt = datetime.datetime(year, month, day_of_month, hour)
+    ref = DateTimeMoment.of(target_dt)
+    known = {
+        CivilTimeComponent.YEAR: year,
+        CivilTimeComponent.MONTH: month,
+        CivilTimeComponent.DAY: day_of_month,
+    }
+    implied = {
+        CivilTimeComponent.HOUR: hour
+    }
+    return CivilTimeMoment(ref, known, implied)
