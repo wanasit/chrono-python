@@ -16,7 +16,7 @@ PATTERN = re.compile(
 )
 
 
-class SlashDateFormatParser(chrono.Parser):
+class SlashDateMonthYearParser(chrono.Parser):
     """Parser for date formats with slash "/" (or dot ".") between numbers.
 
     For examples:

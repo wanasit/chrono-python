@@ -18,7 +18,7 @@ def test_ja_inherited_iso_format():
 def test_ja_inherited_slash_date():
     ref_date = datetime.datetime(2012, 8, 10, 12, 0)
     
-    # Slash dates (e.g. 8/10) should be parsed successfully using the Japanese config
+    # 8/10 -> MM/DD
     results = chrono.ja.parse("8/10", ref_date)
     assert len(results) == 1
     result = results[0]
@@ -26,6 +26,39 @@ def test_ja_inherited_slash_date():
     assert result.moment.get(CivilTimeComponent.YEAR) == 2012
     assert result.moment.get(CivilTimeComponent.MONTH) == 8
     assert result.moment.get(CivilTimeComponent.DAY) == 10
+
+    # 8/10/2012 -> MM/DD/YYYY
+    results = chrono.ja.parse("8/10/2012", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "8/10/2012"
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 8
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 10
+
+    # 2012/8/10 -> YYYY/MM/DD
+    results = chrono.ja.parse("2012/8/10", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "2012/8/10"
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 8
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 10
+
+    # 04/2016 -> MM/YYYY
+    results = chrono.ja.parse("04/2016", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "04/2016"
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2016
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 4
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 1
+
+    # 2012/08 -> YYYY/MM
+    results = chrono.ja.parse("2012/08", ref_date)
+    assert len(results) == 1
+    assert results[0].text == "2012/08"
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 8
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 1
+
 
 
 def test_ja_inherited_time_expression():

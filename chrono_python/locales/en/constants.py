@@ -2,6 +2,8 @@ import re
 
 from chrono_python.types import Timeunit
 from chrono_python.utils import patterns
+from chrono_python.common import calendars
+
 
 WEEKDAY_DICTIONARY = {
     'sunday': 0,
@@ -50,17 +52,30 @@ FULL_MONTH_NAME_DICTIONARY = {
 MONTH_NAME_DICTIONARY = {
     **FULL_MONTH_NAME_DICTIONARY,
     'jan': 1,
+    'jan.': 1,
     'feb': 2,
+    'feb.': 2,
     'mar': 3,
+    'mar.': 3,
     'apr': 4,
+    'apr.': 4,
     'may': 5,
     'jun': 6,
+    'jun.': 6,
     'jul': 7,
+    'jul.': 7,
     'aug': 8,
+    'aug.': 8,
     'sep': 9,
+    'sep.': 9,
+    'sept': 9,
+    'sept.': 9,
     'oct': 10,
+    'oct.': 10,
     'nov': 11,
-    'dec': 12
+    'nov.': 11,
+    'dec': 12,
+    'dec.': 12
 }
 
 INTEGER_WORD_DICTIONARY = {
@@ -187,9 +202,21 @@ def parse_ordinal_number(match_text: str) -> int:
     return int(num)
 
 def parse_year(match_text: str) -> int:
-    year = match_text.lower()
-    year = year.replace('be', '').replace('ad', '').replace('bc', '').replace('bce', '').replace('ce', '')
-    return int(year)
+    # Buddhist Era
+    if re.search(r'BE', match_text, re.IGNORECASE):
+        year_num = re.sub(r'BE', '', match_text, flags=re.IGNORECASE).strip()
+        return int(year_num) - 543
+
+    # Before Christ / Before Common Era
+    if re.search(r'BCE?', match_text, re.IGNORECASE):
+        year_num = re.sub(r'BCE?', '', match_text, flags=re.IGNORECASE).strip()
+        return -int(year_num)
+
+    # Anno Domini / Common Era / normal years
+    year_num = re.sub(r'(?:AD|CE)', '', match_text, flags=re.IGNORECASE).strip()
+    raw_year = int(year_num)
+    return calendars.find_most_likely_ad_year(raw_year)
+
 
 def normalize_duration(fragments: dict[Timeunit | str, float]) -> dict[Timeunit, int]:
     import math

@@ -71,6 +71,13 @@ class Moment(ABC):
         """
         raise NotImplementedError()
 
+    def is_valid_date(self) -> bool:
+        """
+        Returns whether the moment represents a valid calendar date/time.
+        """
+        return True
+
+
 
 @dataclass(frozen=True)
 class DateTimeMoment(Moment):
@@ -117,13 +124,13 @@ class ReferenceMoment(Moment):
     def datetime(self) -> datetime.datetime:
         ref_datetime = self.reference.datetime()
 
-        target_month = (
-            ref_datetime.month +
+        target_month_0 = (
+            ref_datetime.month - 1 +
             self.delta.get(Timeunit.MONTH, 0) +
             self.delta.get(Timeunit.QUARTER, 0) * 3
         )
-        adjusted_year = ref_datetime.year + self.delta.get(Timeunit.YEAR, 0) + target_month // 12
-        adjusted_month = target_month % 12
+        adjusted_year = ref_datetime.year + self.delta.get(Timeunit.YEAR, 0) + target_month_0 // 12
+        adjusted_month = target_month_0 % 12 + 1
 
         adjusted_datetime = ref_datetime.replace(
             year=adjusted_year,

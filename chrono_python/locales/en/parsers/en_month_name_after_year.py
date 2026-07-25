@@ -9,15 +9,25 @@ from chrono_python.utils import patterns
 _YEAR_PATTERN = r'(?:[1-9][0-9]{0,3}\s{0,2}(?:BE|AD|BC|BCE|CE)|[1-9][0-9]{3})'
 
 PATTERN = re.compile(
-    f'({_YEAR_PATTERN})' +
+    f'({_YEAR_PATTERN})' +  # Group 1: Year
     r'(?:\s*[-.\/,]?\s*|\s+of\s+)' +
-    f'({patterns.match_any(constants.MONTH_NAME_DICTIONARY)})' +
-    r'(?=[^\s\w]|\s+[^0-9]|\s+$|$)',
+    f'({patterns.match_any(constants.MONTH_NAME_DICTIONARY)})' +  # Group 2: Month
+    r'(?:' +
+        r'(?:[\s\/\.\,-]+)' +
+        f'({constants.PATTERN_ORDINAL_NUMBER})' +  # Group 3: Day
+        r'(?:' +
+            r'\s{0,3}(?:to|-|–|until|through|till)\s{0,3}' +
+            f'({constants.PATTERN_ORDINAL_NUMBER})' +  # Group 4: End Day
+        r')?' +
+    r')?' +
+    r'(?=\W|$)',
     re.IGNORECASE
 )
 
 _YEAR_GROUP = 1
 _MONTH_NAME_GROUP = 2
+_DAY_GROUP = 3
+_END_DAY_GROUP = 4
 
 
 class ENMonthNameAfterYear(AbstractParserWithWordBoundary):
@@ -30,8 +40,24 @@ class ENMonthNameAfterYear(AbstractParserWithWordBoundary):
         month = constants.MONTH_NAME_DICTIONARY[month_name]
 
         moment = ParsingCivilTimeMoment(context.reference, {})
-        moment.imply(CivilTimeComponent.DAY, 1)
         moment.assign(CivilTimeComponent.MONTH, month)
         moment.assign(CivilTimeComponent.YEAR, year)
+
+        day_str = match[_DAY_GROUP]
+        if day_str:
+            day = constants.parse_ordinal_number(day_str)
+            if day > 31:
+                return None
+            moment.assign(CivilTimeComponent.DAY, day)
+        else:
+            moment.imply(CivilTimeComponent.DAY, 1)
+
+        end_day_str = match[_END_DAY_GROUP]
+        if end_day_str:
+            end_day = constants.parse_ordinal_number(end_day_str)
+            if end_day > 31:
+                return None
+            end_moment = moment.clone().assign(CivilTimeComponent.DAY, end_day)
+            return context.create_parsed_result(match.start(), match.end(), start=moment, end=end_moment)
 
         return context.create_parsed_result(match.start(), match.end(), moment)

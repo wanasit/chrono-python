@@ -14,7 +14,9 @@ from chrono_python.locales.ja.refiners import JPMergeDateRangeRefiner, JPMergeDa
 strict_configuration = chrono.Configuration(
     parsers=[
         common_parsers.ISOFormatParser(),
-        common_parsers.SlashDateFormatParser(little_endian=False),
+        common_parsers.SlashDateMonthYearParser(little_endian=False),
+        common_parsers.SlashMonthYearParser(),
+        common_parsers.SlashYearMonthDateParser(strict_month_date_order=True),
         JPTimeExprParser(),
         JPWeekdayParser(),
         JPWeekdayWithParenthesesParser(),
@@ -27,6 +29,7 @@ strict_configuration = chrono.Configuration(
         JPMergeDateTimeRefiner(),
         JPMergeDateRangeRefiner(),
         JPUnlikelyFormatFilter(),
+        common_refiners.InvalidDateFilter(),
     ])
 
 casual_configuration = chrono.Configuration(
@@ -34,7 +37,9 @@ casual_configuration = chrono.Configuration(
         JPCasualDateParser(),
         JPCasualTimeParser(),
         common_parsers.ISOFormatParser(),
-        common_parsers.SlashDateFormatParser(little_endian=False),
+        common_parsers.SlashDateMonthYearParser(little_endian=False),
+        common_parsers.SlashMonthYearParser(),
+        common_parsers.SlashYearMonthDateParser(strict_month_date_order=False),
         JPTimeExprParser(),
         JPWeekdayParser(),
         JPWeekdayWithParenthesesParser(),
@@ -47,6 +52,7 @@ casual_configuration = chrono.Configuration(
         JPMergeDateTimeRefiner(),
         JPMergeDateRangeRefiner(),
         JPUnlikelyFormatFilter(),
+        common_refiners.InvalidDateFilter(),
     ])
 
 casual = chrono.Chrono(casual_configuration)

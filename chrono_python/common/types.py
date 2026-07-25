@@ -66,6 +66,28 @@ class CivilTimeMoment(DateTimeMoment):
     def freeze(self) -> 'CivilTimeMoment':
         return self
 
+    def is_valid_date(self) -> bool:
+        year = self.get(CivilTimeComponent.YEAR)
+        month = self.get(CivilTimeComponent.MONTH)
+        day = self.get(CivilTimeComponent.DAY)
+
+        if month is not None and (month < 1 or month > 12):
+            return False
+        if day is not None:
+            if day < 1 or day > 31:
+                return False
+            if month is not None:
+                is_leap = True
+                if year is not None:
+                    # Python leap year rules (works for negative years too)
+                    is_leap = (year % 4 == 0 and (year % 100 != 0 or year % 400 == 0))
+                month_days = [31, 29 if is_leap else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+                if day > month_days[month - 1]:
+                    return False
+        return True
+
+
+
     def get(self, component: CivilTimeComponent) -> int | None:
         if component in self._known_values:
             return self._known_values[component]

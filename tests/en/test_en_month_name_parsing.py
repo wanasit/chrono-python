@@ -244,3 +244,45 @@ def test_month_name_after_year():
     assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
     assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
     assert results[0].moment.precision() == DateTimePrecision.MONTH
+
+
+def test_month_name_after_year_with_date_suffix():
+    # 2012 January 20
+    results = chrono.parse('2012 January 20')
+    assert len(results) == 1
+    assert results[0].text == '2012 January 20'
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 20
+    assert results[0].moment.is_certain(CivilTimeComponent.DAY) is True
+    assert results[0].moment.precision() == DateTimePrecision.DAY
+
+    # 2012 January 20 to 25
+    results = chrono.parse('2012 January 20 to 25')
+    assert len(results) == 1
+    assert results[0].text == '2012 January 20 to 25'
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 20
+    assert results[0].end.get(CivilTimeComponent.DAY) == 25
+    assert results[0].end.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].end.get(CivilTimeComponent.YEAR) == 2012
+
+    # Slash-separated chunks: 2012/Jan/20
+    results = chrono.parse('2012/Jan/20')
+    assert len(results) == 1
+    assert results[0].text == '2012/Jan/20'
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 1
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 20
+    assert results[0].moment.is_certain(CivilTimeComponent.DAY) is True
+    assert results[0].moment.precision() == DateTimePrecision.DAY
+
+    # Slash-separated chunks: 2012/August/10
+    results = chrono.parse('2012/August/10')
+    assert len(results) == 1
+    assert results[0].text == '2012/August/10'
+    assert results[0].moment.get(CivilTimeComponent.YEAR) == 2012
+    assert results[0].moment.get(CivilTimeComponent.MONTH) == 8
+    assert results[0].moment.get(CivilTimeComponent.DAY) == 10
+    assert results[0].moment.is_certain(CivilTimeComponent.DAY) is True
+
+

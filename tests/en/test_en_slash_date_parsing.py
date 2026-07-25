@@ -39,7 +39,7 @@ def test_slash_mm_dd_yyyy():
 
 
 def test_slash_dd_mm_yyyy():
-    parser = common_parsers.SlashDateFormatParser(little_endian=True)
+    parser = common_parsers.SlashDateMonthYearParser(little_endian=True)
     config = Configuration(parsers=[parser], refiners=[])
     custom_chrono = Chrono(config)
     ref_date = datetime.datetime(2012, 8, 10, 12, 0)

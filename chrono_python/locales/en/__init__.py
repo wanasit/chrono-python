@@ -1,6 +1,7 @@
 from chrono_python import chrono
 from chrono_python.common import parsers as common_parsers
 from chrono_python.common import refiners as common_refiners
+from chrono_python.locales.en import constants
 from chrono_python.locales.en.parsers.en_month_name_after_date import ENMonthNameAfterDate
 from chrono_python.locales.en.parsers.en_month_name_before_date import ENMonthNameBeforeDate
 from chrono_python.locales.en.parsers.en_month_name_before_year import ENMonthNameBeforeYear
@@ -13,12 +14,20 @@ from chrono_python.locales.en.parsers.en_time_expr_parser import ENTimeExprParse
 from chrono_python.locales.en.parsers.en_weekday_parser import ENWeekdayParser
 from chrono_python.locales.en.parsers.en_casual_date_parser import ENCasualDateParser
 from chrono_python.locales.en.parsers.en_casual_time_parser import ENCasualTimeParser
-from chrono_python.locales.en.refiners import ENMergeDateRangeRefiner, ENMergeDateTimeRefiner, ENUnlikelyFormatFilter
+from chrono_python.locales.en.refiners import (
+    ENMergeDateRangeRefiner,
+    ENMergeDateTimeRefiner,
+    ENUnlikelyFormatFilter,
+    ENMergeRelativeFollowByDateRefiner,
+    ENMergeRelativeAfterDateRefiner
+)
 
 strict_configuration = chrono.Configuration(
     parsers=[
+        common_parsers.SlashYearMonthDateParser(strict_month_date_order=True),
         common_parsers.ISOFormatParser(),
-        common_parsers.SlashDateFormatParser(little_endian=False),
+        common_parsers.SlashDateMonthYearParser(little_endian=False),
+        common_parsers.SlashMonthYearParser(),
         ENTimeExprParser(),
         ENWeekdayParser(),
         ENMonthNameAfterDate(),
@@ -30,6 +39,8 @@ strict_configuration = chrono.Configuration(
         ENTimeUnitLaterParser(allow_abbreviations=False, allow_casual_suffix=False),
     ],
     refiners=[
+        ENMergeRelativeFollowByDateRefiner(),
+        ENMergeRelativeAfterDateRefiner(),
         common_refiners.RemoveOverlapRefiner(),
         common_refiners.ExtractTimezoneOffsetRefiner(),
         common_refiners.RemoveOverlapRefiner(),
@@ -39,12 +50,15 @@ strict_configuration = chrono.Configuration(
         common_refiners.RemoveOverlapRefiner(),
         ENMergeDateRangeRefiner(),
         ENUnlikelyFormatFilter(),
+        common_refiners.InvalidDateFilter(),
     ])
 
 casual_configuration = chrono.Configuration(
     parsers=[
+        common_parsers.SlashYearMonthDateParser(strict_month_date_order=False),
         common_parsers.ISOFormatParser(),
-        common_parsers.SlashDateFormatParser(little_endian=False),
+        common_parsers.SlashDateMonthYearParser(little_endian=False),
+        common_parsers.SlashMonthYearParser(),
         ENTimeExprParser(),
         ENWeekdayParser(),
         ENMonthNameAfterDate(),
@@ -59,6 +73,8 @@ casual_configuration = chrono.Configuration(
         ENCasualTimeParser(),
     ],
     refiners=[
+        ENMergeRelativeFollowByDateRefiner(),
+        ENMergeRelativeAfterDateRefiner(),
         common_refiners.RemoveOverlapRefiner(),
         common_refiners.ExtractTimezoneOffsetRefiner(),
         common_refiners.RemoveOverlapRefiner(),
@@ -68,6 +84,7 @@ casual_configuration = chrono.Configuration(
         common_refiners.RemoveOverlapRefiner(),
         ENMergeDateRangeRefiner(),
         ENUnlikelyFormatFilter(),
+        common_refiners.InvalidDateFilter(),
     ])
 
 casual = chrono.Chrono(casual_configuration)
@@ -76,4 +93,3 @@ strict = chrono.Chrono(strict_configuration)
 
 def parse(*args, **kwargs) -> list[chrono.ParsedResult]:
     return casual.parse(*args, **kwargs)
-
