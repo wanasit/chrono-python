@@ -70,8 +70,9 @@ chrono_python/
 5. **CivilTimeMoment and ParsingCivilTimeMoment (`common.types.CivilTimeMoment`, `common.types.ParsingCivilTimeMoment`)**:
    - `CivilTimeMoment` (immutable) inherits from `DateTimeMoment` and tracks date/time components as either `known_values` (explicitly present in match) or `implied_values` (implied from reference date or other clues).
    - `ParsingCivilTimeMoment` (mutable subclass) is used during the parsing/merging phase.
+   - Use `ParsingCivilTimeMoment.of(reference, precision=None)` (overriding `DateTimeMoment.of`) to initialize moments from a reference moment/datetime. `.of()` automatically implies `YEAR`, `MONTH`, `DAY` from `reference`.
    - Calling `.freeze()` on a mutable moment returns an immutable `CivilTimeMoment`, while `.to_mutable()` returns a mutable instance.
-   - `precision()` only considers components in `known_values` (certain components) and falls back to the reference moment's precision if no components are known.
+   - `precision()` only considers components in `known_values` (certain components) and falls back to `super().precision()` (the reference precision) if no components are known. If both are `None`, it raises `ValueError`.
    - `CivilTimeComponent.MERIDIEM` maps to `DateTimePrecision.DAY` (since meridiem alone does not specify an hour and should only lead to day-level precision).
    - Helper methods are provided for copying components while respecting target precision:
      - `assign_similar_date(target)` / `imply_similar_date(target)`
@@ -90,6 +91,15 @@ chrono_python/
    - Define a file-local helper `compile_pattern(...)` that accepts option flags and returns a compiled `re.Pattern`.
    - Call `compile_pattern` inside the parser class's constructor `__init__` and store the result as `self._pattern`.
    - Do not name the attribute `self.pattern` because it shadows the inherited `pattern()` method.
+
+3. **Full-Width Normalization (`to_hankaku`)**:
+   Full-width character normalization is centrally located in `chrono_python.utils.patterns.to_hankaku`. Locale parsers and common parsers should import `to_hankaku` directly from `utils.patterns`.
+
+4. **Unicode Word Boundaries in Regex**:
+   In Python 3 regex, `\w` matches all Unicode word characters (including Japanese hiragana, katakana, and kanji such as `の`). Avoid using `\W` to demarcate word boundaries in non-English text; use non-digit lookahead `(?=[^\d０-９]|$)` or explicit character sets instead.
+
+5. **Common Slash Date Parsers**:
+   `SlashYearMonthDateParser(strict_month_date_order=True)` should be used directly in locale configurations (e.g., Japanese locale `strict` and `casual` configurations) rather than creating a redundant subclass when no custom parsing behavior is needed.
 
 ---
 
