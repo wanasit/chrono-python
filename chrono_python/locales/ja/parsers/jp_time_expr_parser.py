@@ -130,7 +130,7 @@ def create_time_components(
     if hour > 24:
         return None
 
-    target_components = ParsingCivilTimeMoment(context.reference, {})
+    target_components = ParsingCivilTimeMoment.of(context.reference)
 
     if match_minute is not None:
         if match_minute == "半":

@@ -79,7 +79,7 @@ class SlashDateMonthYearParser(chrono.Parser):
         if day < 1 or day > 31:
             return None
 
-        moment = ParsingCivilTimeMoment(context.reference, {})
+        moment = ParsingCivilTimeMoment.of(context.reference)
         moment.assign(CivilTimeComponent.DAY, day)
         moment.assign(CivilTimeComponent.MONTH, month)
 

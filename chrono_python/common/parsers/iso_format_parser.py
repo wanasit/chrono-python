@@ -30,7 +30,7 @@ class ISOFormatParser(chrono.Parser):
         return PATTERN
 
     def extract(self, context: chrono.ParsingContext, match: chrono.Match) -> ParsingCivilTimeMoment | None:
-        components = ParsingCivilTimeMoment(context.reference, {})
+        components = ParsingCivilTimeMoment.of(context.reference)
         components.assign(CivilTimeComponent.YEAR, int(match.group(1)))
         components.assign(CivilTimeComponent.MONTH, int(match.group(2)))
         components.assign(CivilTimeComponent.DAY, int(match.group(3)))

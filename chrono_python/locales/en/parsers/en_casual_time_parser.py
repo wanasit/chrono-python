@@ -17,7 +17,7 @@ class ENCasualTimeParser(AbstractParserWithWordBoundary):
 
     def inner_extract(self, context: chrono.ParsingContext, match: chrono.Match) -> chrono.ParsedResult | Moment | None:
         target_word = match.group(1).lower()
-        component = ParsingCivilTimeMoment(context.reference, {})
+        component = ParsingCivilTimeMoment.of(context.reference)
 
         if target_word == "afternoon":
             component.assign(CivilTimeComponent.MERIDIEM, Meridiem.PM)

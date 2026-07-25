@@ -158,7 +158,7 @@ class TimeExprParser(chrono.Parser):
     def extract_primary_time_components(
         self, context: chrono.ParsingContext, match: Match
     ) -> ParsingCivilTimeMoment | None:
-        components = ParsingCivilTimeMoment(context.reference, {})
+        components = ParsingCivilTimeMoment.of(context.reference)
         minute = 0
         meridiem = None
 
@@ -290,7 +290,7 @@ class TimeExprParser(chrono.Parser):
     def extract_following_time_components(
         self, context: chrono.ParsingContext, match: Match, result: chrono.ParsedResult
     ) -> ParsingCivilTimeMoment | None:
-        components = ParsingCivilTimeMoment(context.reference, {})
+        components = ParsingCivilTimeMoment.of(context.reference)
 
         # ----- Millisecond
         millisecond_str = match.group(MILLI_SECOND_GROUP)

@@ -32,7 +32,7 @@ class JPYearMonthDateParser(chrono.Parser):
         month = int(to_hankaku(match.group(MONTH_GROUP)))
         day = int(to_hankaku(match.group(DAY_GROUP)))
 
-        moment = ParsingCivilTimeMoment(context.reference, {})
+        moment = ParsingCivilTimeMoment.of(context.reference)
         moment.assign(CivilTimeComponent.MONTH, month)
         moment.assign(CivilTimeComponent.DAY, day)
 

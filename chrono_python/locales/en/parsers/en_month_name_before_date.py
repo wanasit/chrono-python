@@ -47,7 +47,7 @@ class ENMonthNameBeforeDate(chrono.Parser):
         if day > 31:  # Basic validation
             return None
 
-        moment = ParsingCivilTimeMoment(context.reference, {})
+        moment = ParsingCivilTimeMoment.of(context.reference)
         moment.assign(CivilTimeComponent.MONTH, month)
         moment.assign(CivilTimeComponent.DAY, day)
 

@@ -75,7 +75,7 @@ class ENTimeUnitWithinParser(AbstractParserWithWordBoundary):
         elif prefix == 'this':
             if unit_word:
                 unit = list(time_units.keys())[0]
-                moment = ParsingCivilTimeMoment(context.reference, {})
+                moment = ParsingCivilTimeMoment.of(context.reference)
                 ref_dt = context.reference.datetime()
                 if unit == Timeunit.WEEK:
                     # Sunday-start of the week

@@ -62,7 +62,7 @@ class JPYearMonthParser(chrono.Parser):
             year = calendars.find_year_closest_to_ref(context.reference, month, 1)
             year_certain = False
 
-        start_moment = ParsingCivilTimeMoment(context.reference, {})
+        start_moment = ParsingCivilTimeMoment.of(context.reference)
         if year_certain:
             start_moment.assign(CivilTimeComponent.YEAR, year)
         else:

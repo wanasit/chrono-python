@@ -40,28 +40,54 @@ class CivilTimeMoment(DateTimeMoment):
     The time components made of this moment are separated into two groups:
         1. `known_values`: components that are explicitly set by the user.
         2. `implied_values`: components that are inferred and weaker than known_values.
+
+    Components that are neither explicitly set (`known_values`) nor inferred (`implied_values`) are treated as zero values (e.g. month 1, day 1, minute 0, second 0), except year (which defaults to 1970) and hour (which defaults to 12:00 for date-only expressions).
     """
 
     def __init__(
-                 self,
-                 reference: Moment,
-                 known_values: dict[CivilTimeComponent, int],
-                 implied_values: dict[CivilTimeComponent, int] | None = None
-                 ):
-        # Initialize the frozen DateTimeMoment base class
-        super().__init__(_dt=reference.datetime(), _precision=DateTimePrecision.MILLI_SECOND)
-        object.__setattr__(self, '_reference', reference)
-        object.__setattr__(self, '_known_values', known_values.copy())
-        object.__setattr__(self, '_implied_values', implied_values.copy() if implied_values is not None else {})
+        self,
+        known_values: dict[CivilTimeComponent, int] | None = None,
+        implied_values: dict[CivilTimeComponent, int] | None = None,
+        precision: DateTimePrecision | None = None
+    ):
+        super().__init__(_dt=None, _precision=precision)
+
+        object.__setattr__(self, '_known_values', known_values.copy() if known_values else {})
+        object.__setattr__(self, '_implied_values', implied_values.copy() if implied_values else {})
+
+    @classmethod
+    def of(
+        cls,
+        reference: Moment | datetime.datetime,
+        precision: DateTimePrecision | None = None
+    ):
+        """Factory constructor creating a CivilTimeMoment / ParsingCivilTimeMoment with year, month, and day implied from a reference."""
+        ref_dt = reference.datetime() if isinstance(reference, Moment) else reference
+        ref_prec = precision or (reference.precision() if isinstance(reference, Moment) else None)
+
+        implied = {
+            CivilTimeComponent.YEAR: ref_dt.year,
+            CivilTimeComponent.MONTH: ref_dt.month,
+            CivilTimeComponent.DAY: ref_dt.day,
+        }
+        return cls(known_values=None, implied_values=implied, precision=ref_prec)
 
     def __setattr__(self, name, value):
         raise AttributeError("CivilTimeMoment is immutable. Use to_mutable() to modify.")
 
     def clone(self) -> 'CivilTimeMoment':
-        return CivilTimeMoment(self._reference, self._known_values.copy(), self._implied_values.copy())
+        return CivilTimeMoment(
+            known_values=self._known_values.copy(),
+            implied_values=self._implied_values.copy(),
+            precision=super().precision()
+        )
 
     def to_mutable(self) -> 'ParsingCivilTimeMoment':
-        return ParsingCivilTimeMoment(self._reference, self._known_values.copy(), self._implied_values.copy())
+        return ParsingCivilTimeMoment(
+            known_values=self._known_values.copy(),
+            implied_values=self._implied_values.copy(),
+            precision=super().precision()
+        )
 
     def freeze(self) -> 'CivilTimeMoment':
         return self
@@ -85,8 +111,6 @@ class CivilTimeMoment(DateTimeMoment):
                 if day > month_days[month - 1]:
                     return False
         return True
-
-
 
     def get(self, component: CivilTimeComponent) -> int | None:
         if component in self._known_values:
@@ -134,45 +158,33 @@ class CivilTimeMoment(DateTimeMoment):
     def precision(self) -> DateTimePrecision:
         max_precision = None
         for component in self._known_values.keys():
-            precision = COMPONENT_PRECISION_MAP.get(component)
-            if precision is not None:
-                if max_precision is None or precision.value > max_precision.value:
-                    max_precision = precision
+            prec = COMPONENT_PRECISION_MAP.get(component)
+            if prec is not None:
+                if max_precision is None or prec.value > max_precision.value:
+                    max_precision = prec
         
         if max_precision is None:
-            return self._reference.precision()
+            fallback = super().precision()
+            if fallback is not None:
+                return fallback
+            raise ValueError("Cannot determine precision for CivilTimeMoment without known components.")
         return max_precision
 
     def datetime(self) -> datetime.datetime:
-        ref_dt = self._reference.datetime()
-        
-        year = self.get(CivilTimeComponent.YEAR)
-        if year is None:
-            year = ref_dt.year
-            
-        month = self.get(CivilTimeComponent.MONTH)
-        if month is None:
-            month = ref_dt.month
-            
-        day = self.get(CivilTimeComponent.DAY)
-        if day is None:
-            day = ref_dt.day
-            
+        year = self.get(CivilTimeComponent.YEAR) or 1970
+        month = self.get(CivilTimeComponent.MONTH) or 1
+        day = self.get(CivilTimeComponent.DAY) or 1
         hour = self.get(CivilTimeComponent.HOUR)
         if hour is None:
             hour = 12
-            
-        minute = self.get(CivilTimeComponent.MINUTE)
-        if minute is None:
-            minute = 0
-            
-        second = self.get(CivilTimeComponent.SECOND)
-        if second is None:
-            second = 0
-            
+        minute = self.get(CivilTimeComponent.MINUTE) or 0
+        second = self.get(CivilTimeComponent.SECOND) or 0
         millisecond = self.get(CivilTimeComponent.MILLI_SECOND)
         microsecond = millisecond * 1000 if millisecond is not None else 0
-        
+
+        tz_offset = self.get(CivilTimeComponent.TIMEZONE_OFFSET)
+        tzinfo = datetime.timezone(datetime.timedelta(minutes=tz_offset)) if tz_offset is not None else None
+
         return datetime.datetime(
             year=year,
             month=month,
@@ -181,7 +193,7 @@ class CivilTimeMoment(DateTimeMoment):
             minute=minute,
             second=second,
             microsecond=microsecond,
-            tzinfo=ref_dt.tzinfo
+            tzinfo=tzinfo
         )
 
 
@@ -191,25 +203,33 @@ class ParsingCivilTimeMoment(CivilTimeMoment):
     """
 
     def __init__(
-                 self,
-                 reference: Moment,
-                 known_values: dict[CivilTimeComponent, int],
-                 implied_values: dict[CivilTimeComponent, int] | None = None
-                 ):
-        super().__init__(reference, known_values, implied_values)
+        self,
+        known_values: dict[CivilTimeComponent, int] | None = None,
+        implied_values: dict[CivilTimeComponent, int] | None = None,
+        precision: DateTimePrecision | None = None
+    ):
+        super().__init__(known_values=known_values, implied_values=implied_values, precision=precision)
 
     def __setattr__(self, name, value):
         # Bypass the frozen class restrictions on subclass attributes
         object.__setattr__(self, name, value)
 
     def clone(self) -> 'ParsingCivilTimeMoment':
-        return ParsingCivilTimeMoment(self._reference, self._known_values.copy(), self._implied_values.copy())
+        return ParsingCivilTimeMoment(
+            known_values=self._known_values.copy(),
+            implied_values=self._implied_values.copy(),
+            precision=super().precision()
+        )
 
     def to_mutable(self) -> 'ParsingCivilTimeMoment':
         return self
 
     def freeze(self) -> CivilTimeMoment:
-        return CivilTimeMoment(self._reference, self._known_values, self._implied_values)
+        return CivilTimeMoment(
+            known_values=self._known_values.copy(),
+            implied_values=self._implied_values.copy(),
+            precision=super().precision()
+        )
 
     def assign(self, component: CivilTimeComponent, value: int) -> 'ParsingCivilTimeMoment':
         if component in self._implied_values:

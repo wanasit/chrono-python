@@ -22,7 +22,7 @@ def test_custom_parser_return_date():
             return re.compile(r'Chrismas', re.IGNORECASE)
 
         def extract(self, context: ParsingContext, match: Match) -> ParsingCivilTimeMoment | None:
-            moment = ParsingCivilTimeMoment(context.reference, {})
+            moment = ParsingCivilTimeMoment.of(context.reference)
             moment.assign(CivilTimeComponent.MONTH, 12)
             moment.assign(CivilTimeComponent.DAY, 25)
             moment.imply(CivilTimeComponent.YEAR, context.reference.datetime().year)

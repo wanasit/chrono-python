@@ -13,7 +13,7 @@ class JPCasualTimeParser(chrono.Parser):
 
     def extract(self, context: chrono.ParsingContext, match: chrono.Match) -> chrono.ParsedResult | Moment | None:
         text = match.group(0)
-        component = ParsingCivilTimeMoment(context.reference, {})
+        component = ParsingCivilTimeMoment.of(context.reference)
 
         if text in ("朝", "午前中"):
             component.assign(CivilTimeComponent.MERIDIEM, Meridiem.AM)

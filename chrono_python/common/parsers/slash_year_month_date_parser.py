@@ -32,7 +32,7 @@ class SlashYearMonthDateParser(AbstractParserWithWordBoundary):
         month = int(match.group(2))
         day_match = match.group(3)
 
-        moment = ParsingCivilTimeMoment(context.reference, {})
+        moment = ParsingCivilTimeMoment.of(context.reference)
         moment.assign(CivilTimeComponent.YEAR, year)
 
         if day_match is not None:

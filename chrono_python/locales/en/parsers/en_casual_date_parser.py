@@ -18,7 +18,7 @@ class ENCasualDateParser(AbstractParserWithWordBoundary):
     def inner_extract(self, context: chrono.ParsingContext, match: chrono.Match) -> chrono.ParsedResult | Moment | None:
         target_date = context.reference.datetime()
         lower_text = match[0].lower()
-        component = ParsingCivilTimeMoment(context.reference, {})
+        component = ParsingCivilTimeMoment.of(context.reference)
 
         if lower_text == "now":
             component.assign_similar_date(target_date)

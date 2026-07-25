@@ -39,7 +39,7 @@ class ENMonthNameAfterYear(AbstractParserWithWordBoundary):
         month_name = match[_MONTH_NAME_GROUP].lower()
         month = constants.MONTH_NAME_DICTIONARY[month_name]
 
-        moment = ParsingCivilTimeMoment(context.reference, {})
+        moment = ParsingCivilTimeMoment.of(context.reference)
         moment.assign(CivilTimeComponent.MONTH, month)
         moment.assign(CivilTimeComponent.YEAR, year)
 

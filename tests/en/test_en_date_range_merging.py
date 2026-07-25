@@ -24,7 +24,6 @@ def test_weekday_range_refiner_directly():
 
     # Wednesday (July 1) - Friday (July 3) (no adjustment)
     wed_moment = ParsingCivilTimeMoment(
-        reference=DateTimeMoment.of(ref),
         known_values={CivilTimeComponent.WEEKDAY: 3},
         implied_values={
             CivilTimeComponent.DAY: 1,
@@ -33,7 +32,6 @@ def test_weekday_range_refiner_directly():
         }
     )
     fri_moment = ParsingCivilTimeMoment(
-        reference=DateTimeMoment.of(ref),
         known_values={CivilTimeComponent.WEEKDAY: 5},
         implied_values={
             CivilTimeComponent.DAY: 3,
@@ -62,7 +60,6 @@ def test_weekday_range_forward_adjustment():
     # Friday (July 3) - Monday (June 29)
     # Since July 3 > June 29, it should adjust Monday to July 6.
     fri_moment = ParsingCivilTimeMoment(
-        reference=DateTimeMoment.of(ref),
         known_values={CivilTimeComponent.WEEKDAY: 5},
         implied_values={
             CivilTimeComponent.DAY: 3,
@@ -71,7 +68,6 @@ def test_weekday_range_forward_adjustment():
         }
     )
     mon_moment = ParsingCivilTimeMoment(
-        reference=DateTimeMoment.of(ref),
         known_values={CivilTimeComponent.WEEKDAY: 1},
         implied_values={
             CivilTimeComponent.DAY: 29,

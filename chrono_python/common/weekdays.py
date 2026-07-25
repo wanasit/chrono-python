@@ -18,7 +18,7 @@ def create_parsing_components_at_weekday(
     # Calculate the target datetime by shifting by the calculated days
     target_dt = ref_dt + timedelta(days=days_to_weekday)
 
-    moment = ParsingCivilTimeMoment(reference, {})
+    moment = ParsingCivilTimeMoment.of(reference)
     moment.imply(CivilTimeComponent.YEAR, target_dt.year)
     moment.imply(CivilTimeComponent.MONTH, target_dt.month)
     moment.imply(CivilTimeComponent.DAY, target_dt.day)
@@ -109,7 +109,7 @@ def nth_weekday_of_month(year: int, month: int, weekday: Weekday, n: int, hour: 
     implied = {
         CivilTimeComponent.HOUR: hour
     }
-    return CivilTimeMoment(ref, known, implied)
+    return CivilTimeMoment(known_values=known, implied_values=implied)
 
 
 def last_weekday_of_month(year: int, month: int, weekday: Weekday, hour: int = 0) -> CivilTimeMoment:
@@ -148,4 +148,4 @@ def last_weekday_of_month(year: int, month: int, weekday: Weekday, hour: int = 0
     implied = {
         CivilTimeComponent.HOUR: hour
     }
-    return CivilTimeMoment(ref, known, implied)
+    return CivilTimeMoment(known_values=known, implied_values=implied)

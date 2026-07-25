@@ -33,27 +33,27 @@ class JPCasualDateParser(chrono.Parser):
         target_date = context.reference.datetime()
 
         if text in ("本日", "今日"):
-            component = ParsingCivilTimeMoment(context.reference, {})
+            component = ParsingCivilTimeMoment.of(context.reference)
             component.assign_similar_date(target_date)
             component.imply_similar_time(target_date)
             component.delete(CivilTimeComponent.MERIDIEM)
             return component
         elif text == "昨日":
-            component = ParsingCivilTimeMoment(context.reference, {})
+            component = ParsingCivilTimeMoment.of(context.reference)
             new_date = target_date - datetime.timedelta(days=1)
             component.assign_similar_date(new_date)
             component.imply_similar_time(new_date)
             component.delete(CivilTimeComponent.MERIDIEM)
             return component
         elif text == "明日":
-            component = ParsingCivilTimeMoment(context.reference, {})
+            component = ParsingCivilTimeMoment.of(context.reference)
             new_date = target_date + datetime.timedelta(days=1)
             component.assign_similar_date(new_date)
             component.imply_similar_time(new_date)
             component.delete(CivilTimeComponent.MERIDIEM)
             return component
 
-        components = ParsingCivilTimeMoment(context.reference, {})
+        components = ParsingCivilTimeMoment.of(context.reference)
         if text in ("今夜", "今夕", "今晩"):
             components.imply(CivilTimeComponent.HOUR, 22)
             components.imply(CivilTimeComponent.MERIDIEM, Meridiem.PM)
