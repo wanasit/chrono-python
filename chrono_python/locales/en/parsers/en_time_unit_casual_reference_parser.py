@@ -30,4 +30,4 @@ class ENTimeUnitCasualReferenceParser(AbstractParserWithWordBoundary):
             return None
         if prefix in ('last', 'past', '-'):
             duration = {k: -v for k, v in duration.items()}
-        return ReferenceMoment(context.reference, duration)
+        return ReferenceMoment.of(context.reference, duration)

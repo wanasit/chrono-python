@@ -49,7 +49,7 @@ class ENTimeUnitWithinParser(AbstractParserWithWordBoundary):
             time_units = constants.parse_duration(match.group(1))
             if not time_units:
                 return None
-            return ReferenceMoment(context.reference, time_units)
+            return ReferenceMoment.of(context.reference, time_units)
 
         # Case 2: this/next/last/past/after this
         prefix = match.group(2).lower()
@@ -71,7 +71,7 @@ class ENTimeUnitWithinParser(AbstractParserWithWordBoundary):
         if prefix in ('last', 'past'):
             # reverse duration
             time_units = {k: -v for k, v in time_units.items()}
-            return ReferenceMoment(context.reference, time_units)
+            return ReferenceMoment.of(context.reference, time_units)
         elif prefix == 'this':
             if unit_word:
                 unit = list(time_units.keys())[0]
@@ -95,10 +95,10 @@ class ENTimeUnitWithinParser(AbstractParserWithWordBoundary):
                 else:
                     # fallback to offset 0
                     time_units = {unit: 0}
-                    return ReferenceMoment(context.reference, time_units)
+                    return ReferenceMoment.of(context.reference, time_units)
                 return moment
             else:
-                return ReferenceMoment(context.reference, time_units)
+                return ReferenceMoment.of(context.reference, time_units)
         else:
             # next / after this
-            return ReferenceMoment(context.reference, time_units)
+            return ReferenceMoment.of(context.reference, time_units)

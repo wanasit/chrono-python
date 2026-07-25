@@ -31,6 +31,6 @@ class ENMergeRelativeAfterDateRefiner(AbstractMergingRefiner):
         if is_negative_following_reference(next_result):
             duration = {k: -v for k, v in duration.items()}
 
-        moment = ReferenceMoment(current_result.moment, duration)
+        moment = ReferenceMoment.of(current_result.moment, duration)
         new_text = current_result.text + text_between + next_result.text
         return context.create_parsed_result(current_result.index, current_result.index + len(new_text), moment)

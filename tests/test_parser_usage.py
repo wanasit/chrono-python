@@ -61,7 +61,7 @@ def test_custom_parser_return_ref():
             return re.compile(r'Tomorrow', re.IGNORECASE)
 
         def extract(self, context: ParsingContext, match: Match) -> ReferenceMoment | None:
-            return ReferenceMoment(context.reference, {Timeunit.DAY: 1})
+            return ReferenceMoment.of(context.reference, {Timeunit.DAY: 1})
 
     # A custom parser that detects only "Tomorrow" and returns ref+1d
     parser = TomorrowParser()
@@ -89,7 +89,7 @@ def test_custom_parser_return_result():
             return re.compile(r'Today', re.IGNORECASE)
 
         def extract(self, context: ParsingContext, match: Match) -> ParsedResult | None:
-            moment = ReferenceMoment(context.reference, {Timeunit.DAY: 0})
+            moment = ReferenceMoment.of(context.reference, {Timeunit.DAY: 0})
             return context.create_parsed_result(match.start(), match.end(), moment)
 
     parser = TodayParser()

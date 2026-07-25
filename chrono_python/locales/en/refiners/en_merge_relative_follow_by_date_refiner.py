@@ -42,6 +42,6 @@ class ENMergeRelativeFollowByDateRefiner(AbstractMergingRefiner):
         if has_implied_earlier_reference_date(current_result):
             duration = {k: -v for k, v in duration.items()}
 
-        moment = ReferenceMoment(next_result.moment, duration)
+        moment = ReferenceMoment.of(next_result.moment, duration)
         new_text = current_result.text + text_between + next_result.text
         return context.create_parsed_result(current_result.index, current_result.index + len(new_text), moment)

@@ -28,4 +28,4 @@ class ENTimeUnitAgoParser(AbstractParserWithWordBoundary):
         if not duration:
             return None
         reversed_duration = {k: -v for k, v in duration.items()}
-        return ReferenceMoment(context.reference, reversed_duration)
+        return ReferenceMoment.of(context.reference, reversed_duration)

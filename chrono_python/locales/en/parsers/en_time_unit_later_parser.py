@@ -33,4 +33,4 @@ class ENTimeUnitLaterParser(AbstractParserWithWordBoundary):
         time_units = constants.parse_duration(match.group(1))
         if not time_units:
             return None
-        return ReferenceMoment(context.reference, time_units)
+        return ReferenceMoment.of(context.reference, time_units)

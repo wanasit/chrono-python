@@ -89,6 +89,8 @@ class DateTimeMoment(Moment):
     def of(cls,
            reference: datetime.datetime,
            precision: DateTimePrecision = DateTimePrecision.MILLI_SECOND) -> 'DateTimeMoment':
+        if precision is None:
+            raise ValueError("DateTimeMoment precision cannot be None")
         return cls(_dt=reference, _precision=precision)
 
     @classmethod
@@ -116,20 +118,27 @@ class ReferenceMoment(Moment):
     """A Moment represents time relative to another reference moment.
 
     While this class is frozen, the underlying reference could be mutable.
-    When the reference is update, the moment's value could also be changed.
+    When the reference is updated, the moment's value could also be changed.
     """
-    reference: Moment
-    delta: Duration
+    _reference: Moment
+    _delta: Duration
+
+    @classmethod
+    def of(cls,
+           reference: Moment | datetime.datetime,
+           delta: Duration | None = None) -> 'ReferenceMoment':
+        ref_moment = reference if isinstance(reference, Moment) else DateTimeMoment.of(reference)
+        return cls(_reference=ref_moment, _delta=delta if delta is not None else {Timeunit.DAY: 0})
 
     def datetime(self) -> datetime.datetime:
-        ref_datetime = self.reference.datetime()
+        ref_datetime = self._reference.datetime()
 
         target_month_0 = (
             ref_datetime.month - 1 +
-            self.delta.get(Timeunit.MONTH, 0) +
-            self.delta.get(Timeunit.QUARTER, 0) * 3
+            self._delta.get(Timeunit.MONTH, 0) +
+            self._delta.get(Timeunit.QUARTER, 0) * 3
         )
-        adjusted_year = ref_datetime.year + self.delta.get(Timeunit.YEAR, 0) + target_month_0 // 12
+        adjusted_year = ref_datetime.year + self._delta.get(Timeunit.YEAR, 0) + target_month_0 // 12
         adjusted_month = target_month_0 % 12 + 1
 
         adjusted_datetime = ref_datetime.replace(
@@ -137,15 +146,15 @@ class ReferenceMoment(Moment):
             month=adjusted_month,
         )
         return adjusted_datetime + datetime.timedelta(
-            days=self.delta.get(Timeunit.DAY, 0) + self.delta.get(Timeunit.WEEK, 0) * 7,
-            hours=self.delta.get(Timeunit.HOUR, 0),
-            minutes=self.delta.get(Timeunit.MINUTE, 0),
-            seconds=self.delta.get(Timeunit.SECOND, 0),
-            milliseconds=self.delta.get(Timeunit.MILLI_SECOND, 0)
+            days=self._delta.get(Timeunit.DAY, 0) + self._delta.get(Timeunit.WEEK, 0) * 7,
+            hours=self._delta.get(Timeunit.HOUR, 0),
+            minutes=self._delta.get(Timeunit.MINUTE, 0),
+            seconds=self._delta.get(Timeunit.SECOND, 0),
+            milliseconds=self._delta.get(Timeunit.MILLI_SECOND, 0)
         )
 
     def precision(self) -> DateTimePrecision:
-        ref_precision = self.reference.precision()
+        ref_precision = self._reference.precision()
         for unit, precision in [
             (Timeunit.MILLI_SECOND, DateTimePrecision.MILLI_SECOND),
             (Timeunit.SECOND, DateTimePrecision.SECOND),
@@ -157,7 +166,7 @@ class ReferenceMoment(Moment):
             (Timeunit.QUARTER, DateTimePrecision.MONTH),
             (Timeunit.YEAR, DateTimePrecision.YEAR),
         ]:
-            if unit in self.delta and ref_precision.value >= precision.value:
+            if unit in self._delta and ref_precision.value >= precision.value:
                 return precision
         return ref_precision
 
