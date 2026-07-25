@@ -98,8 +98,8 @@ chrono_python/
 4. **Unicode Word Boundaries in Regex**:
    In Python 3 regex, `\w` matches all Unicode word characters (including Japanese hiragana, katakana, and kanji such as `の`). Avoid using `\W` to demarcate word boundaries in non-English text; use non-digit lookahead `(?=[^\d０-９]|$)` or explicit character sets instead.
 
-5. **Common Slash Date Parsers**:
-   `SlashYearMonthDateParser(strict_month_date_order=True)` should be used directly in locale configurations (e.g., Japanese locale `strict` and `casual` configurations) rather than creating a redundant subclass when no custom parsing behavior is needed.
+5. **Reusing Common Parsers & Refiners**:
+   Common parsers and refiners (e.g., `SlashYearMonthDateParser(strict_month_date_order=True)`) should be instantiated directly in locale configurations with appropriate options/flags, rather than creating redundant locale-specific subclasses when no custom logic is needed.
 
 ---
 
