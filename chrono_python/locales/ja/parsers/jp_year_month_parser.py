@@ -5,7 +5,7 @@ from chrono_python import chrono
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.types import Moment
 from chrono_python.common import calendars
-from chrono_python.locales.ja.constants import to_hankaku
+from chrono_python.utils.patterns import to_hankaku
 
 # Regex matching Japanese year/month date format (e.g. 2026年4月, 2026年4月上旬・中旬)
 PATTERN = re.compile(

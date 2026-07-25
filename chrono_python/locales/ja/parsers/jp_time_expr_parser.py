@@ -4,7 +4,8 @@ import datetime
 from chrono_python import chrono
 from chrono_python.common.parsers.abstract_parser_with_word_boundary import AbstractParserWithWordBoundary
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent, Meridiem
-from chrono_python.locales.ja.constants import NUMBER, ja_string_to_number, to_hankaku
+from chrono_python.locales.ja.constants import NUMBER, ja_string_to_number
+from chrono_python.utils.patterns import to_hankaku
 
 KJS = "".join(NUMBER.keys())
 
@@ -59,15 +60,22 @@ class JPTimeExprParser(AbstractParserWithWordBoundary):
 
     def inner_extract(self, context: chrono.ParsingContext, match: chrono.Match) -> chrono.ParsedResult | None:
         start_idx = match.start()
-        if start_idx > 0 and re.match(r'[a-zA-Z0-9_]', context.text[start_idx - 1]):
+        if start_idx > 0 and re.match(r'[\da-zA-Z_０-９]', context.text[start_idx - 1]):
             return None
+
+        am_pm_prefix = match.group(AM_PM_HOUR_GROUP_1) or match.group(AM_PM_HOUR_GROUP_2)
+        if am_pm_prefix is None and start_idx > 0:
+            text_before = context.text[:start_idx]
+            prefix_match = re.search(r'(午前|午後|A\.M\.|P\.M\.|AM|PM)[\s,，、]*$', text_before, re.IGNORECASE)
+            if prefix_match:
+                am_pm_prefix = prefix_match.group(1)
 
         start_moment = create_time_components(
             context,
             match.group(HOUR_GROUP),
             match.group(MINUTE_GROUP),
             match.group(SECOND_GROUP),
-            match.group(AM_PM_HOUR_GROUP_1) or match.group(AM_PM_HOUR_GROUP_2)
+            am_pm_prefix
         )
         if start_moment is None:
             return None
@@ -143,6 +151,8 @@ def create_time_components(
         if minute >= 60:
             return None
         target_components.assign(CivilTimeComponent.MINUTE, minute)
+    else:
+        target_components.imply(CivilTimeComponent.MINUTE, 0)
 
     if match_second is not None:
         try:
@@ -152,6 +162,8 @@ def create_time_components(
         if second >= 60:
             return None
         target_components.assign(CivilTimeComponent.SECOND, second)
+    else:
+        target_components.imply(CivilTimeComponent.SECOND, 0)
 
     meridiem = None
     if match_am_pm is not None:

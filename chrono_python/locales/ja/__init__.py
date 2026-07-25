@@ -39,7 +39,7 @@ casual_configuration = chrono.Configuration(
         common_parsers.ISOFormatParser(),
         common_parsers.SlashDateMonthYearParser(little_endian=False),
         common_parsers.SlashMonthYearParser(),
-        common_parsers.SlashYearMonthDateParser(strict_month_date_order=False),
+        common_parsers.SlashYearMonthDateParser(strict_month_date_order=True),
         JPTimeExprParser(),
         JPWeekdayParser(),
         JPWeekdayWithParenthesesParser(),

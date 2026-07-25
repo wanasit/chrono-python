@@ -4,14 +4,15 @@ from chrono_python import chrono
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.types import Moment
 from chrono_python.common import calendars
+from chrono_python.utils.patterns import to_hankaku
 
 # Regex matching date formats with slash "/", dot ".", or hyphen "-"
-# e.g., 7/10, 7/12/2020, 7.12.2020, 30-12-16
+# e.g., 7/10, 7/12/2020, 7.12.2020, 30-12-16, ７／１０
 PATTERN = re.compile(
-    r'([^\d]|^)'
-    r'([0-3]?\d)[\/\.\-]([0-3]?\d)'
-    r'(?:[\/\.\-](\d{4}|\d{2}))?'
-    r'(\W|$)',
+    r'([^\d０-９]|^)'
+    r'([0-3０-３]?[0-9０-９])[\/\.\-／]([0-3０-３]?[0-9０-９])'
+    r'(?:[\/\.\-／]([0-9０-９]{4}|[0-9０-９]{2}))?'
+    r'(?=[^\d０-９]|$)',
     re.IGNORECASE
 )
 
@@ -33,20 +34,19 @@ class SlashDateMonthYearParser(chrono.Parser):
 
     def extract(self, context: chrono.ParsingContext, match: chrono.Match) -> chrono.ParsedResult | Moment | None:
         group1 = match.group(1) or ""
-        group5 = match.group(5) or ""
 
         index = match.start() + len(group1)
-        index_end = match.end() - len(group5)
+        index_end = match.end()
 
         # Skip if there are digits immediately before or after the matched segment
         if index > 0:
             text_before = context.text[:index]
-            if re.search(r'\d/?$', text_before):
+            if re.search(r'[\d０-９][/\.─\-／]?$', text_before):
                 return None
 
         if index_end < len(context.text):
             text_after = context.text[index_end:]
-            if re.search(r'^/?\d', text_after):
+            if re.match(r'^[/\.─\-／]?[\d０-９]', text_after):
                 return None
 
         text = context.text[index:index_end]
@@ -56,15 +56,15 @@ class SlashDateMonthYearParser(chrono.Parser):
             return None
 
         # MM/dd -> OK, MM.dd -> NG (must have a slash unless it has a year)
-        if not match.group(4) and '/' not in text:
+        if not match.group(4) and '/' not in text and '／' not in text:
             return None
 
         # Resolve month/day group index based on endianness
         month_group = 3 if self.little_endian else 2
         day_group = 2 if self.little_endian else 3
 
-        month = int(match.group(month_group))
-        day = int(match.group(day_group))
+        month = int(to_hankaku(match.group(month_group)))
+        day = int(to_hankaku(match.group(day_group)))
 
         # Check and swap month and day if month is > 12 (implying wrong endianness guess)
         if month < 1 or month > 12:
@@ -84,7 +84,7 @@ class SlashDateMonthYearParser(chrono.Parser):
         moment.assign(CivilTimeComponent.MONTH, month)
 
         if match.group(4):
-            raw_year = int(match.group(4))
+            raw_year = int(to_hankaku(match.group(4)))
             year = calendars.find_most_likely_ad_year(raw_year)
             moment.assign(CivilTimeComponent.YEAR, year)
         else:

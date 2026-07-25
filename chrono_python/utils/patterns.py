@@ -16,3 +16,11 @@ def repeat(
 def match_any(dictionary: dict[str, any]) -> str:
     joined_terms = '|'.join(sorted(dictionary.keys(), reverse=True)).replace('.', '\\.')
     return f'(?:{joined_terms})'
+
+
+def to_hankaku(text: str) -> str:
+    """
+    Converts full-width numbers and slashes to half-width equivalents.
+    """
+    translation_table = str.maketrans("０１２３４５６７８９／", "0123456789/")
+    return text.translate(translation_table)

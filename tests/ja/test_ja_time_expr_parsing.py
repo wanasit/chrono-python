@@ -1,6 +1,7 @@
 import datetime
 import chrono_python as chrono
 from chrono_python.common.types import CivilTimeComponent, Meridiem
+from chrono_python.types import DateTimePrecision
 
 
 def test_ja_time_expr_parsing():
@@ -12,8 +13,10 @@ def test_ja_time_expr_parsing():
     result = results[0]
     assert result.text == "10時"
     assert result.moment.get(CivilTimeComponent.HOUR) == 10
-    assert result.moment.get(CivilTimeComponent.MINUTE) is None
+    assert result.moment.get(CivilTimeComponent.MINUTE) == 0
+    assert result.moment.is_certain(CivilTimeComponent.MINUTE) is False
     assert result.moment.get(CivilTimeComponent.MERIDIEM) == Meridiem.AM
+    assert result.moment.precision() == DateTimePrecision.HOUR
 
     # 午前十時半
     results = chrono.ja.parse("午前十時半", ref_date)
@@ -41,6 +44,10 @@ def test_ja_time_expr_parsing():
     assert result.moment.get(CivilTimeComponent.MINUTE) == 30
     assert result.moment.get(CivilTimeComponent.SECOND) == 20
     assert result.moment.get(CivilTimeComponent.MERIDIEM) == Meridiem.PM
+
+    # 午後１3時 (invalid time expression with AM/PM prefix)
+    results = chrono.ja.parse("午後１3時", ref_date)
+    assert len(results) == 0
 
 
 def test_ja_time_range_parsing():
