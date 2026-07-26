@@ -3,7 +3,7 @@ import datetime
 from chrono_python import chrono
 from chrono_python.common.parsers.abstract_parser_with_word_boundary import AbstractParserWithWordBoundary
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent, Meridiem
-from chrono_python.types import Moment
+from chrono_python.types import Moment, DateTimePrecision
 
 PATTERN = re.compile(
     r'(?:this)?\s{0,3}(morning|afternoon|evening|night|midnight|midday|noon)(?=\W|$)',
@@ -32,7 +32,7 @@ class ENCasualTimeParser(AbstractParserWithWordBoundary):
             target_date = context.reference.datetime()
             if target_date.hour > 2:
                 target_date = target_date + datetime.timedelta(days=1)
-            component.imply_similar_date(target_date)
+            component = ParsingCivilTimeMoment.of(target_date, DateTimePrecision.DAY)
             component.assign(CivilTimeComponent.HOUR, 0)
             component.imply(CivilTimeComponent.MINUTE, 0)
             component.imply(CivilTimeComponent.SECOND, 0)

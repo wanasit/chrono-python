@@ -61,16 +61,32 @@ class CivilTimeMoment(DateTimeMoment):
         reference: Moment | datetime.datetime,
         precision: DateTimePrecision | None = None
     ):
-        """Factory constructor creating a CivilTimeMoment / ParsingCivilTimeMoment with year, month, and day implied from a reference."""
+        """Factory constructor creating a CivilTimeMoment / ParsingCivilTimeMoment with implied components from a reference based on precision."""
         ref_dt = reference.datetime() if isinstance(reference, Moment) else reference
-        ref_prec = precision or (reference.precision() if isinstance(reference, Moment) else None)
+        if precision is not None:
+            target_prec = precision
+        else:
+            ref_prec = reference.precision() if isinstance(reference, Moment) else DateTimePrecision.DAY
+            target_prec = ref_prec if ref_prec.value <= DateTimePrecision.DAY.value else DateTimePrecision.DAY
 
-        implied = {
-            CivilTimeComponent.YEAR: ref_dt.year,
-            CivilTimeComponent.MONTH: ref_dt.month,
-            CivilTimeComponent.DAY: ref_dt.day,
-        }
-        return cls(known_values=None, implied_values=implied, precision=ref_prec)
+        implied = {}
+        if target_prec.value >= DateTimePrecision.YEAR.value:
+            implied[CivilTimeComponent.YEAR] = ref_dt.year
+        if target_prec.value >= DateTimePrecision.MONTH.value:
+            implied[CivilTimeComponent.MONTH] = ref_dt.month
+        if target_prec.value >= DateTimePrecision.DAY.value or target_prec == DateTimePrecision.WEEK:
+            implied[CivilTimeComponent.DAY] = ref_dt.day
+        if target_prec.value >= DateTimePrecision.HOUR.value:
+            implied[CivilTimeComponent.HOUR] = ref_dt.hour
+            implied[CivilTimeComponent.MERIDIEM] = Meridiem.AM if ref_dt.hour < 12 else Meridiem.PM
+        if target_prec.value >= DateTimePrecision.MINUTE.value:
+            implied[CivilTimeComponent.MINUTE] = ref_dt.minute
+        if target_prec.value >= DateTimePrecision.SECOND.value:
+            implied[CivilTimeComponent.SECOND] = ref_dt.second
+        if target_prec.value >= DateTimePrecision.MILLI_SECOND.value:
+            implied[CivilTimeComponent.MILLI_SECOND] = ref_dt.microsecond // 1000
+
+        return cls(known_values=None, implied_values=implied, precision=precision or (reference.precision() if isinstance(reference, Moment) else None))
 
     def __setattr__(self, name, value):
         raise AttributeError("CivilTimeMoment is immutable. Use to_mutable() to modify.")

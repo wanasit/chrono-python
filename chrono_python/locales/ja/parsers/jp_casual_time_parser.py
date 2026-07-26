@@ -2,7 +2,7 @@ import re
 import datetime
 from chrono_python import chrono
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent, Meridiem
-from chrono_python.types import Moment
+from chrono_python.types import Moment, DateTimePrecision
 
 PATTERN = re.compile(r'朝|午前中|昼|お昼|夕方|夜|深夜|真夜中|正午')
 
@@ -43,7 +43,7 @@ class JPCasualTimeParser(chrono.Parser):
             target_date = context.reference.datetime()
             if target_date.hour > 2:
                 target_date = target_date + datetime.timedelta(days=1)
-            component.imply_similar_date(target_date)
+            component = ParsingCivilTimeMoment.of(target_date, DateTimePrecision.DAY)
             component.assign(CivilTimeComponent.HOUR, 0)
             component.imply(CivilTimeComponent.MINUTE, 0)
             component.imply(CivilTimeComponent.SECOND, 0)

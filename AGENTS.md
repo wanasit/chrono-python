@@ -70,7 +70,7 @@ chrono_python/
 5. **CivilTimeMoment and ParsingCivilTimeMoment (`common.types.CivilTimeMoment`, `common.types.ParsingCivilTimeMoment`)**:
    - `CivilTimeMoment` (immutable) inherits from `DateTimeMoment` and tracks date/time components as either `known_values` (explicitly present in match) or `implied_values` (implied from reference date or other clues).
    - `ParsingCivilTimeMoment` (mutable subclass) is used during the parsing/merging phase.
-   - Use `ParsingCivilTimeMoment.of(reference, precision=None)` (overriding `DateTimeMoment.of`) to initialize moments from a reference moment/datetime. `.of()` automatically implies `YEAR`, `MONTH`, `DAY` from `reference`.
+   - Use `ParsingCivilTimeMoment.of(reference, precision=None)` (overriding `DateTimeMoment.of`) to initialize moments from a reference moment/datetime. `.of()` inspects the reference precision (or target `precision`) and implies component details accordingly.
    - Calling `.freeze()` on a mutable moment returns an immutable `CivilTimeMoment`, while `.to_mutable()` returns a mutable instance.
    - `precision()` only considers components in `known_values` (certain components) and falls back to `super().precision()` (the reference precision) if no components are known. If both are `None`, it raises `ValueError`.
    - `CivilTimeComponent.MERIDIEM` maps to `DateTimePrecision.DAY` (since meridiem alone does not specify an hour and should only lead to day-level precision).

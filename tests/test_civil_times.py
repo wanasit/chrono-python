@@ -79,6 +79,48 @@ def test_parsing_civil_time_moment_assign_overrides_imply():
 
 
 def test_civil_time_objects_creation():
+    ref_dt = datetime.datetime(2026, 5, 31, 8, 30, 45, 500000)
+
+    # YEAR precision implies only YEAR
+    year_moment = CivilTimeMoment.of(ref_dt, DateTimePrecision.YEAR)
+    assert year_moment.get(CivilTimeComponent.YEAR) == 2026
+    assert year_moment.get(CivilTimeComponent.MONTH) is None
+    assert year_moment.get(CivilTimeComponent.DAY) is None
+
+    # MONTH precision implies YEAR and MONTH
+    month_moment = CivilTimeMoment.of(ref_dt, DateTimePrecision.MONTH)
+    assert month_moment.get(CivilTimeComponent.YEAR) == 2026
+    assert month_moment.get(CivilTimeComponent.MONTH) == 5
+    assert month_moment.get(CivilTimeComponent.DAY) is None
+
+    # DAY precision implies YEAR, MONTH, DAY
+    day_moment = CivilTimeMoment.of(ref_dt, DateTimePrecision.DAY)
+    assert day_moment.get(CivilTimeComponent.YEAR) == 2026
+    assert day_moment.get(CivilTimeComponent.MONTH) == 5
+    assert day_moment.get(CivilTimeComponent.DAY) == 31
+    assert day_moment.get(CivilTimeComponent.HOUR) is None
+
+    # HOUR precision implies date + HOUR + MERIDIEM
+    hour_moment = CivilTimeMoment.of(ref_dt, DateTimePrecision.HOUR)
+    assert hour_moment.get(CivilTimeComponent.HOUR) == 8
+    assert hour_moment.get(CivilTimeComponent.MERIDIEM) == Meridiem.AM
+    assert hour_moment.get(CivilTimeComponent.MINUTE) is None
+
+    # MINUTE precision implies date + HOUR + MERIDIEM + MINUTE
+    min_moment = CivilTimeMoment.of(ref_dt, DateTimePrecision.MINUTE)
+    assert min_moment.get(CivilTimeComponent.HOUR) == 8
+    assert min_moment.get(CivilTimeComponent.MINUTE) == 30
+    assert min_moment.get(CivilTimeComponent.SECOND) is None
+
+    # SECOND precision implies date + time up to SECOND
+    sec_moment = CivilTimeMoment.of(ref_dt, DateTimePrecision.SECOND)
+    assert sec_moment.get(CivilTimeComponent.SECOND) == 45
+    assert sec_moment.get(CivilTimeComponent.MILLI_SECOND) is None
+
+    # MILLI_SECOND precision implies date + time up to MILLI_SECOND
+    ms_moment = CivilTimeMoment.of(ref_dt, DateTimePrecision.MILLI_SECOND)
+    assert ms_moment.get(CivilTimeComponent.MILLI_SECOND) == 500
+
     moment = CivilTimeMoment(known_values={CivilTimeComponent.YEAR: 2026})
     assert moment.get(CivilTimeComponent.YEAR) == 2026
 
