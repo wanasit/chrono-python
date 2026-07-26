@@ -53,10 +53,7 @@ def merge_date_time_component(
     if time_component.is_certain(CivilTimeComponent.TIMEZONE_OFFSET):
         dateTimeComponent.assign(CivilTimeComponent.TIMEZONE_OFFSET, time_component.get(CivilTimeComponent.TIMEZONE_OFFSET))
 
-    date_has_meaningful_meridiem = (
-        date_component.get(CivilTimeComponent.MERIDIEM) is not None
-        and date_component.is_certain(CivilTimeComponent.MERIDIEM)
-    )
+    date_has_meaningful_meridiem = date_component.get(CivilTimeComponent.MERIDIEM) is not None
 
     if time_component.is_certain(CivilTimeComponent.MERIDIEM):
         dateTimeComponent.assign(CivilTimeComponent.MERIDIEM, time_component.get(CivilTimeComponent.MERIDIEM))

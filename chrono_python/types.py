@@ -183,6 +183,10 @@ class ParsedResult:
     def datetime(self) -> datetime.datetime:
         return self.moment.datetime()
 
+    @property
+    def start(self) -> Moment:
+        return self.moment
+
 
 @dataclass(frozen=True)
 class ParsedRangeResult(ParsedResult):
