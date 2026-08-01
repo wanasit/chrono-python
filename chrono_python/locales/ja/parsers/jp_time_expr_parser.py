@@ -1,192 +1,265 @@
 import re
-import datetime
+from datetime import date, timedelta
 
 from chrono_python import chrono
-from chrono_python.common.parsers.abstract_parser_with_word_boundary import AbstractParserWithWordBoundary
+from chrono_python.common.parsers.abstract_time_expr_parser import (
+    AbstractTimeExprParser,
+    HOUR_GROUP,
+    MINUTE_GROUP,
+    SECOND_GROUP,
+    MILLI_SECOND_GROUP,
+    AM_PM_HOUR_GROUP,
+)
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent, Meridiem
 from chrono_python.locales.ja.constants import NUMBER, ja_string_to_number
 from chrono_python.utils.patterns import to_hankaku
+from chrono_python.utils.re import Match
 
 KJS = "".join(NUMBER.keys())
 
-FIRST_REG_PATTERN = re.compile(
+# Primary time pattern template for Japanese.
+# Note: Capturing group indices must strictly follow AbstractTimeExprParser base class:
+#   Group 1: Prefix (<primary_prefix>)
+#   Group 2: Hour ([0-9０-９]+|[" + KJS + r"]+)
+#   Group 3: Minute ([0-9０-９]+|半|[" + KJS + r"]+)
+#   Group 4: Second ([0-9０-９]+|[" + KJS + r"]+)
+#   Group 5: Millisecond (\d{1,6})
+#   Group 6: AM/PM (<am_pm_pattern>)
+PRIMARY_TIME_PATTERN_TEMPLATE = (
+    r"<primary_prefix>"
+    r"(?:(?:午前|午後|A\.M\.|P\.M\.|AM|PM)[\s,，、]*)?"
+    r"([0-9０-９]+|[" + KJS + r"]+)"                  # Hour
+    r"(?:\s*)(?:時(?!間)|:|：)"
     r"(?:"
-    r"(午前|午後|A.M\.|P\.M\.|AM|PM)"
+        r"\s*"
+        r"([0-9０-９]+|半|[" + KJS + r"]+)"            # Minute
+        r"(?:\s*)(?:分|:|：)?"
     r")?"
-    r"(?:[\s,，、]*)"
     r"(?:"
-    r"([0-9０-９]+|[" + KJS + r"]+)(?:\s*)(?:時(?!間)|:|：)"
-    r"(?:\s*)"
-    r"([0-9０-９]+|半|[" + KJS + r"]+)?(?:\s*)(?:分|:|：)?"
-    r"(?:\s*)"
-    r"([0-9０-９]+|[" + KJS + r"]+)?(?:\s*)(?:秒)?)"
-    r"(?:\s*(A\.M\.|P\.M\.|AM?|PM?))?",
-    re.IGNORECASE
+        r"\s*"
+        r"([0-9０-９]+|[" + KJS + r"]+)"              # Second
+        r"(?:\s*)(?:秒)?"
+    r")?"
+    r"(?:\.(\d{1,6}))?"                               # Millisecond
+    r"(?:\s*<am_pm_pattern>)?"                        # AM/PM
+    r"<primary_suffix>"
 )
 
-SECOND_REG_PATTERN = re.compile(
-    r"(?:^\s*(?:から|\-|–|－|~|〜)\s*)"
+# Following time pattern template for Japanese range expressions.
+# Note: Capturing group indices must strictly follow AbstractTimeExprParser base class:
+#   Group 1: Following phase connector (<following_phase>)
+#   Group 2: Hour ([0-9０-９]+|[" + KJS + r"]+)
+#   Group 3: Minute ([0-9０-９]+|半|[" + KJS + r"]+)
+#   Group 4: Second ([0-9０-９]+|[" + KJS + r"]+)
+#   Group 5: Millisecond (\d{1,6})
+#   Group 6: AM/PM (<am_pm_pattern>)
+FOLLOWING_TIME_PATTERN_TEMPLATE = (
+    r"^"
+    r"(<following_phase>)"                           # Phase connector matching group
+    r"(?:(?:午前|午後|A\.M\.|P\.M\.|AM|PM)[\s,，、]*)?"
+    r"([0-9０-９]+|[" + KJS + r"]+)"                  # Hour
+    r"(?:\s*)(?:時(?!間)|:|：)"
     r"(?:"
-    r"(午前|午後|A.M\.|P\.M\.|AM|PM)"
+        r"\s*"
+        r"([0-9０-９]+|半|[" + KJS + r"]+)"            # Minute
+        r"(?:\s*)(?:分|:|：)?"
     r")?"
-    r"(?:[\s,，、]*)"
     r"(?:"
-    r"([0-9０-９]+|[" + KJS + r"]+)(?:\s*)(?:時|:|：)"
-    r"(?:\s*)"
-    r"([0-9０-９]+|半|[" + KJS + r"]+)?(?:\s*)(?:分|:|：)?"
-    r"(?:\s*)"
-    r"([0-9０-９]+|[" + KJS + r"]+)?(?:\s*)(?:秒)?)"
-    r"(?:\s*(A\.M\.|P\.M\.|AM?|PM?))?",
-    re.IGNORECASE
+        r"\s*"
+        r"([0-9０-９]+|[" + KJS + r"]+)"              # Second
+        r"(?:\s*)(?:秒)?"
+    r")?"
+    r"(?:\.(\d{1,6}))?"                               # Millisecond
+    r"(?:\s*<am_pm_pattern>)?"                        # AM/PM
+    r"<following_suffix>"
 )
 
-AM_PM_HOUR_GROUP_1 = 1
-HOUR_GROUP = 2
-MINUTE_GROUP = 3
-SECOND_GROUP = 4
-AM_PM_HOUR_GROUP_2 = 5
 
-
-class JPTimeExprParser(AbstractParserWithWordBoundary):
-    """Japanese time expression parser."""
-
-    def left_word_boundary(self) -> str:
-        # Override to match empty group so we don't consume any Japanese characters
-        # as word boundaries. The ASCII boundary check is done inside inner_extract.
-        return '()'
-
-    def inner_pattern(self) -> re.Pattern:
-        return FIRST_REG_PATTERN
-
-    def inner_extract(self, context: chrono.ParsingContext, match: chrono.Match) -> chrono.ParsedResult | None:
-        start_idx = match.start()
-        if start_idx > 0 and re.match(r'[\da-zA-Z_０-９]', context.text[start_idx - 1]):
-            return None
-
-        am_pm_prefix = match.group(AM_PM_HOUR_GROUP_1) or match.group(AM_PM_HOUR_GROUP_2)
-        if am_pm_prefix is None and start_idx > 0:
-            text_before = context.text[:start_idx]
-            prefix_match = re.search(r'(午前|午後|A\.M\.|P\.M\.|AM|PM)[\s,，、]*$', text_before, re.IGNORECASE)
-            if prefix_match:
-                am_pm_prefix = prefix_match.group(1)
-
-        start_moment = create_time_components(
-            context,
-            match.group(HOUR_GROUP),
-            match.group(MINUTE_GROUP),
-            match.group(SECOND_GROUP),
-            am_pm_prefix
-        )
-        if start_moment is None:
-            return None
-
-        # Check for range parsing
-        remaining_idx = start_idx + len(match.group(0))
-        remaining_text = context.text[remaining_idx:]
-
-        second_match = SECOND_REG_PATTERN.match(remaining_text)
-        if not second_match:
-            return context.create_parsed_result(start_idx, remaining_idx, start_moment)
-
-        end_moment = create_time_components(
-            context,
-            second_match.group(HOUR_GROUP),
-            second_match.group(MINUTE_GROUP),
-            second_match.group(SECOND_GROUP),
-            second_match.group(AM_PM_HOUR_GROUP_1) or second_match.group(AM_PM_HOUR_GROUP_2)
-        )
-        if end_moment is None:
-            return None
-
-        # Propagate meridiem
-        if not end_moment.is_certain(CivilTimeComponent.MERIDIEM) and start_moment.is_certain(CivilTimeComponent.MERIDIEM):
-            start_meridiem = start_moment.get(CivilTimeComponent.MERIDIEM)
-            end_moment.imply(CivilTimeComponent.MERIDIEM, start_meridiem)
-            if start_meridiem == Meridiem.PM:
-                start_hour = start_moment.get(CivilTimeComponent.HOUR)
-                end_hour = end_moment.get(CivilTimeComponent.HOUR)
-                if start_hour - 12 > end_hour:
-                    end_moment.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
-                elif end_hour < 12:
-                    end_moment.assign(CivilTimeComponent.HOUR, end_hour + 12)
-
-        if end_moment.datetime() < start_moment.datetime():
-            next_day = end_moment.datetime() + datetime.timedelta(days=1)
-            end_moment.imply(CivilTimeComponent.DAY, next_day.day)
-            end_moment.imply(CivilTimeComponent.MONTH, next_day.month)
-            end_moment.imply(CivilTimeComponent.YEAR, next_day.year)
-
-        total_text = match.group(0) + second_match.group(0)
-        return context.create_parsed_result(start_idx, start_idx + len(total_text), start_moment, end_moment)
-
-
-def create_time_components(
-    context: chrono.ParsingContext,
-    match_hour: str | None,
-    match_minute: str | None,
-    match_second: str | None,
-    match_am_pm: str | None
-) -> ParsingCivilTimeMoment | None:
-    if match_hour is None:
+def parse_ja_number(str_val: str | None) -> int | None:
+    if str_val is None:
         return None
-
     try:
-        hour = int(to_hankaku(match_hour))
+        return int(to_hankaku(str_val))
     except ValueError:
-        hour = ja_string_to_number(match_hour)
+        return ja_string_to_number(str_val)
 
-    if hour > 24:
-        return None
 
-    target_components = ParsingCivilTimeMoment.of(context.reference)
+class JPTimeExprParser(AbstractTimeExprParser):
+    """Japanese time expression parser inheriting from AbstractTimeExprParser."""
 
-    if match_minute is not None:
-        if match_minute == "半":
-            minute = 30
+    def primary_prefix(self) -> str:
+        return r"(^|(?<=[^\da-zA-Z_０-９]))"
+
+    def following_phase(self) -> str:
+        return r"\s*(?:から|\-|–|－|\~|\〜)\s*"
+
+    def primary_suffix(self) -> str:
+        return r"(?!/)(?=[^\da-zA-Z_０-９]|$)"
+
+    def following_suffix(self) -> str:
+        return r"(?!/)(?=[^\da-zA-Z_０-９]|$)"
+
+    def get_am_pm_pattern(self) -> str:
+        return r"(午前|午後|A\.M\.|P\.M\.|AM?|PM?)"
+
+    def get_primary_time_pattern_template(self) -> str:
+        return PRIMARY_TIME_PATTERN_TEMPLATE
+
+    def get_following_time_pattern_template(self) -> str:
+        return FOLLOWING_TIME_PATTERN_TEMPLATE
+
+    def extract_primary_time_components(
+        self, context: chrono.ParsingContext, match: Match
+    ) -> ParsingCivilTimeMoment | None:
+        return self._extract_time_components_from_match(context, match, is_following=False)
+
+    def extract_following_time_components(
+        self, context: chrono.ParsingContext, match: Match, result: chrono.ParsedResult
+    ) -> ParsingCivilTimeMoment | None:
+        return self._extract_time_components_from_match(context, match, is_following=True, result=result)
+
+    def _extract_time_components_from_match(
+        self,
+        context: chrono.ParsingContext,
+        match: Match,
+        is_following: bool = False,
+        result: chrono.ParsedResult | None = None,
+    ) -> ParsingCivilTimeMoment | None:
+        components = ParsingCivilTimeMoment.of(context.reference)
+
+        hour_str = match.group(HOUR_GROUP)
+        if hour_str is None:
+            return None
+
+        hour = parse_ja_number(hour_str)
+        if hour is None or hour > 24:
+            return None
+
+        minute_str = match.group(MINUTE_GROUP)
+        minute_certain = True
+        if minute_str is not None:
+            if minute_str == "半":
+                minute = 30
+            else:
+                minute = parse_ja_number(minute_str)
+            if minute is None or minute >= 60:
+                return None
         else:
+            if hour > 100:
+                minute = hour % 100
+                hour = hour // 100
+                if minute >= 60 or hour > 24:
+                    return None
+            else:
+                minute = 0
+                minute_certain = False
+
+        second_str = match.group(SECOND_GROUP)
+        if second_str is not None:
+            second = parse_ja_number(second_str)
+            if second is None or second >= 60:
+                return None
+            components.assign(CivilTimeComponent.SECOND, second)
+        else:
+            components.imply(CivilTimeComponent.SECOND, 0)
+
+        milli_str = match.group(MILLI_SECOND_GROUP)
+        if milli_str is not None:
+            milli = int(milli_str[:3])
+            if milli >= 1000:
+                return None
+            components.assign(CivilTimeComponent.MILLI_SECOND, milli)
+
+        am_pm_str = match.group(AM_PM_HOUR_GROUP)
+        if am_pm_str is None:
+            matched_text = match.group(0)
+            prefix_match = re.search(r'(午前|午後|A\.M\.|P\.M\.|AM|PM)', matched_text, re.IGNORECASE)
+            if prefix_match:
+                am_pm_str = prefix_match.group(1)
+            elif not is_following and match.start() > 0:
+                text_before = context.text[:match.start()]
+                before_match = re.search(r'(午前|午後|A\.M\.|P\.M\.|AM|PM)[\s,，、]*$', text_before, re.IGNORECASE)
+                if before_match:
+                    am_pm_str = before_match.group(1)
+
+        def imply_next_day(moment_to_imply):
+            ref_dt = context.reference.datetime()
+            y = moment_to_imply.get(CivilTimeComponent.YEAR) or ref_dt.year
+            m = moment_to_imply.get(CivilTimeComponent.MONTH) or ref_dt.month
+            d_val = moment_to_imply.get(CivilTimeComponent.DAY) or ref_dt.day
             try:
-                minute = int(to_hankaku(match_minute))
+                next_date = date(y, m, d_val) + timedelta(days=1)
+                moment_to_imply.imply(CivilTimeComponent.DAY, next_date.day)
+                moment_to_imply.imply(CivilTimeComponent.MONTH, next_date.month)
+                moment_to_imply.imply(CivilTimeComponent.YEAR, next_date.year)
             except ValueError:
-                minute = ja_string_to_number(match_minute)
-        if minute >= 60:
-            return None
-        target_components.assign(CivilTimeComponent.MINUTE, minute)
-    else:
-        target_components.imply(CivilTimeComponent.MINUTE, 0)
+                pass
 
-    if match_second is not None:
-        try:
-            second = int(to_hankaku(match_second))
-        except ValueError:
-            second = ja_string_to_number(match_second)
-        if second >= 60:
-            return None
-        target_components.assign(CivilTimeComponent.SECOND, second)
-    else:
-        target_components.imply(CivilTimeComponent.SECOND, 0)
+        meridiem = None
+        if am_pm_str is not None:
+            if hour > 12:
+                return None
+            ampm_lower = am_pm_str.lower()
+            if am_pm_str == "午前" or ampm_lower.startswith("a"):
+                meridiem = Meridiem.AM
+                if hour == 12:
+                    hour = 0
+                    if is_following and not components.is_certain(CivilTimeComponent.DAY):
+                        imply_next_day(components)
+            elif am_pm_str == "午後" or ampm_lower.startswith("p"):
+                meridiem = Meridiem.PM
+                if hour != 12:
+                    hour += 12
 
-    meridiem = None
-    if match_am_pm is not None:
-        if hour > 12:
-            return None
-        ampm_string = match_am_pm
-        if ampm_string == "午前" or ampm_string[0].lower() == "a":
-            meridiem = Meridiem.AM
-            if hour == 12:
-                hour = 0
-        elif ampm_string == "午後" or ampm_string[0].lower() == "p":
-            meridiem = Meridiem.PM
-            if hour != 12:
-                hour += 12
+            if is_following and result and not result.moment.is_certain(CivilTimeComponent.MERIDIEM):
+                if meridiem == Meridiem.AM:
+                    result.moment.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
+                    if result.moment.get(CivilTimeComponent.HOUR) == 12:
+                        result.moment.assign(CivilTimeComponent.HOUR, 0)
+                else:
+                    result.moment.imply(CivilTimeComponent.MERIDIEM, Meridiem.PM)
+                    if result.moment.get(CivilTimeComponent.HOUR) != 12:
+                        result.moment.assign(
+                            CivilTimeComponent.HOUR,
+                            result.moment.get(CivilTimeComponent.HOUR) + 12
+                        )
 
-    target_components.assign(CivilTimeComponent.HOUR, hour)
+        components.assign(CivilTimeComponent.HOUR, hour)
 
-    if meridiem is not None:
-        target_components.assign(CivilTimeComponent.MERIDIEM, meridiem)
-    else:
-        if hour < 12:
-            target_components.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
+        if minute_certain:
+            components.assign(CivilTimeComponent.MINUTE, minute)
         else:
-            target_components.imply(CivilTimeComponent.MERIDIEM, Meridiem.PM)
+            components.imply(CivilTimeComponent.MINUTE, minute)
 
-    return target_components
+        if meridiem is not None:
+            components.assign(CivilTimeComponent.MERIDIEM, meridiem)
+        elif is_following and result:
+            start_at_pm = (
+                result.moment.is_certain(CivilTimeComponent.MERIDIEM) and
+                result.moment.get(CivilTimeComponent.HOUR) > 12
+            )
+            if start_at_pm:
+                if result.moment.get(CivilTimeComponent.HOUR) - 12 > hour:
+                    components.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
+                elif hour <= 12:
+                    components.assign(CivilTimeComponent.HOUR, hour + 12)
+                    components.assign(CivilTimeComponent.MERIDIEM, Meridiem.PM)
+            elif hour > 12:
+                components.imply(CivilTimeComponent.MERIDIEM, Meridiem.PM)
+            elif hour <= 12:
+                components.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
+        else:
+            if hour < 12:
+                components.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
+            else:
+                components.imply(CivilTimeComponent.MERIDIEM, Meridiem.PM)
+
+        ref_dt = context.reference.datetime()
+        components.imply(CivilTimeComponent.YEAR, ref_dt.year)
+        components.imply(CivilTimeComponent.MONTH, ref_dt.month)
+        components.imply(CivilTimeComponent.DAY, ref_dt.day)
+
+        if is_following and result and components.datetime() < result.moment.datetime():
+            imply_next_day(components)
+
+        return components
