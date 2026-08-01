@@ -3,6 +3,7 @@ import datetime
 from chrono_python.locales import en
 from chrono_python.locales import ja
 from chrono_python.locales import fr
+from chrono_python.locales import it
 from chrono_python import types
 
 casual = en.casual
