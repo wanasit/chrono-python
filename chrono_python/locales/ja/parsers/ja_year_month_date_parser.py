@@ -22,7 +22,7 @@ MONTH_GROUP = 5
 DAY_GROUP = 6
 
 
-class JPYearMonthDateParser(chrono.Parser):
+class JAYearMonthDateParser(chrono.Parser):
     """Parser for Japanese standard date formats."""
 
     def pattern(self) -> re.Pattern:

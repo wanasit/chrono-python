@@ -30,8 +30,8 @@ Parser classes should use a descriptive name based on the relative position of t
 - `MonthNameBeforeDate` (formerly `MonthNameMiddleEndianParser`) for month-first formats (e.g., "January 20").
 - `MonthNameBeforeYear` for month-before-year formats (e.g., "January 2012").
 - `MonthNameAfterYear` for year-before-month formats (e.g., "2012 January").
-- `JPYearMonthDateParser` (formerly `JPStandardParser`) for year-month-date formats (e.g., "2012年3月31日").
-- `JPYearMonthParser` for year-month formats (e.g., "2026年4月").
+- `JAYearMonthDateParser` (formerly `JPStandardParser`) for year-month-date formats (e.g., "2012年3月31日").
+- `JAYearMonthParser` for year-month formats (e.g., "2026年4月").
 
 ---
 
@@ -107,7 +107,7 @@ chrono_python/
 
 Follow the existing commit message format conventions:
 - Use prefix `New:` for new features or implementations (e.g. `New: Time expr parsing`, `New: Merge date range refiners`).
-- Use prefix `New: (Locale)` for locale-specific features or implementations (e.g. `New: (JP) Setup Japanese merge date range refiner`).
+- Use prefix `New: (Locale)` for locale-specific features or implementations (e.g. `New: (JA) Setup Japanese merge date range refiner`).
 - Use prefix `Refactor:` for code cleanups or refactoring changes (e.g. `Refactor: Introduce CivilTime concept`).
 - Use prefix `Add:` or `Fix:` if adding tests or fixing issues (e.g. `Add test for parsers`).
 

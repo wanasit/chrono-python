@@ -5,7 +5,7 @@ from chrono_python.common.types import CivilTimeMoment, ParsingCivilTimeMoment, 
 from chrono_python.types import ParsedResult, ParsedRangeResult
 
 
-class JPMergeWeekdayComponentRefiner(AbstractMergingRefiner):
+class JAMergeWeekdayComponentRefiner(AbstractMergingRefiner):
     def should_merge_results(self, text_between: str, current_result: ParsedResult, next_result: ParsedResult, context: ParsingContext) -> bool:
         current_moment = current_result.moment
         next_moment = next_result.moment

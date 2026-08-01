@@ -1,15 +1,15 @@
 from chrono_python import chrono
 from chrono_python.common import parsers as common_parsers
 from chrono_python.common import refiners as common_refiners
-from chrono_python.locales.ja.parsers.jp_year_month_date_parser import JPYearMonthDateParser
-from chrono_python.locales.ja.parsers.jp_year_month_parser import JPYearMonthParser
-from chrono_python.locales.ja.parsers.jp_time_expr_parser import JPTimeExprParser
-from chrono_python.locales.ja.parsers.jp_weekday_parser import JPWeekdayParser
-from chrono_python.locales.ja.parsers.jp_casual_date_parser import JPCasualDateParser
-from chrono_python.locales.ja.parsers.jp_casual_time_parser import JPCasualTimeParser
-from chrono_python.locales.ja.parsers.jp_weekday_with_parentheses_parser import JPWeekdayWithParenthesesParser
-from chrono_python.locales.ja.refiners.jp_merge_weekday_component_refiner import JPMergeWeekdayComponentRefiner
-from chrono_python.locales.ja.refiners import JPMergeDateRangeRefiner, JPMergeDateTimeRefiner, JPUnlikelyFormatFilter
+from chrono_python.locales.ja.parsers.ja_year_month_date_parser import JAYearMonthDateParser
+from chrono_python.locales.ja.parsers.ja_year_month_parser import JAYearMonthParser
+from chrono_python.locales.ja.parsers.ja_time_expr_parser import JATimeExprParser
+from chrono_python.locales.ja.parsers.ja_weekday_parser import JAWeekdayParser
+from chrono_python.locales.ja.parsers.ja_casual_date_parser import JACasualDateParser
+from chrono_python.locales.ja.parsers.ja_casual_time_parser import JACasualTimeParser
+from chrono_python.locales.ja.parsers.ja_weekday_with_parentheses_parser import JAWeekdayWithParenthesesParser
+from chrono_python.locales.ja.refiners.ja_merge_weekday_component_refiner import JAMergeWeekdayComponentRefiner
+from chrono_python.locales.ja.refiners import JAMergeDateRangeRefiner, JAMergeDateTimeRefiner, JAUnlikelyFormatFilter
 
 strict_configuration = chrono.Configuration(
     parsers=[
@@ -17,41 +17,41 @@ strict_configuration = chrono.Configuration(
         common_parsers.SlashDateMonthYearParser(little_endian=False),
         common_parsers.SlashMonthYearParser(),
         common_parsers.SlashYearMonthDateParser(strict_month_date_order=True),
-        JPTimeExprParser(),
-        JPWeekdayParser(),
-        JPWeekdayWithParenthesesParser(),
-        JPYearMonthDateParser(),
-        JPYearMonthParser(),
+        JATimeExprParser(),
+        JAWeekdayParser(),
+        JAWeekdayWithParenthesesParser(),
+        JAYearMonthDateParser(),
+        JAYearMonthParser(),
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
-        JPMergeWeekdayComponentRefiner(),
-        JPMergeDateTimeRefiner(),
-        JPMergeDateRangeRefiner(),
-        JPUnlikelyFormatFilter(),
+        JAMergeWeekdayComponentRefiner(),
+        JAMergeDateTimeRefiner(),
+        JAMergeDateRangeRefiner(),
+        JAUnlikelyFormatFilter(),
         common_refiners.InvalidDateFilter(),
     ])
 
 casual_configuration = chrono.Configuration(
     parsers=[
-        JPCasualDateParser(),
-        JPCasualTimeParser(),
+        JACasualDateParser(),
+        JACasualTimeParser(),
         common_parsers.ISOFormatParser(),
         common_parsers.SlashDateMonthYearParser(little_endian=False),
         common_parsers.SlashMonthYearParser(),
         common_parsers.SlashYearMonthDateParser(strict_month_date_order=True),
-        JPTimeExprParser(),
-        JPWeekdayParser(),
-        JPWeekdayWithParenthesesParser(),
-        JPYearMonthDateParser(),
-        JPYearMonthParser(),
+        JATimeExprParser(),
+        JAWeekdayParser(),
+        JAWeekdayWithParenthesesParser(),
+        JAYearMonthDateParser(),
+        JAYearMonthParser(),
     ],
     refiners=[
         common_refiners.RemoveOverlapRefiner(),
-        JPMergeWeekdayComponentRefiner(),
-        JPMergeDateTimeRefiner(),
-        JPMergeDateRangeRefiner(),
-        JPUnlikelyFormatFilter(),
+        JAMergeWeekdayComponentRefiner(),
+        JAMergeDateTimeRefiner(),
+        JAMergeDateRangeRefiner(),
+        JAUnlikelyFormatFilter(),
         common_refiners.InvalidDateFilter(),
     ])
 

@@ -1,4 +1,4 @@
-from .jp_merge_date_range_refiner import JPMergeDateRangeRefiner
-from .jp_merge_date_time_refiner import JPMergeDateTimeRefiner
-from .jp_unlikely_format_filter import JPUnlikelyFormatFilter
+from .ja_merge_date_range_refiner import JAMergeDateRangeRefiner
+from .ja_merge_date_time_refiner import JAMergeDateTimeRefiner
+from .ja_unlikely_format_filter import JAUnlikelyFormatFilter
 

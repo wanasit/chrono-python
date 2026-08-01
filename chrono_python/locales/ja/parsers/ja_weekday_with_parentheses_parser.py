@@ -9,7 +9,7 @@ _PATTERN = re.compile(
     re.IGNORECASE
 )
 
-class JPWeekdayWithParenthesesParser(Parser):
+class JAWeekdayWithParenthesesParser(Parser):
     """
     Weekday with parentheses in Japanese
     For examples:

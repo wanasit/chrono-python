@@ -3,10 +3,10 @@ import chrono_python as chrono
 from chrono_python.types import ParsedResult, ParsedRangeResult, DateTimeMoment, DateTimePrecision
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent
 from chrono_python.chrono import ParsingContext
-from chrono_python.locales.ja.refiners import JPMergeDateRangeRefiner
+from chrono_python.locales.ja.refiners import JAMergeDateRangeRefiner
 
 
-def test_standard_jp_date_range():
+def test_standard_ja_date_range():
     ref = datetime.datetime(2012, 8, 10, 12, 0)
 
     # 1. 2012年3月31日〜2012年4月1日 (with Wave Dash 〜)
@@ -26,10 +26,10 @@ def test_standard_jp_date_range():
     assert result[0].end.datetime() == datetime.datetime(2012, 4, 1, 12, 0)
 
 
-def test_jp_weekday_range_refiner_directly():
+def test_ja_weekday_range_refiner_directly():
     ref = datetime.datetime(2020, 7, 1, 12, 0)  # July 1, 2020 is a Wednesday
     context = ParsingContext("水曜日から金曜日", DateTimeMoment.of(ref))
-    refiner = JPMergeDateRangeRefiner()
+    refiner = JAMergeDateRangeRefiner()
 
     # 水曜日 (July 1) - 金曜日 (July 3) (no adjustment)
     wed_moment = ParsingCivilTimeMoment(
@@ -61,10 +61,10 @@ def test_jp_weekday_range_refiner_directly():
     assert merged[0].end.datetime() == datetime.datetime(2020, 7, 3, 12, 0)
 
 
-def test_jp_weekday_range_forward_adjustment():
+def test_ja_weekday_range_forward_adjustment():
     ref = datetime.datetime(2020, 7, 1, 12, 0)  # Wednesday
     context = ParsingContext("金曜日から月曜日", DateTimeMoment.of(ref))
-    refiner = JPMergeDateRangeRefiner()
+    refiner = JAMergeDateRangeRefiner()
 
     # 金曜日 (July 3) - 月曜日 (June 29)
     # Since July 3 > June 29, it should adjust Monday to July 6.
@@ -97,7 +97,7 @@ def test_jp_weekday_range_forward_adjustment():
     assert merged[0].end.datetime() == datetime.datetime(2020, 7, 6, 12, 0)
 
 
-def test_jp_unknown_year_adjustment():
+def test_ja_unknown_year_adjustment():
     ref = datetime.datetime(2020, 7, 1, 12, 0)
     # 12月30日 parses to Dec 30, 2020.
     # 1月5日 parses to Jan 5, 2020.

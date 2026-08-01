@@ -24,7 +24,7 @@ def normalize_text_to_kanji(text: str) -> str:
     return mapping.get(text, text)
 
 
-class JPCasualDateParser(chrono.Parser):
+class JACasualDateParser(chrono.Parser):
     def pattern(self) -> re.Pattern:
         return PATTERN
 

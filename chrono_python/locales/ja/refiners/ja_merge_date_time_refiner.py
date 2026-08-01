@@ -2,7 +2,7 @@ import re
 from chrono_python.common.refiners.abstract_merge_date_time_refiner import AbstractMergeDateTimeRefiner
 
 
-class JPMergeDateTimeRefiner(AbstractMergeDateTimeRefiner):
+class JAMergeDateTimeRefiner(AbstractMergeDateTimeRefiner):
     """
     Merging date-only result and time-only result for Japanese.
     - 2012年3月31日の午後3時

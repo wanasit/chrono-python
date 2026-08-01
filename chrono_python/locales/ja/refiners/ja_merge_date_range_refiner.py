@@ -2,7 +2,7 @@ import re
 from chrono_python.common.refiners.abstract_merge_date_range_refiner import AbstractMergeDateRangeRefiner
 
 
-class JPMergeDateRangeRefiner(AbstractMergeDateRangeRefiner):
+class JAMergeDateRangeRefiner(AbstractMergeDateRangeRefiner):
     """
     Merges two parsed Japanese dates separated by range indicators.
     

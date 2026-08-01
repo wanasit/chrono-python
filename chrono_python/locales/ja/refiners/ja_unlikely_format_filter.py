@@ -8,7 +8,7 @@ UNLIKELY_SUFFIX_PATTERN = re.compile(
 )
 
 
-class JPUnlikelyFormatFilter(Filter):
+class JAUnlikelyFormatFilter(Filter):
     """
     Filters out unlikely date/time matches in Japanese, such as:
     - "一時" when it is likely used to mean "temporary" or "at one time"

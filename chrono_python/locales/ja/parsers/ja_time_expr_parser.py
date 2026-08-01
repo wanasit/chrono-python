@@ -84,7 +84,7 @@ def parse_ja_number(str_val: str | None) -> int | None:
         return ja_string_to_number(str_val)
 
 
-class JPTimeExprParser(AbstractTimeExprParser):
+class JATimeExprParser(AbstractTimeExprParser):
     """Japanese time expression parser inheriting from AbstractTimeExprParser."""
 
     def primary_prefix(self) -> str:

@@ -29,7 +29,7 @@ def _last_day_of_month(year: int, month: int) -> int:
     return calendar.monthrange(year, month)[1]
 
 
-class JPYearMonthParser(chrono.Parser):
+class JAYearMonthParser(chrono.Parser):
     """Parser for Japanese year and month formats, including month sections (上旬, 中旬, 下旬)."""
 
     def pattern(self) -> re.Pattern:

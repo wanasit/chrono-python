@@ -11,7 +11,7 @@ PATTERN = re.compile(
 )
 
 
-class JPWeekdayParser(chrono.Parser):
+class JAWeekdayParser(chrono.Parser):
     def pattern(self) -> re.Pattern:
         return PATTERN
 

@@ -7,7 +7,7 @@ from chrono_python.types import Moment, DateTimePrecision
 PATTERN = re.compile(r'朝|午前中|昼|お昼|夕方|夜|深夜|真夜中|正午')
 
 
-class JPCasualTimeParser(chrono.Parser):
+class JACasualTimeParser(chrono.Parser):
     def pattern(self) -> re.Pattern:
         return PATTERN
 
