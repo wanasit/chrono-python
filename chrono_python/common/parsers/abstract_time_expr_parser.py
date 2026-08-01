@@ -1,3 +1,25 @@
+"""Time expression parsing module.
+
+Provides `AbstractTimeExprParser`, an abstract base parser for extracting time expressions (e.g. "1:30", "1:30am", "1:30-2:10pm").
+
+Overridable Pattern Templates:
+- `PRIMARY_TIME_PATTERN_TEMPLATE`: Primary regex template for matching initial time expressions.
+- `FOLLOWING_TIME_PATTERN_TEMPLATE`: Following regex template for matching range end times (e.g., "- 2:10pm").
+
+Subclasses may override `get_primary_time_pattern_template()` and `get_following_time_pattern_template()` to supply
+custom templates (or override `primary_prefix()`, `primary_suffix()`, `following_phase()`, `following_suffix()`,
+and `get_am_pm_pattern()`).
+
+IMPORTANT FOR SUBCLASSES:
+When overriding template strings, subclasses MUST preserve the capturing group index convention:
+- Group 1: Left boundary / prefix or following phase connector
+- Group 2: Hour
+- Group 3: Minute (optional)
+- Group 4: Second (optional)
+- Group 5: Millisecond (optional)
+- Group 6: AM/PM indicator (optional)
+"""
+
 import re
 from chrono_python import chrono
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent, Meridiem
@@ -10,13 +32,19 @@ SECOND_GROUP = 4
 MILLI_SECOND_GROUP = 5
 AM_PM_HOUR_GROUP = 6
 
-# Primary time expression pattern with placeholders for prefix and suffix.
-# Group 1: Left boundary (and optional prefix)
-# Group 2: Hour
-# Group 3: Minute (optional)
-# Group 4: Second (optional)
-# Group 5: Millisecond (optional)
-# Group 6: AM/PM (optional)
+# Default primary time expression pattern template with placeholders:
+#   <primary_prefix>, <primary_suffix>, and <am_pm_pattern>.
+# Returned by `AbstractTimeExprParser.get_primary_time_pattern_template()`.
+#
+# Used by `get_primary_time_pattern_through_cache()` to compile `pattern()` by replacing placeholders.
+#
+# IMPORTANT FOR SUBCLASSES: Subclasses overriding this template must maintain the capturing group ordering:
+#   Group 1: Left boundary & prefix (e.g., "at", "from")
+#   Group 2: Hour
+#   Group 3: Minute (optional)
+#   Group 4: Second (optional)
+#   Group 5: Millisecond (optional)
+#   Group 6: AM/PM (optional)
 PRIMARY_TIME_PATTERN_TEMPLATE = (
     r"<primary_prefix>"                      # Left boundary & prefix (e.g., "at", "from")
     r"(\d{1,4})"                              # Hour (1-4 digits, handles 24h or HHMM)
@@ -29,17 +57,23 @@ PRIMARY_TIME_PATTERN_TEMPLATE = (
             r"(?:\.(\d{1,6}))?"               # Millisecond (1-6 digits)
         r")?"
     r")?"
-    r"(?:\s*(a\.m\.|p\.m\.|am?|pm?))?"        # AM/PM indicator (optional, with optional leading space)
+    r"(?:\s*<am_pm_pattern>)?"                # AM/PM indicator (optional, with optional leading space)
     r"<primary_suffix>"                       # Suffix constraint (optional o'clock/night/etc.)
 )
 
-# Following time expression pattern (for ranges) with placeholders for phase and suffix.
-# Group 1: Following phase/connector (e.g., "-", "to", "until")
-# Group 2: Hour
-# Group 3: Minute (optional)
-# Group 4: Second (optional)
-# Group 5: Millisecond (optional)
-# Group 6: AM/PM (optional)
+# Default following time expression pattern template (for date/time ranges) with placeholders:
+#   <following_phase>, <following_suffix>, and <am_pm_pattern>.
+# Returned by `AbstractTimeExprParser.get_following_time_pattern_template()`.
+#
+# Used by `get_following_time_pattern_through_cache()` to extract range end components.
+#
+# IMPORTANT FOR SUBCLASSES: Subclasses overriding this template must maintain the capturing group ordering:
+#   Group 1: Following phase/connector (e.g., "-", "to", "until")
+#   Group 2: Hour
+#   Group 3: Minute (optional)
+#   Group 4: Second (optional)
+#   Group 5: Millisecond (optional)
+#   Group 6: AM/PM (optional)
 FOLLOWING_TIME_PATTERN_TEMPLATE = (
     r"^"                                      # Anchor to the beginning of the remaining text
     r"(<following_phase>)"                    # Phase connector matching group
@@ -52,22 +86,31 @@ FOLLOWING_TIME_PATTERN_TEMPLATE = (
             r"(\d{1,2})(?:\.(\d{1,6}))?"       # Second and optional millisecond
         r")?"
     r")?"
-    r"(?:\s*(a\.m\.|p\.m\.|am?|pm?))?"        # AM/PM indicator
+    r"(?:\s*<am_pm_pattern>)?"                # AM/PM indicator
     r"<following_suffix>"                     # Suffix constraint
 )
 
 
-class TimeExprParser(chrono.Parser):
-    """A parser that extracts common time expressions (e.g. 1:30, 1:30am, 1:30-2:10pm).
+class AbstractTimeExprParser(chrono.Parser):
+    """Abstract base parser that extracts common time expressions (e.g. 1:30, 1:30am, 1:30-2:10pm).
 
     This parser handles standard time expressions, mostly in English but adaptable.
-    Future sub-classes or specialized implementations can override the prefix/suffix/between patterns.
+    Sub-classes or specialized implementations can override the prefix/suffix/between pattern templates.
     """
 
     def __init__(self, strict_mode: bool = False):
         self.strict_mode = strict_mode
         self._cached_primary_time_pattern = None
         self._cached_following_time_pattern = None
+
+    def get_primary_time_pattern_template(self) -> str:
+        return PRIMARY_TIME_PATTERN_TEMPLATE
+
+    def get_following_time_pattern_template(self) -> str:
+        return FOLLOWING_TIME_PATTERN_TEMPLATE
+
+    def get_am_pm_pattern(self) -> str:
+        return r"(a\.m\.|p\.m\.|am?|pm?)"
 
     def primary_prefix(self) -> str:
         # Roll left boundary constraints directly into the prefix
@@ -94,10 +137,12 @@ class TimeExprParser(chrono.Parser):
 
         primary_prefix = self.primary_prefix()
         primary_suffix = self.primary_suffix()
-        pattern_str = PRIMARY_TIME_PATTERN_TEMPLATE.replace(
-            "<primary_prefix>", primary_prefix
-        ).replace(
-            "<primary_suffix>", primary_suffix
+        am_pm_pattern = self.get_am_pm_pattern()
+        pattern_str = (
+            self.get_primary_time_pattern_template()
+            .replace("<primary_prefix>", primary_prefix)
+            .replace("<primary_suffix>", primary_suffix)
+            .replace("<am_pm_pattern>", am_pm_pattern)
         )
         self._cached_primary_time_pattern = re.compile(pattern_str, self.pattern_flags())
         return self._cached_primary_time_pattern
@@ -108,10 +153,12 @@ class TimeExprParser(chrono.Parser):
 
         following_phase = self.following_phase()
         following_suffix = self.following_suffix()
-        pattern_str = FOLLOWING_TIME_PATTERN_TEMPLATE.replace(
-            "<following_phase>", following_phase
-        ).replace(
-            "<following_suffix>", following_suffix
+        am_pm_pattern = self.get_am_pm_pattern()
+        pattern_str = (
+            self.get_following_time_pattern_template()
+            .replace("<following_phase>", following_phase)
+            .replace("<following_suffix>", following_suffix)
+            .replace("<am_pm_pattern>", am_pm_pattern)
         )
         self._cached_following_time_pattern = re.compile(pattern_str, re.IGNORECASE)
         return self._cached_following_time_pattern
@@ -185,9 +232,9 @@ class TimeExprParser(chrono.Parser):
                         has_time_context = False
                         if ampm_str is not None:
                             has_time_context = True
-                        elif any(word in match_str.lower() for word in ["night", "afternoon", "morning", "clock"]):
+                        elif any(word in match_str.lower() for word in ["night", "afternoon", "morning", "clock", "h", "heures"]):
                             has_time_context = True
-                        elif re.search(r'\b(?:at|from)\b', match_str[:hour_idx].lower()):
+                        elif re.search(r'\b(?:at|from|à|a|de)\b', match_str[:hour_idx].lower()):
                             has_time_context = True
 
                         if not has_time_context:
@@ -198,11 +245,11 @@ class TimeExprParser(chrono.Parser):
             has_time_context = False
             if ampm_str is not None:
                 has_time_context = True
-            elif any(word in match_str.lower() for word in ["night", "afternoon", "morning", "clock"]):
+            elif any(word in match_str.lower() for word in ["night", "afternoon", "morning", "clock", "h", "heures"]):
                 has_time_context = True
             else:
                 hour_idx = match_str.find(hour_str)
-                if hour_idx != -1 and re.search(r'\b(?:at|from)\b', match_str[:hour_idx].lower()):
+                if hour_idx != -1 and re.search(r'\b(?:at|from|à|a|de)\b', match_str[:hour_idx].lower()):
                     has_time_context = True
 
             if not has_time_context:
@@ -245,7 +292,7 @@ class TimeExprParser(chrono.Parser):
                 meridiem = Meridiem.AM
                 if hour == 12:
                     hour = 0
-            elif ampm == 'p':
+            elif ampm in ('p', 'm'):
                 meridiem = Meridiem.PM
                 if hour != 12:
                     hour += 12

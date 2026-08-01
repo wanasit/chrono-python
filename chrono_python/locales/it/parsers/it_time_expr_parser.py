@@ -1,11 +1,11 @@
 import re
 from chrono_python import chrono
-from chrono_python.common.parsers.time_expr_parser import TimeExprParser
+from chrono_python.common.parsers.abstract_time_expr_parser import AbstractTimeExprParser
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent, Meridiem
 from chrono_python.utils.re import Match
 
 
-class ITTimeExprParser(TimeExprParser):
+class ITTimeExprParser(AbstractTimeExprParser):
     def primary_prefix(self) -> str:
         return r"(^|\s|T|\b)(?:(?:alle?|dalle?)\s*)??"
 

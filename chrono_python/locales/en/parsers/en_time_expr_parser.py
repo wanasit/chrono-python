@@ -1,13 +1,13 @@
 import re
 
 from chrono_python import chrono
-from chrono_python.common.parsers.time_expr_parser import TimeExprParser
+from chrono_python.common.parsers.abstract_time_expr_parser import AbstractTimeExprParser
 from chrono_python.common.types import ParsingCivilTimeMoment, CivilTimeComponent, Meridiem
 from chrono_python.utils.re import Match
 
 
-class ENTimeExprParser(TimeExprParser):
-    """English subclass of TimeExprParser that overrides English-specific time patterns and logic."""
+class ENTimeExprParser(AbstractTimeExprParser):
+    """English subclass of AbstractTimeExprParser that overrides English-specific time patterns and logic."""
 
     def primary_prefix(self) -> str:
         return r"(^|\s|T|\b)(?:(?:at|from)\s*)??"

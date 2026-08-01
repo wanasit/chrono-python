@@ -2,5 +2,5 @@ from .iso_format_parser import ISOFormatParser
 from .slash_date_month_year_parser import SlashDateMonthYearParser
 from .slash_month_year_parser import SlashMonthYearParser
 from .slash_year_month_date_parser import SlashYearMonthDateParser
-from .time_expr_parser import TimeExprParser
+from .abstract_time_expr_parser import AbstractTimeExprParser
 
