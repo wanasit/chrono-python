@@ -80,6 +80,7 @@ def test_parsed_result():
     assert result.text == "today"
     assert result.moment == moment
     assert result.datetime() == dt
+    assert result.precision() == DateTimePrecision.HOUR
 
 
 def test_parsed_range_result():

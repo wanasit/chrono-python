@@ -183,6 +183,9 @@ class ParsedResult:
     def datetime(self) -> datetime.datetime:
         return self.moment.datetime()
 
+    def precision(self) -> DateTimePrecision:
+        return self.moment.precision()
+
     @property
     def start(self) -> Moment:
         return self.moment
