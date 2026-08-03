@@ -232,9 +232,9 @@ class AbstractTimeExprParser(chrono.Parser):
                         has_time_context = False
                         if ampm_str is not None:
                             has_time_context = True
-                        elif any(word in match_str.lower() for word in ["night", "afternoon", "morning", "clock", "h", "heures"]):
+                        elif any(word in match_str.lower() for word in ["night", "afternoon", "morning", "clock", "h", "heures", "klo", "kello", "uhr", "утра", "вечера", "полудня", "дня", "ночи"]):
                             has_time_context = True
-                        elif re.search(r'\b(?:at|from|à|a|de)\b', match_str[:hour_idx].lower()):
+                        elif re.search(r'\b(?:at|from|à|a|de|в|с)\b', match_str[:hour_idx].lower()):
                             has_time_context = True
 
                         if not has_time_context:
@@ -245,11 +245,11 @@ class AbstractTimeExprParser(chrono.Parser):
             has_time_context = False
             if ampm_str is not None:
                 has_time_context = True
-            elif any(word in match_str.lower() for word in ["night", "afternoon", "morning", "clock", "h", "heures"]):
+            elif any(word in match_str.lower() for word in ["night", "afternoon", "morning", "clock", "h", "heures", "klo", "kello", "uhr", "утра", "вечера", "полудня", "дня", "ночи"]):
                 has_time_context = True
             else:
                 hour_idx = match_str.find(hour_str)
-                if hour_idx != -1 and re.search(r'\b(?:at|from|à|a|de)\b', match_str[:hour_idx].lower()):
+                if hour_idx != -1 and re.search(r'(?:^|\s|\b)(?:at|from|à|a|de|в|с)(?:\s|\b)', match_str[:hour_idx].lower()):
                     has_time_context = True
 
             if not has_time_context:
@@ -374,7 +374,9 @@ class AbstractTimeExprParser(chrono.Parser):
             return None
 
         if hour >= 12:
-            meridiem = Meridiem.PM
+            components.imply(CivilTimeComponent.MERIDIEM, Meridiem.PM)
+        else:
+            components.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
 
         # Helper to imply next day safely
         def imply_next_day(moment_to_imply):
@@ -426,8 +428,17 @@ class AbstractTimeExprParser(chrono.Parser):
         components.assign(CivilTimeComponent.HOUR, hour)
         components.assign(CivilTimeComponent.MINUTE, minute)
 
-        if meridiem is not None:
-            components.assign(CivilTimeComponent.MERIDIEM, meridiem)
+        has_explicit_meridiem = ampm_str is not None or components.is_certain(CivilTimeComponent.MERIDIEM)
+        if has_explicit_meridiem:
+            end_meridiem = meridiem if meridiem is not None else components.get(CivilTimeComponent.MERIDIEM)
+            components.assign(CivilTimeComponent.MERIDIEM, end_meridiem)
+            if not result.moment.is_certain(CivilTimeComponent.MERIDIEM):
+                start_hour = result.moment.get(CivilTimeComponent.HOUR)
+                if end_meridiem == Meridiem.PM and start_hour is not None and start_hour < 12:
+                    result.moment.imply(CivilTimeComponent.MERIDIEM, Meridiem.PM)
+                    result.moment.assign(CivilTimeComponent.HOUR, start_hour + 12)
+                elif end_meridiem == Meridiem.AM and start_hour is not None:
+                    result.moment.imply(CivilTimeComponent.MERIDIEM, Meridiem.AM)
         else:
             start_at_pm = (
                 result.moment.is_certain(CivilTimeComponent.MERIDIEM) and
@@ -479,7 +490,7 @@ class AbstractTimeExprParser(chrono.Parser):
                 return None
 
             # If it ends only with dot single digit, e.g. "at 1.2"
-            if '.' in ending_numbers and not re.match(r'\d(\.\d{2})+$', ending_numbers):
+            if '.' in ending_numbers and not re.match(r'\d+(\.\d{2})+$', ending_numbers):
                 return None
 
             # If it ends only with numbers above 24, e.g. "at 25"

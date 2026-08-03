@@ -57,7 +57,7 @@ class AbstractParserWithWordBoundary(chrono.Parser):
 # noinspection PyProtectedMember
 def _create_inner_match_remove_group(match: chrono.Match, left_boundary_group_index=1):
     """Create a new match with the left boundary group removed."""
-    boundary = match.group(left_boundary_group_index)
+    boundary = match.group(left_boundary_group_index) or ""
     inner_group_spans = [(match._group_spans[0][0] + len(boundary), match._group_spans[0][1])]
     inner_group_spans += [g for i, g in enumerate(match._group_spans) if i != 0 and i != left_boundary_group_index]
     inner_group_name_to_index = {name: index - 1 for name, index in match._group_name_to_index.items() if

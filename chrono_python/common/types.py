@@ -128,14 +128,24 @@ class CivilTimeMoment(DateTimeMoment):
                     return False
         return True
 
-    def get(self, component: CivilTimeComponent) -> int | None:
+    def get(self, component: CivilTimeComponent | str) -> int | None:
+        if isinstance(component, str):
+            try:
+                component = CivilTimeComponent(component)
+            except ValueError:
+                return None
         if component in self._known_values:
             return self._known_values[component]
         if component in self._implied_values:
             return self._implied_values[component]
         return None
 
-    def is_certain(self, component: CivilTimeComponent) -> bool:
+    def is_certain(self, component: CivilTimeComponent | str) -> bool:
+        if isinstance(component, str):
+            try:
+                component = CivilTimeComponent(component)
+            except ValueError:
+                return False
         return component in self._known_values
 
     def list(self, only_certain: bool = True) -> list[CivilTimeComponent]:
@@ -247,13 +257,17 @@ class ParsingCivilTimeMoment(CivilTimeMoment):
             precision=super().precision()
         )
 
-    def assign(self, component: CivilTimeComponent, value: int) -> 'ParsingCivilTimeMoment':
+    def assign(self, component: CivilTimeComponent | str, value: int) -> 'ParsingCivilTimeMoment':
+        if isinstance(component, str):
+            component = CivilTimeComponent(component)
         if component in self._implied_values:
             del self._implied_values[component]
         self._known_values[component] = value
         return self
 
-    def imply(self, component: CivilTimeComponent, value: int) -> 'ParsingCivilTimeMoment':
+    def imply(self, component: CivilTimeComponent | str, value: int) -> 'ParsingCivilTimeMoment':
+        if isinstance(component, str):
+            component = CivilTimeComponent(component)
         if component not in self._known_values:
             self._implied_values[component] = value
         return self

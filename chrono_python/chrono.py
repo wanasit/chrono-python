@@ -104,6 +104,6 @@ class Chrono:
                 result = context.create_parsed_result(match.start(), match.end(), result)
 
             logger.info(f'{parser.__class__.__name__} extracted (at index {result.index}): "{result.text}"')
-            offset += result.index + len(result.text)
+            offset = result.index + len(result.text)
             results.append(result)
         return results

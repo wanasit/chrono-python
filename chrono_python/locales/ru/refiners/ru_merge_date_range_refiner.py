@@ -1,0 +1,7 @@
+import re
+from chrono_python.common.refiners.abstract_merge_date_range_refiner import AbstractMergeDateRangeRefiner
+
+
+class RUMergeDateRangeRefiner(AbstractMergeDateRangeRefiner):
+    def pattern_between(self) -> re.Pattern:
+        return re.compile(r"^\s*(и до|и по|до|по|-)\s*$", re.IGNORECASE)
