@@ -9,13 +9,13 @@ This document provides a guide for AI agents working on `chrono-python` to quick
 
 ## Technical Stack & Setup
 - **Language**: Python (requires version `^3.12` or newer)
-- **Dependency Manager**: [Poetry](https://python-poetry.org/)
+- **Dependency Manager**: [uv](https://docs.astral.sh/uv/)
 - **Testing Framework**: `pytest`
 
 ### Running Tests
 To run the full test suite, execute:
 ```bash
-poetry run pytest
+uv run pytest
 ```
 *Note: Test logging is configured to `DEBUG` level via `pytest.ini`.*
 
@@ -117,7 +117,7 @@ Follow the existing commit message format conventions:
 
 To ensure secure, auditable, and standard operations:
 - **Network Requests**: Do not run casual python commands to execute network calls (e.g. `python3 -c "import urllib..."`). Instead, use standard tools like `curl -L -k` or `wget`.
-- **Code Execution**: Do not run temporary python code snippets locally to check outputs or verify states. Modify the workspace code directly and use the proper verification tools (e.g. `poetry run pytest`).
+- **Code Execution**: Do not run temporary python code snippets locally to check outputs or verify states. Modify the workspace code directly and use the proper verification tools (e.g. `uv run pytest`).
 
 
 

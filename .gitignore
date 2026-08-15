@@ -10,5 +10,6 @@ reports/
 *.egg-info
 .pypirc
 env
+.venv
 .vscode
 .pytest_cache
